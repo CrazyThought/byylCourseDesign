@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>词法分析器生成器</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tabRegex">
+       <attribute name="title">
+        <string>正则表达式</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QTextEdit" name="textEditRegex"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="btnOpenRegex">
+            <property name="text">
+             <string>打开</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnSaveRegex">
+            <property name="text">
+             <string>保存</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnParseRegex">
+            <property name="text">
+             <string>解析正则表达式</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabNFA">
+       <attribute name="title">
+        <string>NFA</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTableWidget" name="tableNFA">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>状态</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>输入字符</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>目标状态</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnGenerateNFA">
+          <property name="text">
+           <string>生成NFA</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabDFA">
+       <attribute name="title">
+        <string>DFA</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTableWidget" name="tableDFA">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>状态集合</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>输入字符</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>目标状态集合</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnGenerateDFA">
+          <property name="text">
+           <string>生成DFA</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabMinDFA">
+       <attribute name="title">
+        <string>最小化DFA</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QTableWidget" name="tableMinDFA">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <column>
+           <property name="text">
+            <string>状态</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>输入字符</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>目标状态</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnMinimizeDFA">
+          <property name="text">
+           <string>最小化DFA</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabLexer">
+       <attribute name="title">
+        <string>词法分析器</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QTextEdit" name="textEditLexerCode"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="btnGenerateLexer">
+            <property name="text">
+             <string>生成词法分析器</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnSaveLexer">
+            <property name="text">
+             <string>保存为.cpp</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabTest">
+       <attribute name="title">
+        <string>测试</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QTextEdit" name="textEditTestInput">
+            <property name="maximumSize">
+             <size>
+              <width>400</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="tableTestOutput">
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+            <column>
+             <property name="text">
+              <string>行号</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>单词</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>编码</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QPushButton" name="btnOpenTestFile">
+            <property name="text">
+             <string>打开测试文件</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnRunLexer">
+            <property name="text">
+             <string>运行词法分析</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnSaveTestOutput">
+            <property name="text">
+             <string>保存结果</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="actionOpenRegex"/>
+    <addaction name="actionSaveRegex"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpenRegex">
+   <property name="text">
+    <string>打开正则表达式</string>
+   </property>
+  </action>
+  <action name="actionSaveRegex">
+   <property name="text">
+    <string>保存正则表达式</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
