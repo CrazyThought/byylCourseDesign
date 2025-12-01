@@ -48,6 +48,7 @@ private:
 private:
     QList<RegexItem> m_regexItems;
     QString m_errorMessage;
+    QMap<QString, QString> m_regexReferences; // 保存正则表达式引用，如digit=[0-9]
 };
 
 #endif // REGEXPROCESSOR_H

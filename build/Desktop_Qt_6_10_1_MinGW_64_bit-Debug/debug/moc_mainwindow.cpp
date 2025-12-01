@@ -53,7 +53,9 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         "on_btnSaveLexer_clicked",
         "on_btnOpenTestFile_clicked",
         "on_btnRunLexer_clicked",
-        "on_btnSaveTestOutput_clicked"
+        "on_btnSaveTestOutput_clicked",
+        "on_comboBoxRegex_currentIndexChanged",
+        "arg1"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -85,6 +87,10 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         QtMocHelpers::SlotData<void()>(14, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'on_btnSaveTestOutput_clicked'
         QtMocHelpers::SlotData<void()>(15, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'on_comboBoxRegex_currentIndexChanged'
+        QtMocHelpers::SlotData<void(const QString &)>(16, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::QString, 17 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -122,10 +128,10 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 11: _t->on_btnOpenTestFile_clicked(); break;
         case 12: _t->on_btnRunLexer_clicked(); break;
         case 13: _t->on_btnSaveTestOutput_clicked(); break;
+        case 14: _t->on_comboBoxRegex_currentIndexChanged((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
         default: ;
         }
     }
-    (void)_a;
 }
 
 const QMetaObject *MainWindow::metaObject() const
@@ -147,14 +153,14 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 15;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 15)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 14;
+        _id -= 15;
     }
     return _id;
 }

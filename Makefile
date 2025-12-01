@@ -286,7 +286,6 @@ Makefile: byylCD.pro E:/Qt/6.10.1/mingw_64/mkspecs/win32-g++/qmake.conf E:/Qt/6.
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/resolve_config.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/exclusive_builds_post.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/default_post.prf \
-		E:/Qt/6.10.1/mingw_64/mkspecs/features/win32/console.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/precompile_header.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/warn_on.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/permissions.prf \
@@ -298,6 +297,7 @@ Makefile: byylCD.pro E:/Qt/6.10.1/mingw_64/mkspecs/win32-g++/qmake.conf E:/Qt/6.
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/uic.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/qmake_use.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/file_copies.prf \
+		E:/Qt/6.10.1/mingw_64/mkspecs/features/win32/windows.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/testcase_targets.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/exceptions.prf \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/yacc.prf \
@@ -306,6 +306,7 @@ Makefile: byylCD.pro E:/Qt/6.10.1/mingw_64/mkspecs/win32-g++/qmake.conf E:/Qt/6.
 		E:/Qt/6.10.1/mingw_64/lib/Qt6Widgets.prl \
 		E:/Qt/6.10.1/mingw_64/lib/Qt6Gui.prl \
 		E:/Qt/6.10.1/mingw_64/lib/Qt6Core.prl \
+		E:/Qt/6.10.1/mingw_64/lib/Qt6EntryPoint.prl \
 		E:/Qt/6.10.1/mingw_64/mkspecs/features/build_pass.prf
 	$(QMAKE) -o Makefile byylCD.pro
 E:/Qt/6.10.1/mingw_64/mkspecs/features/spec_pre.prf:
@@ -524,7 +525,6 @@ E:/Qt/6.10.1/mingw_64/mkspecs/features/win32/default_pre.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/resolve_config.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/exclusive_builds_post.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/default_post.prf:
-E:/Qt/6.10.1/mingw_64/mkspecs/features/win32/console.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/precompile_header.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/warn_on.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/permissions.prf:
@@ -536,6 +536,7 @@ E:/Qt/6.10.1/mingw_64/mkspecs/features/win32/opengl.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/uic.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/qmake_use.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/file_copies.prf:
+E:/Qt/6.10.1/mingw_64/mkspecs/features/win32/windows.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/testcase_targets.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/exceptions.prf:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/yacc.prf:
@@ -544,6 +545,7 @@ byylCD.pro:
 E:/Qt/6.10.1/mingw_64/lib/Qt6Widgets.prl:
 E:/Qt/6.10.1/mingw_64/lib/Qt6Gui.prl:
 E:/Qt/6.10.1/mingw_64/lib/Qt6Core.prl:
+E:/Qt/6.10.1/mingw_64/lib/Qt6EntryPoint.prl:
 E:/Qt/6.10.1/mingw_64/mkspecs/features/build_pass.prf:
 qmake: FORCE
 	@$(QMAKE) -o Makefile byylCD.pro

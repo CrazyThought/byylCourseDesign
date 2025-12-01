@@ -57,10 +57,21 @@ private:
     DFAMinimizer m_dfaMinimizer; // DFA最小化器
     LexerGenerator m_lexerGenerator; // 词法分析器生成器
     LexerTester m_lexerTester; // 词法分析器测试器
-    NFA m_currentNFA; // 当前NFA
-    DFA m_currentDFA; // 当前DFA
-    DFA m_currentMinimizedDFA; // 当前最小化DFA
+    
+    // 多个NFA和DFA的管理
     QList<RegexItem> m_currentRegexItems; // 当前正则表达式列表
+    QMap<QString, NFA> m_nfaMap; // 存储所有NFA，键为正则表达式名称
+    QMap<QString, DFA> m_dfaMap; // 存储所有DFA，键为正则表达式名称
+    QMap<QString, DFA> m_minimizedDfaMap; // 存储所有最小化DFA，键为正则表达式名称
+    
+    // 总表
+    NFA m_totalNFA; // 合并后的总NFA
+    DFA m_totalDFA; // 合并后的总DFA
+    DFA m_totalMinimizedDFA; // 合并后的总最小化DFA
+    
+    QString m_currentRegexName; // 当前选中的正则表达式名称
+    bool m_isTotalView; // 是否显示总表
+    
     QList<LexicalResult> m_currentLexicalResults; // 当前词法分析结果
     
     // 辅助函数
@@ -71,5 +82,14 @@ private:
     void displayDFA(const DFA &dfa); // 显示DFA到表格
     void displayMinimizedDFA(const DFA &dfa); // 显示最小化DFA到表格
     void displayLexicalResults(const QList<LexicalResult> &results); // 显示词法分析结果
+    void updateRegexComboBox(); // 更新正则表达式下拉列表
+    void updateNFADisplay(); // 更新NFA显示
+    void updateDFADisplay(); // 更新DFA显示
+    void updateMinimizedDFADisplay(); // 更新最小化DFA显示
+    NFA mergeNFAs(const QList<NFA> &nfAs); // 合并多个NFA
+    
+private slots:
+    // 新增：正则表达式选择切换
+    void on_comboBoxRegex_currentIndexChanged(const QString &arg1);
 };
 #endif // MAINWINDOW_H

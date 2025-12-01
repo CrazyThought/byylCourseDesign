@@ -12,8 +12,10 @@
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -47,6 +49,10 @@ public:
     QPushButton *btnParseRegex;
     QWidget *tabNFA;
     QVBoxLayout *verticalLayout_3;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *label;
+    QComboBox *comboBoxRegex;
+    QSpacerItem *horizontalSpacer_2;
     QTableWidget *tableNFA;
     QPushButton *btnGenerateNFA;
     QWidget *tabDFA;
@@ -131,6 +137,26 @@ public:
         tabNFA->setObjectName("tabNFA");
         verticalLayout_3 = new QVBoxLayout(tabNFA);
         verticalLayout_3->setObjectName("verticalLayout_3");
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
+        label = new QLabel(tabNFA);
+        label->setObjectName("label");
+
+        horizontalLayout_5->addWidget(label);
+
+        comboBoxRegex = new QComboBox(tabNFA);
+        comboBoxRegex->setObjectName("comboBoxRegex");
+        comboBoxRegex->setMinimumSize(QSize(200, 0));
+
+        horizontalLayout_5->addWidget(comboBoxRegex);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_5->addItem(horizontalSpacer_2);
+
+
+        verticalLayout_3->addLayout(horizontalLayout_5);
+
         tableNFA = new QTableWidget(tabNFA);
         if (tableNFA->columnCount() < 3)
             tableNFA->setColumnCount(3);
@@ -296,7 +322,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -312,6 +338,7 @@ public:
         btnSaveRegex->setText(QCoreApplication::translate("MainWindow", "\344\277\235\345\255\230", nullptr));
         btnParseRegex->setText(QCoreApplication::translate("MainWindow", "\350\247\243\346\236\220\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabRegex), QCoreApplication::translate("MainWindow", "\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
         QTableWidgetItem *___qtablewidgetitem = tableNFA->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = tableNFA->horizontalHeaderItem(1);

@@ -1,0 +1,82 @@
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\mainwindow.cpp:186: error: no matching function for call to 'QList<int>::insert(int)'
+..\..\src\mainwindow.cpp: In member function 'NFA MainWindow::mergeNFAs(const QList<NFA>&)':
+..\..\src\mainwindow.cpp:186:35: error: no matching function for call to 'QList<int>::insert(int)'
+  186 |             totalNFA.states.insert(state + stateOffset);
+      |             ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+
+E:\Qt\6.10.1\mingw_64\include\QtCore\qobject.h:13: In file included from E:/Qt/6.10.1/mingw_64/include/QtCore/qobject.h:13,
+In file included from E:/Qt/6.10.1/mingw_64/include/QtCore/qobject.h:13,
+                 from E:/Qt/6.10.1/mingw_64/include/QtWidgets/qwidget.h:10,
+                 from E:/Qt/6.10.1/mingw_64/include/QtWidgets/qmainwindow.h:9,
+                 from E:/Qt/6.10.1/mingw_64/include/QtWidgets/QMainWindow:1,
+                 from ../../include/mainwindow.h:4,
+                 from ..\..\src\mainwindow.cpp:1:
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:543:14: note: candidate: 'QList<T>::iterator QList<T>::insert(qsizetype, parameter_type) [with T = int; qsizetype = long long int; parameter_type = int]'
+  543 |     iterator insert(qsizetype i, parameter_type t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:543:14: note:   candidate expects 2 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:921:1: note: candidate: 'QList<T>::iterator QList<T>::insert(qsizetype, qsizetype, parameter_type) [with T = int; qsizetype = long long int; parameter_type = int]'
+  921 | QList<T>::insert(qsizetype i, qsizetype n, parameter_type t)
+      | ^~~~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:921:1: note:   candidate expects 3 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:546:14: note: candidate: 'QList<T>::iterator QList<T>::insert(const_iterator, parameter_type) [with T = int; parameter_type = int]'
+  546 |     iterator insert(const_iterator before, parameter_type t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:546:14: note:   candidate expects 2 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:551:14: note: candidate: 'QList<T>::iterator QList<T>::insert(const_iterator, qsizetype, parameter_type) [with T = int; qsizetype = long long int; parameter_type = int]'
+  551 |     iterator insert(const_iterator before, qsizetype n, parameter_type t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:551:14: note:   candidate expects 3 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:556:14: note: candidate: 'QList<T>::iterator QList<T>::insert(const_iterator, rvalue_ref) [with T = int; rvalue_ref = QList<int>::DisableRValueRefs]'
+  556 |     iterator insert(const_iterator before, rvalue_ref t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:556:14: note:   candidate expects 2 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:561:14: note: candidate: 'QList<T>::iterator QList<T>::insert(qsizetype, rvalue_ref) [with T = int; qsizetype = long long int; rvalue_ref = QList<int>::DisableRValueRefs]'
+  561 |     iterator insert(qsizetype i, rvalue_ref t) {
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:561:14: note:   candidate expects 2 arguments, 1 provided
+
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\mainwindow.cpp:213: error: no matching function for call to 'QList<int>::insert(NFAState&)'
+..\..\src\mainwindow.cpp:213:27: error: no matching function for call to 'QList<int>::insert(NFAState&)'
+  213 |     totalNFA.states.insert(totalStartState);
+      |     ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:543:14: note: candidate: 'QList<T>::iterator QList<T>::insert(qsizetype, parameter_type) [with T = int; qsizetype = long long int; parameter_type = int]'
+  543 |     iterator insert(qsizetype i, parameter_type t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:543:14: note:   candidate expects 2 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:921:1: note: candidate: 'QList<T>::iterator QList<T>::insert(qsizetype, qsizetype, parameter_type) [with T = int; qsizetype = long long int; parameter_type = int]'
+  921 | QList<T>::insert(qsizetype i, qsizetype n, parameter_type t)
+      | ^~~~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:921:1: note:   candidate expects 3 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:546:14: note: candidate: 'QList<T>::iterator QList<T>::insert(const_iterator, parameter_type) [with T = int; parameter_type = int]'
+  546 |     iterator insert(const_iterator before, parameter_type t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:546:14: note:   candidate expects 2 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:551:14: note: candidate: 'QList<T>::iterator QList<T>::insert(const_iterator, qsizetype, parameter_type) [with T = int; qsizetype = long long int; parameter_type = int]'
+  551 |     iterator insert(const_iterator before, qsizetype n, parameter_type t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:551:14: note:   candidate expects 3 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:556:14: note: candidate: 'QList<T>::iterator QList<T>::insert(const_iterator, rvalue_ref) [with T = int; rvalue_ref = QList<int>::DisableRValueRefs]'
+  556 |     iterator insert(const_iterator before, rvalue_ref t)
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:556:14: note:   candidate expects 2 arguments, 1 provided
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:561:14: note: candidate: 'QList<T>::iterator QList<T>::insert(qsizetype, rvalue_ref) [with T = int; qsizetype = long long int; rvalue_ref = QList<int>::DisableRValueRefs]'
+  561 |     iterator insert(qsizetype i, rvalue_ref t) {
+      |              ^~~~~~
+E:/Qt/6.10.1/mingw_64/include/QtCore/qlist.h:561:14: note:   candidate expects 2 arguments, 1 provided
+
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\mainwindow.cpp:482: error: 'const class QList<int>' has no member named 'values'; did you mean 'value'?
+..\..\src\mainwindow.cpp: In member function 'void MainWindow::displayNFA(const NFA&)':
+..\..\src\mainwindow.cpp:482:44: error: 'const class QList<int>' has no member named 'values'; did you mean 'value'?
+  482 |     QList<NFAState> allStates = nfa.states.values();
+      |                                            ^~~~~~
+      |                                            value
+
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\mainwindow.cpp:547: error: 'const class QList<int>' has no member named 'values'; did you mean 'value'?
+..\..\src\mainwindow.cpp: In member function 'void MainWindow::displayDFA(const DFA&)':
+..\..\src\mainwindow.cpp:547:44: error: 'const class QList<int>' has no member named 'values'; did you mean 'value'?
+  547 |     QList<DFAState> allStates = dfa.states.values();
+      |                                            ^~~~~~
+      |                                            value
+
+:-1: error: [Makefile.Debug:1466: debug/mainwindow.o] Error 1

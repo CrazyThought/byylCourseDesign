@@ -15,9 +15,49 @@ bool RegexProcessor::parse(const QString &text)
 {
     m_regexItems.clear();
     m_errorMessage.clear();
+    m_regexReferences.clear();
 
-    QStringList lines = text.split(QRegularExpression("[\\r\\n]"), Qt::SkipEmptyParts);
+    QStringList lines = text.split(QRegularExpression("[\\r\\n]"));
+    int actualLineNumber = 0;
+    
+    // 第一次遍历：收集所有引用定义
     for (int i = 0; i < lines.size(); ++i) {
+        actualLineNumber++;
+        QString line = lines[i].trimmed();
+        if (line.isEmpty() || line.startsWith("//")) {
+            continue; // 跳过空行和注释行
+        }
+
+        // 寻找等号位置
+        int equalsPos = line.indexOf('=');
+        if (equalsPos == -1) {
+            continue; // 跳过无效行
+        }
+
+        // 提取名称
+        QString name = line.left(equalsPos).trimmed();
+        if (name.isEmpty()) {
+            continue; // 跳过无效行
+        }
+
+        // 提取模式
+        QString pattern = line.mid(equalsPos + 1).trimmed();
+        if (pattern.isEmpty()) {
+            continue; // 跳过无效行
+        }
+
+        // 如果不是以下划线开头，说明是引用定义
+        if (!name.startsWith('_')) {
+            // 处理转义字符
+            QString processedPattern = processEscapeCharacters(pattern);
+            m_regexReferences[name] = processedPattern;
+        }
+    }
+    
+    // 第二次遍历：解析正则表达式项
+    actualLineNumber = 0;
+    for (int i = 0; i < lines.size(); ++i) {
+        actualLineNumber++;
         QString line = lines[i].trimmed();
         if (line.isEmpty() || line.startsWith("//")) {
             continue; // 跳过空行和注释行
@@ -26,7 +66,7 @@ bool RegexProcessor::parse(const QString &text)
         RegexItem item;
         if (!parseLine(line, item)) {
             m_errorMessage = QString("第 %1 行解析错误: %2")
-                             .arg(i + 1).arg(m_errorMessage);
+                             .arg(actualLineNumber).arg(m_errorMessage);
             return false;
         }
         m_regexItems.append(item);
@@ -78,11 +118,6 @@ bool RegexProcessor::parseLine(const QString &line, RegexItem &item)
     // 处理转义字符
     QString processedPattern = processEscapeCharacters(pattern);
 
-    // 检查正则表达式语法
-    if (!checkRegexSyntax(processedPattern)) {
-        return false;
-    }
-
     // 转换为标准正则表达式格式
     QString standardPattern = convertToStandardRegex(processedPattern);
 
@@ -97,30 +132,32 @@ bool RegexProcessor::parseLine(const QString &line, RegexItem &item)
 
 bool RegexProcessor::validateName(const QString &name, int &code, bool &isMultiWord)
 {
-    // 检查名称是否以下划线开头
-    if (!name.startsWith('_')) {
-        m_errorMessage = "正则表达式名称必须以下划线开头";
-        return false;
-    }
+    // 只有以下划线开头的正则表达式才需要验证命名规则
+    if (name.startsWith('_')) {
+        // 检查名称格式：_xxx123 或 _xxx123S
+        // 简化正则表达式，确保能正确匹配_num100这样的名称
+        QRegularExpression nameRegex("^_([a-zA-Z0-9_]+)(\\d+)(S?)$");
+        QRegularExpressionMatch match = nameRegex.match(name);
+        if (!match.hasMatch()) {
+            m_errorMessage = "正则表达式名称格式错误，应为 _名称编码 或 _名称编码S";
+            return false;
+        }
 
-    // 检查名称格式：_xxx123 或 _xxx123S
-    QRegularExpression nameRegex("^_([a-zA-Z_][a-zA-Z0-9_]*)(\\d+)(S?)$");
-    QRegularExpressionMatch match = nameRegex.match(name);
-    if (!match.hasMatch()) {
-        m_errorMessage = "正则表达式名称格式错误，应为 _名称编码 或 _名称编码S";
-        return false;
-    }
+        // 提取编码
+        QString codeStr = match.captured(2);
+        code = codeStr.toInt();
+        if (code < 0) {
+            m_errorMessage = "单词编码必须为正整数";
+            return false;
+        }
 
-    // 提取编码
-    QString codeStr = match.captured(2);
-    code = codeStr.toInt();
-    if (code <= 0) {
-        m_errorMessage = "单词编码必须为正整数";
-        return false;
+        // 检查是否为多单词
+        isMultiWord = match.captured(3) == "S";
+    } else {
+        // 对于非下划线开头的正则表达式，设置默认值
+        code = 0;
+        isMultiWord = false;
     }
-
-    // 检查是否为多单词
-    isMultiWord = match.captured(3) == "S";
 
     return true;
 }
@@ -133,12 +170,14 @@ QString RegexProcessor::processEscapeCharacters(const QString &pattern)
     // Escape special characters: +, *, ?, |, (, ), [, ], {, }, ., ^, $
     QList<QChar> specialChars;
     specialChars << '+' << '*' << '?' << '|' << '(' << ')' << '[' << ']' << '{' << '}' << '.' << '^' << '$' << '\\';    
+    
+    // Iterate through the string and process escape characters
     for (int i = 0; i < result.length(); ++i) {
         QChar c = result.at(i);
         if (c == '\\' && i < result.length() - 1) {
             QChar nextC = result.at(i + 1);
             if (specialChars.contains(nextC)) {
-                // Keep escape character
+                // Keep escape character for special characters
                 i++; // Skip next character
             } else {
                 // Remove unnecessary escape
@@ -173,61 +212,19 @@ QString RegexProcessor::convertToStandardRegex(const QString &pattern)
 {
     QString result = pattern;
     
-    // 转换自定义语法为标准正则表达式语法
-    
-    // 处理字符集：[a-z] 已经是标准格式
-    
-    // 处理连接操作：在需要的地方添加隐式连接
-    // 例如：ab -> a(?>b)
-    QString temp = "";
-    for (int i = 0; i < result.length(); ++i) {
-        temp += result.at(i);
-        if (i < result.length() - 1) {
-            QChar current = result.at(i);
-            QChar next = result.at(i + 1);
-            
-            // 需要添加连接的情况：
-            // 1. 当前字符是普通字符、字符集结束或闭包操作，下一个字符是普通字符、字符集开始或左括号
-            bool needConcat = false;
-            
-            // 当前字符是普通字符或字符集结束
-            bool currentIsEnd = (current != '(' && current != '|' && current != '\\');
-            if (current == ']' || current == '*' || current == '+' || current == '?') {
-                currentIsEnd = true;
-            }
-            
-            // 下一个字符是普通字符或字符集开始
-            bool nextIsStart = (next != ')' && next != '|' && next != '*' && next != '+' && next != '?');
-            if (next == '[' || next == '(') {
-                nextIsStart = true;
-            }
-            
-            if (currentIsEnd && nextIsStart) {
-                temp += "(?>";
-                int j = i + 1;
-                // 找到需要连接的部分的结束位置
-                int parenCount = 0;
-                int bracketCount = 0;
-                while (j < result.length()) {
-                    QChar c = result.at(j);
-                    if (c == '(') parenCount++;
-                    else if (c == ')') {
-                        if (parenCount == 0) break;
-                        parenCount--;
-                    } else if (c == '[') bracketCount++;
-                    else if (c == ']') bracketCount--;
-                    else if ((c == '|' || c == '*' || c == '+' || c == '?') && parenCount == 0 && bracketCount == 0) {
-                        break;
-                    }
-                    j++;
-                }
-                temp += result.mid(i + 1, j - i - 1);
-                temp += ")";
-                i = j - 1;
-            }
-        }
+    // 替换引用，如 digit 替换为 [0-9]，letter 替换为 [A-Za-z]
+    // 遍历所有引用
+    for (auto it = m_regexReferences.constBegin(); it != m_regexReferences.constEnd(); ++it) {
+        const QString &name = it.key();
+        const QString &refPattern = it.value();
+        
+        // 构建正则表达式：匹配引用名称，确保不是其他单词的一部分
+        // 使用 \b 作为单词边界
+        QRegularExpression refRegex(QString("\\b%1\\b").arg(name));
+        
+        // 替换所有匹配的引用
+        result.replace(refRegex, refPattern);
     }
-    result = temp;
     
     return result;
 }

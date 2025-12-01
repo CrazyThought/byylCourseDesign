@@ -12,8 +12,10 @@
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -47,14 +49,29 @@ public:
     QPushButton *btnParseRegex;
     QWidget *tabNFA;
     QVBoxLayout *verticalLayout_3;
+    QLabel *labelNFATitle;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *label;
+    QComboBox *comboBoxRegex;
+    QSpacerItem *horizontalSpacer_2;
     QTableWidget *tableNFA;
     QPushButton *btnGenerateNFA;
     QWidget *tabDFA;
     QVBoxLayout *verticalLayout_4;
+    QLabel *labelDFATitle;
+    QHBoxLayout *horizontalLayout_6;
+    QLabel *label_2;
+    QComboBox *comboBoxRegex_2;
+    QSpacerItem *horizontalSpacer_3;
     QTableWidget *tableDFA;
     QPushButton *btnGenerateDFA;
     QWidget *tabMinDFA;
     QVBoxLayout *verticalLayout_5;
+    QLabel *labelMinDFATitle;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label_3;
+    QComboBox *comboBoxRegex_3;
+    QSpacerItem *horizontalSpacer_4;
     QTableWidget *tableMinDFA;
     QPushButton *btnMinimizeDFA;
     QWidget *tabLexer;
@@ -131,6 +148,35 @@ public:
         tabNFA->setObjectName("tabNFA");
         verticalLayout_3 = new QVBoxLayout(tabNFA);
         verticalLayout_3->setObjectName("verticalLayout_3");
+        labelNFATitle = new QLabel(tabNFA);
+        labelNFATitle->setObjectName("labelNFATitle");
+        QFont font;
+        font.setPointSize(12);
+        font.setBold(true);
+        labelNFATitle->setFont(font);
+
+        verticalLayout_3->addWidget(labelNFATitle);
+
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
+        label = new QLabel(tabNFA);
+        label->setObjectName("label");
+
+        horizontalLayout_5->addWidget(label);
+
+        comboBoxRegex = new QComboBox(tabNFA);
+        comboBoxRegex->setObjectName("comboBoxRegex");
+        comboBoxRegex->setMinimumSize(QSize(200, 0));
+
+        horizontalLayout_5->addWidget(comboBoxRegex);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_5->addItem(horizontalSpacer_2);
+
+
+        verticalLayout_3->addLayout(horizontalLayout_5);
+
         tableNFA = new QTableWidget(tabNFA);
         if (tableNFA->columnCount() < 3)
             tableNFA->setColumnCount(3);
@@ -155,6 +201,32 @@ public:
         tabDFA->setObjectName("tabDFA");
         verticalLayout_4 = new QVBoxLayout(tabDFA);
         verticalLayout_4->setObjectName("verticalLayout_4");
+        labelDFATitle = new QLabel(tabDFA);
+        labelDFATitle->setObjectName("labelDFATitle");
+        labelDFATitle->setFont(font);
+
+        verticalLayout_4->addWidget(labelDFATitle);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setObjectName("horizontalLayout_6");
+        label_2 = new QLabel(tabDFA);
+        label_2->setObjectName("label_2");
+
+        horizontalLayout_6->addWidget(label_2);
+
+        comboBoxRegex_2 = new QComboBox(tabDFA);
+        comboBoxRegex_2->setObjectName("comboBoxRegex_2");
+        comboBoxRegex_2->setMinimumSize(QSize(200, 0));
+
+        horizontalLayout_6->addWidget(comboBoxRegex_2);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer_3);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_6);
+
         tableDFA = new QTableWidget(tabDFA);
         if (tableDFA->columnCount() < 3)
             tableDFA->setColumnCount(3);
@@ -179,6 +251,32 @@ public:
         tabMinDFA->setObjectName("tabMinDFA");
         verticalLayout_5 = new QVBoxLayout(tabMinDFA);
         verticalLayout_5->setObjectName("verticalLayout_5");
+        labelMinDFATitle = new QLabel(tabMinDFA);
+        labelMinDFATitle->setObjectName("labelMinDFATitle");
+        labelMinDFATitle->setFont(font);
+
+        verticalLayout_5->addWidget(labelMinDFATitle);
+
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName("horizontalLayout_7");
+        label_3 = new QLabel(tabMinDFA);
+        label_3->setObjectName("label_3");
+
+        horizontalLayout_7->addWidget(label_3);
+
+        comboBoxRegex_3 = new QComboBox(tabMinDFA);
+        comboBoxRegex_3->setObjectName("comboBoxRegex_3");
+        comboBoxRegex_3->setMinimumSize(QSize(200, 0));
+
+        horizontalLayout_7->addWidget(comboBoxRegex_3);
+
+        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_7->addItem(horizontalSpacer_4);
+
+
+        verticalLayout_5->addLayout(horizontalLayout_7);
+
         tableMinDFA = new QTableWidget(tabMinDFA);
         if (tableMinDFA->columnCount() < 3)
             tableMinDFA->setColumnCount(3);
@@ -312,6 +410,8 @@ public:
         btnSaveRegex->setText(QCoreApplication::translate("MainWindow", "\344\277\235\345\255\230", nullptr));
         btnParseRegex->setText(QCoreApplication::translate("MainWindow", "\350\247\243\346\236\220\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabRegex), QCoreApplication::translate("MainWindow", "\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217", nullptr));
+        labelNFATitle->setText(QCoreApplication::translate("MainWindow", "NFA \345\233\276\357\274\232\346\200\273\350\241\250", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
         QTableWidgetItem *___qtablewidgetitem = tableNFA->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = tableNFA->horizontalHeaderItem(1);
@@ -320,6 +420,8 @@ public:
         ___qtablewidgetitem2->setText(QCoreApplication::translate("MainWindow", "\347\233\256\346\240\207\347\212\266\346\200\201", nullptr));
         btnGenerateNFA->setText(QCoreApplication::translate("MainWindow", "\347\224\237\346\210\220NFA", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabNFA), QCoreApplication::translate("MainWindow", "NFA", nullptr));
+        labelDFATitle->setText(QCoreApplication::translate("MainWindow", "DFA \345\233\276\357\274\232\346\200\273\350\241\250", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
         QTableWidgetItem *___qtablewidgetitem3 = tableDFA->horizontalHeaderItem(0);
         ___qtablewidgetitem3->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201\351\233\206\345\220\210", nullptr));
         QTableWidgetItem *___qtablewidgetitem4 = tableDFA->horizontalHeaderItem(1);
@@ -328,6 +430,8 @@ public:
         ___qtablewidgetitem5->setText(QCoreApplication::translate("MainWindow", "\347\233\256\346\240\207\347\212\266\346\200\201\351\233\206\345\220\210", nullptr));
         btnGenerateDFA->setText(QCoreApplication::translate("MainWindow", "\347\224\237\346\210\220DFA", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabDFA), QCoreApplication::translate("MainWindow", "DFA", nullptr));
+        labelMinDFATitle->setText(QCoreApplication::translate("MainWindow", "\346\234\200\345\260\217\345\214\226 DFA \345\233\276\357\274\232\346\200\273\350\241\250", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
         QTableWidgetItem *___qtablewidgetitem6 = tableMinDFA->horizontalHeaderItem(0);
         ___qtablewidgetitem6->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201", nullptr));
         QTableWidgetItem *___qtablewidgetitem7 = tableMinDFA->horizontalHeaderItem(1);
