@@ -220,7 +220,7 @@ NFA MainWindow::mergeNFAs(const QList<NFA> &nfAs)
     // 收集所有NFA的起始状态（偏移后）
     QList<NFAState> allStartStates;
     
-    // 合并所有NFA的状态、转移和接受状态
+    // 合并所有NFA的状态、转移、接受状态和字母表
     for (const NFA &nfa : nfAs) {
         // 处理状态
         for (const NFAState &state : nfa.states) {
@@ -240,6 +240,9 @@ NFA MainWindow::mergeNFAs(const QList<NFA> &nfAs)
         for (const NFAState &acceptState : nfa.acceptStates) {
             totalNFA.acceptStates.insert(acceptState + stateOffset);
         }
+        
+        // 处理字母表 - 合并所有NFA的字母表
+        totalNFA.alphabet.unite(nfa.alphabet);
         
         // 记录偏移后的起始状态
         allStartStates.append(nfa.startState + stateOffset);
@@ -550,26 +553,17 @@ QMap<QString, QString> MainWindow::processRegexReferences(const QList<RegexItem>
         QString pattern = trimmedLine.mid(equalsPos + 1).trimmed();
         
         // 只处理不以下划线开头的名称
-        if (!name.startsWith('_')) {
-            // 处理字符集格式，如 [a-z] 或 [0-9] 或 [!@#$%^&*()]
-            if (pattern.startsWith('[') && pattern.endsWith(']')) {
-                // 提取字符集内容
-                QString charset = pattern.mid(1, pattern.length() - 2);
-                
-                // 处理范围格式，如 a-z, A-Z, 0-9
-                int dashPos = charset.indexOf('-');
-                if (dashPos > 0 && dashPos < charset.length() - 1) {
-                    char start = charset.at(dashPos - 1).toLatin1();
-                    char end = charset.at(dashPos + 1).toLatin1();
+            if (!name.startsWith('_')) {
+                // 处理字符集格式，如 [a-z] 或 [0-9] 或 [!@#$%^&*()]
+                if (pattern.startsWith('[') && pattern.endsWith(']')) {
+                    // 提取字符集内容
+                    QString charset = pattern.mid(1, pattern.length() - 2);
                     
-                    // 添加范围内的所有字符
-                    for (char c = start; c <= end; ++c) {
-                        charToRefMap[QString(c)] = name;
-                    }
-                } else {
-                    // 处理单个字符集，如 [abc] 或 [!@#$%^&*()]
-                    for (int i = 0; i < charset.length(); ++i) {
+                    // 使用循环处理字符集中的所有字符和范围
+                    int i = 0;
+                    while (i < charset.length()) {
                         QChar c = charset.at(i);
+                        
                         // 处理转义字符
                         if (c == '\\' && i < charset.length() - 1) {
                             // 下一个字符是转义字符
@@ -586,17 +580,29 @@ QMap<QString, QString> MainWindow::processRegexReferences(const QList<RegexItem>
                                 // 其他转义字符，如 \a, \b, \f, \v
                                 charToRefMap[nextC] = name;
                             }
-                            i++; // 跳过下一个字符
+                            i += 2; // 跳过转义字符和被转义的字符
+                        }
+                        // 处理范围格式，如 a-z, A-Z, 0-9
+                        else if (i + 2 < charset.length() && charset.at(i + 1) == '-') {
+                            char start = charset.at(i).toLatin1();
+                            char end = charset.at(i + 2).toLatin1();
+                            
+                            // 添加范围内的所有字符
+                            for (char c = start; c <= end; ++c) {
+                                charToRefMap[QString(c)] = name;
+                            }
+                            
+                            i += 3; // 跳过范围：start + '-' + end
                         } else {
-                            // 普通字符
-                            charToRefMap[c] = name;
+                            // 处理单个字符
+                            charToRefMap[QString(c)] = name;
+                            i += 1;
                         }
                     }
+                } else if (pattern.length() == 1) {
+                    // 处理单个字符
+                    charToRefMap[pattern] = name;
                 }
-            } else if (pattern.length() == 1) {
-                // 处理单个字符
-                charToRefMap[pattern] = name;
-            }
         }
     }
     

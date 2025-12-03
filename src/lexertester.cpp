@@ -24,7 +24,7 @@ bool LexerTester::compileLexer(const QString &lexerCode, const QString &outputFi
     }
     
     // 编译命令
-    QString command = QString("g++ %1 -o %2 -std=c++11").arg(sourceFileName, outputFileName);
+    QString command = QString("g++ %1 -o %2 `-std=c++11").arg(sourceFileName, outputFileName);
     
     // 执行编译命令
     QString output;

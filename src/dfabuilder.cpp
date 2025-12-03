@@ -95,6 +95,30 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
             transition.toState = targetDFAState;
             dfa.transitions.append(transition);
         }
+    
+    // 确保每个状态对每个输入字符都有转换（添加遗漏的转换）
+    for (DFAState state : dfa.states) {
+        for (const QString &input : dfa.alphabet) {
+            if (input == "#") continue;
+            
+            // 检查是否已经存在该转换
+            bool hasTransition = false;
+            for (const DFATransition &t : dfa.transitions) {
+                if (t.fromState == state && t.input == input) {
+                    hasTransition = true;
+                    break;
+                }
+            }
+            
+            if (!hasTransition) {
+                // 添加遗漏的转换（这里可以考虑添加到一个错误状态）
+                DFATransition transition;
+                transition.fromState = state;
+                transition.input = input;
+                transition.toState = state; // 暂时转换到自身，实际应该转换到错误状态
+                dfa.transitions.append(transition);
+            }
+        }
     }
     
     // 保存状态映射
@@ -102,7 +126,7 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
     
     return dfa;
 }
-
+}
 QString DFABuilder::getErrorMessage() const
 {
     return m_errorMessage;

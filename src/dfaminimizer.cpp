@@ -34,7 +34,11 @@ DFA DFAMinimizer::minimizeDFA(const DFA &dfa)
     DFA minimizedDFA;
     minimizedDFA.alphabet = dfa.alphabet;
     
-    // 设置新的起始状态
+    // 设置新的起始状态，添加边界检查
+    if (!stateMap.contains(dfa.startState)) {
+        m_errorMessage = QString("起始状态 %1 不在状态映射中").arg(dfa.startState);
+        return DFA();
+    }
     minimizedDFA.startState = stateMap[dfa.startState];
     
     // 设置新的状态集合
@@ -42,26 +46,54 @@ DFA DFAMinimizer::minimizeDFA(const DFA &dfa)
         minimizedDFA.states.append(i);
     }
     
-    // 设置新的接受状态集合
+    // 设置新的接受状态集合，添加边界检查
     for (DFAState state : dfa.acceptStates) {
-        minimizedDFA.acceptStates.insert(stateMap[state]);
+        if (stateMap.contains(state)) {
+            minimizedDFA.acceptStates.insert(stateMap[state]);
+        } else {
+            // 记录错误，但继续执行
+            m_errorMessage += QString("警告：接受状态 %1 不在状态映射中\n").arg(state);
+        }
     }
     
     // 构建新的转换表
     QSet<QString> processedTransitions;
     
-    for (const DFATransition &transition : dfa.transitions) {
-        DFAState from = stateMap[transition.fromState];
-        DFAState to = stateMap[transition.toState];
-        QString key = QString::number(from) + "|" + transition.input + "|" + QString::number(to);
+    // 遍历所有等价类和输入字符，确保生成所有必要的转换
+    for (int i = 0; i < partitions.size(); ++i) {
+        DFAState newState = i;
         
-        if (!processedTransitions.contains(key)) {
-            DFATransition newTransition;
-            newTransition.fromState = from;
-            newTransition.input = transition.input;
-            newTransition.toState = to;
-            minimizedDFA.transitions.append(newTransition);
-            processedTransitions.insert(key);
+        // 选择等价类中的一个代表状态
+        DFAState representative = *partitions[i].begin();
+        
+        // 为每个输入字符生成转换
+        for (const QString &input : dfa.alphabet) {
+            if (input == "#") continue;
+            
+            // 找到代表状态的原始转换
+            DFAState originalToState = -1;
+            for (const DFATransition &t : dfa.transitions) {
+                if (t.fromState == representative && t.input == input) {
+                    originalToState = t.toState;
+                    break;
+                }
+            }
+            
+            if (originalToState != -1) {
+                // 获取转换后的新状态
+                DFAState newToState = stateMap[originalToState];
+                
+                // 检查是否已经处理过该转换
+                QString key = QString::number(newState) + "|" + input + "|" + QString::number(newToState);
+                if (!processedTransitions.contains(key)) {
+                    DFATransition newTransition;
+                    newTransition.fromState = newState;
+                    newTransition.input = input;
+                    newTransition.toState = newToState;
+                    minimizedDFA.transitions.append(newTransition);
+                    processedTransitions.insert(key);
+                }
+            }
         }
     }
     
@@ -112,9 +144,10 @@ QList<QSet<DFAState>> DFAMinimizer::hopcroftAlgorithm(const DFA &dfa)
             
             if (X.isEmpty()) continue;
             
-            // 对P中的每个集合Y
-            QList<QSet<DFAState>> newP;
+            // 创建一个临时列表来存储新的划分
+            QList<QSet<DFAState>> tempP;
             
+            // 遍历当前P的副本，避免在循环中修改正在迭代的集合
             for (const QSet<DFAState> &Y : P) {
                 QSet<DFAState> Y1;
                 QSet<DFAState> Y2;
@@ -127,8 +160,8 @@ QList<QSet<DFAState>> DFAMinimizer::hopcroftAlgorithm(const DFA &dfa)
                 }
                 
                 if (!Y1.isEmpty() && !Y2.isEmpty()) {
-                    newP.append(Y1);
-                    newP.append(Y2);
+                    tempP.append(Y1);
+                    tempP.append(Y2);
                     
                     // 更新工作集合W
                     if (W.contains(Y)) {
@@ -143,11 +176,12 @@ QList<QSet<DFAState>> DFAMinimizer::hopcroftAlgorithm(const DFA &dfa)
                         }
                     }
                 } else {
-                    newP.append(Y);
+                    tempP.append(Y);
                 }
             }
             
-            P = newP;
+            // 使用临时列表更新P
+            P = tempP;
         }
     }
     
