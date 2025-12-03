@@ -1,5 +1,6 @@
 #include "lexergenerator.h"
 #include <QDebug>
+#include <QMap>
 
 LexerGenerator::LexerGenerator()
 {
@@ -13,18 +14,18 @@ QString LexerGenerator::generateLexer(const QList<RegexItem> &regexItems, const 
 {
     m_errorMessage.clear();
     m_regexItems = regexItems;
-    
+
     // 检查输入是否有效
     if (regexItems.isEmpty()) {
         m_errorMessage = "正则表达式列表为空";
         return "";
     }
-    
+
     if (minimizedDFA.states.isEmpty()) {
         m_errorMessage = "最小化DFA为空";
         return "";
     }
-    
+
     // 根据选择的方法生成词法分析器
     switch (method) {
     case GenerationMethod::DIRECT_MATCH:
@@ -45,15 +46,16 @@ QString LexerGenerator::getErrorMessage() const
 QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexItems, const DFA &/*minimizedDFA*/)
 {
     QString code;
-    
+
     // 生成头文件
     code += "#include <iostream>\n";
     code += "#include <fstream>\n";
     code += "#include <string>\n";
     code += "#include <regex>\n";
     code += "#include <vector>\n";
+    code += "#include <cctype>\n";
     code += "\n";
-    
+
     // 生成词法单元结构
     code += "struct Token {\n";
     code += "    int code;\n";
@@ -61,11 +63,11 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "    int line;\n";
     code += "};\n";
     code += "\n";
-    
+
     // 生成单词编码映射
     code += generateTokenCodeMap(regexItems);
     code += "\n";
-    
+
     // 生成词法分析函数
     code += "std::vector<Token> lexicalAnalysis(const std::string &source) {\n";
     code += "    std::vector<Token> tokens;\n";
@@ -85,10 +87,10 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "        int tokenCode = -1;\n";
     code += "        std::string matchedLexeme;\n";
     code += "\n";
-    
+
     // 生成每个正则表达式的匹配逻辑
     for (const RegexItem &item : regexItems) {
-        if (item.name.startsWith('_')) { // 只生成以下划线开头的正则表达式
+        if (item.name.startsWith('_')) {
             code += "        // 匹配 " + item.name.mid(1) + "\n";
             code += "        {\n";
             code += "            std::regex pattern(\"" + item.pattern + "\");\n";
@@ -104,13 +106,13 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
             code += "        }\n";
         }
     }
-    
+
     code += "\n";
     code += "        if (matched) {\n";
     code += "            tokens.push_back({tokenCode, matchedLexeme, line});\n";
     code += "            pos += maxMatchLen;\n";
     code += "        } else {\n";
-    code += "            std::cerr << \"Error at line \" << line << \": Unexpected character '\" << source[pos] << \"' << std::endl;\n";
+    code += "            std::cerr << \"Error at line \" << line << \": Invalid character '\" << source[pos] << \"'\\n\";\n";
     code += "            pos++;\n";
     code += "        }\n";
     code += "    }\n";
@@ -118,131 +120,21 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "    return tokens;\n";
     code += "}\n";
     code += "\n";
-    
-    // 生成主函数
-    code += "int main(int argc, char *argv[]) {\n";
-    code += "    if (argc != 2) {\n";
-    code += "        std::cerr << \"Usage: \" << argv[0] << \" <source_file>\" << std::endl;\n";
-    code += "        return 1;\n";
-    code += "    }\n";
-    code += "\n";
-    code += "    std::ifstream input(argv[1]);\n";
-    code += "    if (!input.is_open()) {\n";
-    code += "        std::cerr << \"Failed to open file: \" << argv[1] << \"\n\";\n";    code += "        return 1;\n";
-    code += "    }\n";
-    code += "\n";
-    code += "    std::string source((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());\n";
-    code += "    input.close();\n";
-    code += "\n";
+
+    // 主函数示例
+    code += "int main() {\n";
+    code += "    std::string source;\n";
+    code += "    std::getline(std::cin, source, '\\0');\n";
+    code += "    \n";
     code += "    std::vector<Token> tokens = lexicalAnalysis(source);\n";
-    code += "\n";
-    code += "    // 输出到控制台\n";
+    code += "    \n";
     code += "    for (const auto &token : tokens) {\n";
-    code += "        std::cout << token.line << \"\t\" << token.lexeme << \"\t\" << token.code << \"\n\";\n";
+    code += "        std::cout << \"Token(code: \" << token.code << \", lexeme: \\\"\" << token.lexeme << \\\"\", line: \" << token.line << \")\\n\";\n";
     code += "    }\n";
-    code += "\n";
-    
-    // 输出到文件
-    code += "    std::string outputFile = std::string(argv[1]) + \"\\.lex\";\n";
-    code += "    std::ofstream output(outputFile);\n";
-    code += "    if (output.is_open()) {\n";
-    code += "        for (const auto &token : tokens) {\n";
-    code += "            output << token.line << \"\t\" << token.lexeme << \"\t\" << token.code << \"\n\";\n";
-    code += "        }\n";
-    code += "        output.close();\n";
-    code += "    }\n";
-    code += "\n";
+    code += "    \n";
     code += "    return 0;\n";
     code += "}\n";
-    
-    return code;
-}
 
-QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
-{
-    QString code;
-    
-    // 生成单词编码宏定义
-    code += "// Token code definitions\n";
-    for (const RegexItem &item : regexItems) {
-        if (item.name.startsWith('_')) {
-            code += "#define TOKEN_" + item.name.mid(1).toUpper() + " " + QString::number(item.code) + "\n";
-        }
-    }
-    code += "\n";
-    
-    // 生成单词名称映射
-    code += "const std::map<int, std::string> tokenNames = {\n";
-    for (const RegexItem &item : regexItems) {
-        if (item.name.startsWith('_')) {
-            code += "    {TOKEN_" + item.name.mid(1).toUpper() + ", \"" + item.name.mid(1) + "\"},\n";
-        }
-    }
-    code += "};\n";
-    
-    return code;
-}
-
-QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
-{
-    QString code;
-    
-    // 生成状态转移表
-    code += "// DFA State Transition Table\n";
-    code += "const std::map<int, std::map<int, int>> stateTransitionTable = {\n";
-    
-    // 遍历所有DFA状态
-    for (const DFAState &state : minimizedDFA.states) {
-        code += QString("    {%1, {\n").arg(state);
-        
-        // 遍历所有转换，找出属于当前状态的转换
-        bool firstTransition = true;
-        for (const auto &transition : minimizedDFA.transitions) {
-            if (transition.fromState == state) {
-                if (!firstTransition) {
-                    code += ",\n";
-                }
-                firstTransition = false;
-                
-                QString inputSymbol;
-                if (transition.input == "a-z" || transition.input == "A-Z") {
-                    inputSymbol = "0";
-                } else if (transition.input == "0-9") {
-                    inputSymbol = "1";
-                } else if (transition.input == " ") {
-                    inputSymbol = "2";
-                } else {
-                    inputSymbol = QString::number(transition.input.at(0).toLatin1());
-                }
-                
-                code += QString("        {%1, %2},\n").arg(inputSymbol).arg(transition.toState);
-            }
-        }
-        
-        code += "    }},\n";
-    }
-    
-    code += "};\n";
-    
-    return code;
-}
-
-QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexItems, const DFA &minimizedDFA)
-{
-    QString code;
-    
-    // 生成接受状态映射
-    code += "// Accept States Map\n";
-    code += "const std::map<int, int> acceptStates = {\n";
-    
-    // 遍历所有DFA接受状态
-    for (const DFAState &state : minimizedDFA.acceptStates) {
-        // 找到对应的正则表达式（这里简化处理，实际需要根据状态映射获取）
-        code += QString("    {%1, 0},\n").arg(state);
-    }
-    
-    code += "};\n";
-    
     return code;
 }
 
@@ -255,9 +147,8 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "#include <fstream>\n";
     code += "#include <string>\n";
     code += "#include <vector>\n";
-    code += "#include <map>\n";
     code += "#include <cctype>\n";
-    code += "#include <algorithm>\n";
+    code += "#include <cstring>\n";
     code += "\n";
     
     // 生成词法单元结构
@@ -272,22 +163,12 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += generateTokenCodeMap(regexItems);
     code += "\n";
     
-    // 生成状态转移表
+    // 生成DFA状态转移表
     code += generateStateTransitionTable(minimizedDFA);
     code += "\n";
     
     // 生成接受状态映射
     code += generateAcceptStatesMap(regexItems, minimizedDFA);
-    code += "\n";
-    
-    // 生成获取输入符号的辅助函数
-    code += "int getInputSymbol(char c) {\n";
-    code += "    if (std::isalpha(c)) return 0;\n";
-    code += "    if (std::isdigit(c)) return 1;\n";
-    code += "    if (std::isspace(c)) return 2;\n";
-    code += "    // 其他符号返回ASCII值\n";
-    code += "    return static_cast<int>(c);\n";
-    code += "}\n";
     code += "\n";
     
     // 生成词法分析函数
@@ -305,34 +186,34 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "        }\n";
     code += "\n";
     code += "        int currentState = 0;\n";
-    code += "        size_t lastAcceptPos = pos;\n";
-    code += "        int lastAcceptState = -1;\n";
+    code += "        size_t startPos = pos;\n";
+    code += "        size_t maxMatchPos = pos;\n";
+    code += "        int tokenCode = -1;\n";
     code += "\n";
-    code += "        // 模拟DFA状态转移\n";
-    code += "        for (size_t i = pos; i < source.length(); i++) {\n";
-    code += "            char c = source[i];\n";
-    code += "            int inputSymbol = getInputSymbol(c);\n";
-    code += "            \n";
-    code += "            if (stateTransitionTable[currentState].find(inputSymbol) == stateTransitionTable[currentState].end()) {\n";
-    code += "                break;\n";
-    code += "            }\n";
-    code += "            \n";
-    code += "            currentState = stateTransitionTable[currentState][inputSymbol];\n";
-    code += "            \n";
-    code += "            if (acceptStates.find(currentState) != acceptStates.end()) {\n";
-    code += "                lastAcceptPos = i + 1;\n";
-    code += "                lastAcceptState = currentState;\n";
+    code += "        // 尝试最长匹配\n";
+    code += "        while (pos < source.length()) {\n";
+    code += "            unsigned char c = static_cast<unsigned char>(source[pos]);\n";
+    code += "            int nextState = transitions[currentState][c];\n";
+    code += "\n";
+    code += "            if (nextState == ERROR_STATE) break;\n";
+    code += "\n";
+    code += "            currentState = nextState;\n";
+    code += "            pos++;\n";
+    code += "\n";
+    code += "            // 检查是否是接受状态\n";
+    code += "            if (isAcceptState[currentState]) {\n";
+    code += "                maxMatchPos = pos;\n";
+    code += "                tokenCode = acceptTokens[currentState];\n";
     code += "            }\n";
     code += "        }\n";
     code += "\n";
-    code += "        if (lastAcceptState != -1) {\n";
-    code += "            std::string lexeme = source.substr(pos, lastAcceptPos - pos);\n";
-    code += "            int tokenCode = acceptStates[lastAcceptState];\n";
+    code += "        if (tokenCode != -1) {\n";
+    code += "            std::string lexeme = source.substr(startPos, maxMatchPos - startPos);\n";
     code += "            tokens.push_back({tokenCode, lexeme, line});\n";
-    code += "            pos = lastAcceptPos;\n";
+    code += "            pos = maxMatchPos;\n";
     code += "        } else {\n";
-    code += "            std::cerr << \"Error at line \" << line << \": Unexpected character '\" << source[pos] << \"' << std::endl;\n";
-    code += "            pos++;\n";
+    code += "            std::cerr << \"Error at line \" << line << \": Invalid character '\" << source[startPos] << \"'\\n\";\n";
+    code += "            pos = startPos + 1;\n";
     code += "        }\n";
     code += "    }\n";
     code += "\n";
@@ -340,41 +221,144 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "}\n";
     code += "\n";
     
-    // 生成主函数
-    code += "int main(int argc, char *argv[]) {\n";
-    code += "    if (argc != 2) {\n";
-  code += "        std::cerr << \"Usage: \" << argv[0] << \" <source_file>\" << std::endl;\n";
-    code += "        return 1;\n";
-    code += "    }\n";
-    code += "\n";
-    code += "    std::ifstream input(argv[1]);\n";
-    code += "    if (!input.is_open()) {\n";
-    code += "        std::cerr << \"Failed to open file: \" << argv[1] << \"\n\";\n";
-    code += "        return 1;\n";
-    code += "    }\n";
-    code += "\n";
-    code += "    std::string source((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());\n";
-    code += "    input.close();\n";
-    code += "\n";
+    // 主函数示例
+    code += "int main() {\n";
+    code += "    std::string source;\n";
+    code += "    std::getline(std::cin, source, '\\0');\n";
+    code += "    \n";
     code += "    std::vector<Token> tokens = lexicalAnalysis(source);\n";
-    code += "\n";
-    code += "    // 输出到控制台\n";
+    code += "    \n";
     code += "    for (const auto &token : tokens) {\n";
-    code += "        std::cout << token.line << \"\t\" << token.lexeme << \"\t\" << token.code << \"\n\";\n";
+    code += "        std::cout << \"Token(code: \" << token.code << \", lexeme: \\\"\" << token.lexeme << \\\"\", line: \" << token.line << \")\\n\";\n";
     code += "    }\n";
-    code += "\n";
-    code += "    // 输出到文件\n";
-    code += "    std::string outputFile = std::string(argv[1]) + \"\\.lex\";\n";
-    code += "    std::ofstream output(outputFile);\n";
-    code += "    if (output.is_open()) {\n";
-    code += "        for (const auto &token : tokens) {\n";
-    code += "            output << token.line << \"\t\" << token.lexeme << \"\t\" << token.code << \"\n\";\n";
-    code += "        }\n";
-    code += "        output.close();\n";
-    code += "    }\n";
-    code += "\n";
+    code += "    \n";
     code += "    return 0;\n";
     code += "}\n";
     
     return code;
+}
+
+QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
+{
+    QString code;
+    
+    code += "// DFA状态转移表\n";
+    code += "const int NUM_STATES = " + QString::number(minimizedDFA.states.size()) + ";\n";
+    code += "const int ERROR_STATE = -1;\n";
+    code += "\n";
+    
+    // 创建一个二维数组表示状态转移表
+    code += "// 状态转移表: transitions[当前状态][输入字符] = 下一个状态\n";
+    code += "int transitions[NUM_STATES][256] = {\n";
+    
+    // 初始化所有转移为错误状态
+    for (int i = 0; i < minimizedDFA.states.size(); i++) {
+        code += "    {";
+        for (int j = 0; j < 256; j++) {
+            if (j > 0) code += ", ";
+            code += "ERROR_STATE";
+        }
+        code += "}";
+        if (i < minimizedDFA.states.size() - 1) code += ",\n";
+    }
+    
+    code += "\n};\n";
+    code += "\n";
+    
+    // 设置实际的转移
+    code += "// 初始化转移表\n";
+    for (const auto &transition : minimizedDFA.transitions) {
+        QString inputSymbol = getInputSymbol(transition.input);
+        
+        if (transition.input.size() == 1) {
+            // 单个字符
+            char c = transition.input.at(0).toLatin1();
+            code += QString("transitions[%1]['%2'] = %3;\n")
+                    .arg(transition.fromState)
+                    .arg(inputSymbol)
+                    .arg(transition.toState);
+        } else {
+            // 特殊字符处理
+            if (transition.input == "\\n") {
+                code += QString("transitions[%1]['\\n'] = %2;\n")
+                        .arg(transition.fromState)
+                        .arg(transition.toState);
+            } else if (transition.input == "\\t") {
+                code += QString("transitions[%1]['\\t'] = %2;\n")
+                        .arg(transition.fromState)
+                        .arg(transition.toState);
+            } else if (transition.input == "\\r") {
+                code += QString("transitions[%1]['\\r'] = %2;\n")
+                        .arg(transition.fromState)
+                        .arg(transition.toState);
+            } else if (transition.input == "\\0") {
+                code += QString("transitions[%1]['\\0'] = %2;\n")
+                        .arg(transition.fromState)
+                        .arg(transition.toState);
+            }
+        }
+    }
+    
+    return code;
+}
+
+QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexItems, const DFA &minimizedDFA)
+{
+    QString code;
+    
+    code += "// 接受状态映射\n";
+    code += "bool isAcceptState[NUM_STATES] = {false};\n";
+    code += "int acceptTokens[NUM_STATES] = {-1};\n";
+    code += "\n";
+    
+    // 为了简化，我们假设每个接受状态对应一个正则表达式
+    // 在实际应用中，这部分需要根据DFA的实际构建方式进行调整
+    for (const auto &state : minimizedDFA.acceptStates) {
+        code += QString("isAcceptState[%1] = true;\n").arg(state);
+        
+        // 查找对应的正则表达式
+        // 注意：这里需要根据实际情况调整，因为DFA结构中没有直接存储acceptRegexId
+        // 这里简单地为每个接受状态分配第一个正则表达式的代码
+        if (!regexItems.isEmpty()) {
+            code += QString("acceptTokens[%1] = %2;\n")
+                    .arg(state)
+                    .arg(regexItems.first().code);
+        }
+    }
+    
+    return code;
+}
+
+QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
+{
+    QString code;
+    
+    code += "// 单词编码映射\n";
+    code += "enum TokenCode {\n";
+    
+    for (const auto &regexItem : regexItems) {
+        if (regexItem.name.startsWith('_')) {
+            QString tokenName = regexItem.name.mid(1).toUpper();
+            code += "    " + tokenName + " = " + QString::number(regexItem.code) + ",\n";
+        }
+    }
+    
+    // 移除最后一个逗号
+    if (code.endsWith(",\n")) {
+        code.chop(2);
+        code += "\n";
+    }
+    
+    code += "};\n";
+    
+    return code;
+}
+
+QString LexerGenerator::getInputSymbol(const QString &input)
+{
+    if (input == "\\n") return "\\n";
+    if (input == "\\t") return "\\t";
+    if (input == "\\r") return "\\r";
+    if (input == "\\0") return "\\0";
+    return input;
 }

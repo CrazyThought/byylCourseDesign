@@ -218,12 +218,8 @@ QString RegexProcessor::convertToStandardRegex(const QString &pattern)
         const QString &name = it.key();
         const QString &refPattern = it.value();
         
-        // 构建正则表达式：匹配引用名称，确保不是其他单词的一部分
-        // 使用 \b 作为单词边界
-        QRegularExpression refRegex(QString("\\b%1\\b").arg(name));
-        
-        // 替换所有匹配的引用
-        result.replace(refRegex, refPattern);
+        // 使用直接字符串替换，确保所有引用都能被正确替换
+        result.replace(name, refPattern, Qt::CaseSensitive);
     }
     
     return result;

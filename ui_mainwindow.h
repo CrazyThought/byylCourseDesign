@@ -13,6 +13,7 @@
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -49,31 +50,31 @@ public:
     QPushButton *btnParseRegex;
     QWidget *tabNFA;
     QVBoxLayout *verticalLayout_3;
-    QLabel *labelNFATitle;
     QHBoxLayout *horizontalLayout_5;
-    QLabel *label;
-    QComboBox *comboBoxRegex;
+    QLabel *labelNFA;
+    QComboBox *comboBoxNFA;
     QSpacerItem *horizontalSpacer_2;
-    QTableWidget *tableNFA;
     QPushButton *btnGenerateNFA;
+    QGroupBox *groupBoxNFA;
+    QVBoxLayout *verticalLayout_8;
     QWidget *tabDFA;
     QVBoxLayout *verticalLayout_4;
-    QLabel *labelDFATitle;
     QHBoxLayout *horizontalLayout_6;
-    QLabel *label_2;
-    QComboBox *comboBoxRegex_2;
+    QLabel *labelDFA;
+    QComboBox *comboBoxDFA;
     QSpacerItem *horizontalSpacer_3;
-    QTableWidget *tableDFA;
     QPushButton *btnGenerateDFA;
+    QGroupBox *groupBoxDFA;
+    QVBoxLayout *verticalLayout_16;
     QWidget *tabMinDFA;
     QVBoxLayout *verticalLayout_5;
-    QLabel *labelMinDFATitle;
     QHBoxLayout *horizontalLayout_7;
-    QLabel *label_3;
-    QComboBox *comboBoxRegex_3;
+    QLabel *labelMinDFA;
+    QComboBox *comboBoxMinDFA;
     QSpacerItem *horizontalSpacer_4;
-    QTableWidget *tableMinDFA;
     QPushButton *btnMinimizeDFA;
+    QGroupBox *groupBoxMinDFA;
+    QVBoxLayout *verticalLayout_22;
     QWidget *tabLexer;
     QVBoxLayout *verticalLayout_6;
     QTextEdit *textEditLexerCode;
@@ -148,153 +149,111 @@ public:
         tabNFA->setObjectName("tabNFA");
         verticalLayout_3 = new QVBoxLayout(tabNFA);
         verticalLayout_3->setObjectName("verticalLayout_3");
-        labelNFATitle = new QLabel(tabNFA);
-        labelNFATitle->setObjectName("labelNFATitle");
-        QFont font;
-        font.setPointSize(12);
-        font.setBold(true);
-        labelNFATitle->setFont(font);
-
-        verticalLayout_3->addWidget(labelNFATitle);
-
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName("horizontalLayout_5");
-        label = new QLabel(tabNFA);
-        label->setObjectName("label");
+        labelNFA = new QLabel(tabNFA);
+        labelNFA->setObjectName("labelNFA");
 
-        horizontalLayout_5->addWidget(label);
+        horizontalLayout_5->addWidget(labelNFA);
 
-        comboBoxRegex = new QComboBox(tabNFA);
-        comboBoxRegex->setObjectName("comboBoxRegex");
-        comboBoxRegex->setMinimumSize(QSize(200, 0));
+        comboBoxNFA = new QComboBox(tabNFA);
+        comboBoxNFA->setObjectName("comboBoxNFA");
+        comboBoxNFA->setMinimumSize(QSize(200, 0));
 
-        horizontalLayout_5->addWidget(comboBoxRegex);
+        horizontalLayout_5->addWidget(comboBoxNFA);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_5->addItem(horizontalSpacer_2);
 
-
-        verticalLayout_3->addLayout(horizontalLayout_5);
-
-        tableNFA = new QTableWidget(tabNFA);
-        if (tableNFA->columnCount() < 3)
-            tableNFA->setColumnCount(3);
-        QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
-        tableNFA->setHorizontalHeaderItem(0, __qtablewidgetitem);
-        QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
-        tableNFA->setHorizontalHeaderItem(1, __qtablewidgetitem1);
-        QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
-        tableNFA->setHorizontalHeaderItem(2, __qtablewidgetitem2);
-        tableNFA->setObjectName("tableNFA");
-        tableNFA->setAlternatingRowColors(true);
-
-        verticalLayout_3->addWidget(tableNFA);
-
         btnGenerateNFA = new QPushButton(tabNFA);
         btnGenerateNFA->setObjectName("btnGenerateNFA");
 
-        verticalLayout_3->addWidget(btnGenerateNFA);
+        horizontalLayout_5->addWidget(btnGenerateNFA);
+
+
+        verticalLayout_3->addLayout(horizontalLayout_5);
+
+        groupBoxNFA = new QGroupBox(tabNFA);
+        groupBoxNFA->setObjectName("groupBoxNFA");
+        verticalLayout_8 = new QVBoxLayout(groupBoxNFA);
+        verticalLayout_8->setObjectName("verticalLayout_8");
+
+        verticalLayout_3->addWidget(groupBoxNFA);
 
         tabWidget->addTab(tabNFA, QString());
         tabDFA = new QWidget();
         tabDFA->setObjectName("tabDFA");
         verticalLayout_4 = new QVBoxLayout(tabDFA);
         verticalLayout_4->setObjectName("verticalLayout_4");
-        labelDFATitle = new QLabel(tabDFA);
-        labelDFATitle->setObjectName("labelDFATitle");
-        labelDFATitle->setFont(font);
-
-        verticalLayout_4->addWidget(labelDFATitle);
-
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName("horizontalLayout_6");
-        label_2 = new QLabel(tabDFA);
-        label_2->setObjectName("label_2");
+        labelDFA = new QLabel(tabDFA);
+        labelDFA->setObjectName("labelDFA");
 
-        horizontalLayout_6->addWidget(label_2);
+        horizontalLayout_6->addWidget(labelDFA);
 
-        comboBoxRegex_2 = new QComboBox(tabDFA);
-        comboBoxRegex_2->setObjectName("comboBoxRegex_2");
-        comboBoxRegex_2->setMinimumSize(QSize(200, 0));
+        comboBoxDFA = new QComboBox(tabDFA);
+        comboBoxDFA->setObjectName("comboBoxDFA");
+        comboBoxDFA->setMinimumSize(QSize(200, 0));
 
-        horizontalLayout_6->addWidget(comboBoxRegex_2);
+        horizontalLayout_6->addWidget(comboBoxDFA);
 
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_6->addItem(horizontalSpacer_3);
 
-
-        verticalLayout_4->addLayout(horizontalLayout_6);
-
-        tableDFA = new QTableWidget(tabDFA);
-        if (tableDFA->columnCount() < 3)
-            tableDFA->setColumnCount(3);
-        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
-        tableDFA->setHorizontalHeaderItem(0, __qtablewidgetitem3);
-        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
-        tableDFA->setHorizontalHeaderItem(1, __qtablewidgetitem4);
-        QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
-        tableDFA->setHorizontalHeaderItem(2, __qtablewidgetitem5);
-        tableDFA->setObjectName("tableDFA");
-        tableDFA->setAlternatingRowColors(true);
-
-        verticalLayout_4->addWidget(tableDFA);
-
         btnGenerateDFA = new QPushButton(tabDFA);
         btnGenerateDFA->setObjectName("btnGenerateDFA");
 
-        verticalLayout_4->addWidget(btnGenerateDFA);
+        horizontalLayout_6->addWidget(btnGenerateDFA);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_6);
+
+        groupBoxDFA = new QGroupBox(tabDFA);
+        groupBoxDFA->setObjectName("groupBoxDFA");
+        verticalLayout_16 = new QVBoxLayout(groupBoxDFA);
+        verticalLayout_16->setObjectName("verticalLayout_16");
+
+        verticalLayout_4->addWidget(groupBoxDFA);
 
         tabWidget->addTab(tabDFA, QString());
         tabMinDFA = new QWidget();
         tabMinDFA->setObjectName("tabMinDFA");
         verticalLayout_5 = new QVBoxLayout(tabMinDFA);
         verticalLayout_5->setObjectName("verticalLayout_5");
-        labelMinDFATitle = new QLabel(tabMinDFA);
-        labelMinDFATitle->setObjectName("labelMinDFATitle");
-        labelMinDFATitle->setFont(font);
-
-        verticalLayout_5->addWidget(labelMinDFATitle);
-
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName("horizontalLayout_7");
-        label_3 = new QLabel(tabMinDFA);
-        label_3->setObjectName("label_3");
+        labelMinDFA = new QLabel(tabMinDFA);
+        labelMinDFA->setObjectName("labelMinDFA");
 
-        horizontalLayout_7->addWidget(label_3);
+        horizontalLayout_7->addWidget(labelMinDFA);
 
-        comboBoxRegex_3 = new QComboBox(tabMinDFA);
-        comboBoxRegex_3->setObjectName("comboBoxRegex_3");
-        comboBoxRegex_3->setMinimumSize(QSize(200, 0));
+        comboBoxMinDFA = new QComboBox(tabMinDFA);
+        comboBoxMinDFA->setObjectName("comboBoxMinDFA");
+        comboBoxMinDFA->setMinimumSize(QSize(200, 0));
 
-        horizontalLayout_7->addWidget(comboBoxRegex_3);
+        horizontalLayout_7->addWidget(comboBoxMinDFA);
 
         horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_7->addItem(horizontalSpacer_4);
 
-
-        verticalLayout_5->addLayout(horizontalLayout_7);
-
-        tableMinDFA = new QTableWidget(tabMinDFA);
-        if (tableMinDFA->columnCount() < 3)
-            tableMinDFA->setColumnCount(3);
-        QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
-        tableMinDFA->setHorizontalHeaderItem(0, __qtablewidgetitem6);
-        QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
-        tableMinDFA->setHorizontalHeaderItem(1, __qtablewidgetitem7);
-        QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
-        tableMinDFA->setHorizontalHeaderItem(2, __qtablewidgetitem8);
-        tableMinDFA->setObjectName("tableMinDFA");
-        tableMinDFA->setAlternatingRowColors(true);
-
-        verticalLayout_5->addWidget(tableMinDFA);
-
         btnMinimizeDFA = new QPushButton(tabMinDFA);
         btnMinimizeDFA->setObjectName("btnMinimizeDFA");
 
-        verticalLayout_5->addWidget(btnMinimizeDFA);
+        horizontalLayout_7->addWidget(btnMinimizeDFA);
+
+
+        verticalLayout_5->addLayout(horizontalLayout_7);
+
+        groupBoxMinDFA = new QGroupBox(tabMinDFA);
+        groupBoxMinDFA->setObjectName("groupBoxMinDFA");
+        verticalLayout_22 = new QVBoxLayout(groupBoxMinDFA);
+        verticalLayout_22->setObjectName("verticalLayout_22");
+
+        verticalLayout_5->addWidget(groupBoxMinDFA);
 
         tabWidget->addTab(tabMinDFA, QString());
         tabLexer = new QWidget();
@@ -337,12 +296,12 @@ public:
         tableTestOutput = new QTableWidget(tabTest);
         if (tableTestOutput->columnCount() < 3)
             tableTestOutput->setColumnCount(3);
-        QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
-        tableTestOutput->setHorizontalHeaderItem(0, __qtablewidgetitem9);
-        QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
-        tableTestOutput->setHorizontalHeaderItem(1, __qtablewidgetitem10);
-        QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
-        tableTestOutput->setHorizontalHeaderItem(2, __qtablewidgetitem11);
+        QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
+        tableTestOutput->setHorizontalHeaderItem(0, __qtablewidgetitem);
+        QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
+        tableTestOutput->setHorizontalHeaderItem(1, __qtablewidgetitem1);
+        QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
+        tableTestOutput->setHorizontalHeaderItem(2, __qtablewidgetitem2);
         tableTestOutput->setObjectName("tableTestOutput");
         tableTestOutput->setAlternatingRowColors(true);
 
@@ -394,7 +353,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -410,45 +369,27 @@ public:
         btnSaveRegex->setText(QCoreApplication::translate("MainWindow", "\344\277\235\345\255\230", nullptr));
         btnParseRegex->setText(QCoreApplication::translate("MainWindow", "\350\247\243\346\236\220\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabRegex), QCoreApplication::translate("MainWindow", "\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217", nullptr));
-        labelNFATitle->setText(QCoreApplication::translate("MainWindow", "NFA \345\233\276\357\274\232\346\200\273\350\241\250", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
-        QTableWidgetItem *___qtablewidgetitem = tableNFA->horizontalHeaderItem(0);
-        ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201", nullptr));
-        QTableWidgetItem *___qtablewidgetitem1 = tableNFA->horizontalHeaderItem(1);
-        ___qtablewidgetitem1->setText(QCoreApplication::translate("MainWindow", "\350\276\223\345\205\245\345\255\227\347\254\246", nullptr));
-        QTableWidgetItem *___qtablewidgetitem2 = tableNFA->horizontalHeaderItem(2);
-        ___qtablewidgetitem2->setText(QCoreApplication::translate("MainWindow", "\347\233\256\346\240\207\347\212\266\346\200\201", nullptr));
+        labelNFA->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
         btnGenerateNFA->setText(QCoreApplication::translate("MainWindow", "\347\224\237\346\210\220NFA", nullptr));
+        groupBoxNFA->setTitle(QCoreApplication::translate("MainWindow", "NFA\345\233\276\350\241\250", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabNFA), QCoreApplication::translate("MainWindow", "NFA", nullptr));
-        labelDFATitle->setText(QCoreApplication::translate("MainWindow", "DFA \345\233\276\357\274\232\346\200\273\350\241\250", nullptr));
-        label_2->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
-        QTableWidgetItem *___qtablewidgetitem3 = tableDFA->horizontalHeaderItem(0);
-        ___qtablewidgetitem3->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201\351\233\206\345\220\210", nullptr));
-        QTableWidgetItem *___qtablewidgetitem4 = tableDFA->horizontalHeaderItem(1);
-        ___qtablewidgetitem4->setText(QCoreApplication::translate("MainWindow", "\350\276\223\345\205\245\345\255\227\347\254\246", nullptr));
-        QTableWidgetItem *___qtablewidgetitem5 = tableDFA->horizontalHeaderItem(2);
-        ___qtablewidgetitem5->setText(QCoreApplication::translate("MainWindow", "\347\233\256\346\240\207\347\212\266\346\200\201\351\233\206\345\220\210", nullptr));
+        labelDFA->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
         btnGenerateDFA->setText(QCoreApplication::translate("MainWindow", "\347\224\237\346\210\220DFA", nullptr));
+        groupBoxDFA->setTitle(QCoreApplication::translate("MainWindow", "DFA\345\233\276\350\241\250", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabDFA), QCoreApplication::translate("MainWindow", "DFA", nullptr));
-        labelMinDFATitle->setText(QCoreApplication::translate("MainWindow", "\346\234\200\345\260\217\345\214\226 DFA \345\233\276\357\274\232\346\200\273\350\241\250", nullptr));
-        label_3->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
-        QTableWidgetItem *___qtablewidgetitem6 = tableMinDFA->horizontalHeaderItem(0);
-        ___qtablewidgetitem6->setText(QCoreApplication::translate("MainWindow", "\347\212\266\346\200\201", nullptr));
-        QTableWidgetItem *___qtablewidgetitem7 = tableMinDFA->horizontalHeaderItem(1);
-        ___qtablewidgetitem7->setText(QCoreApplication::translate("MainWindow", "\350\276\223\345\205\245\345\255\227\347\254\246", nullptr));
-        QTableWidgetItem *___qtablewidgetitem8 = tableMinDFA->horizontalHeaderItem(2);
-        ___qtablewidgetitem8->setText(QCoreApplication::translate("MainWindow", "\347\233\256\346\240\207\347\212\266\346\200\201", nullptr));
+        labelMinDFA->setText(QCoreApplication::translate("MainWindow", "\351\200\211\346\213\251\346\255\243\345\210\231\350\241\250\350\276\276\345\274\217\357\274\232", nullptr));
         btnMinimizeDFA->setText(QCoreApplication::translate("MainWindow", "\346\234\200\345\260\217\345\214\226DFA", nullptr));
+        groupBoxMinDFA->setTitle(QCoreApplication::translate("MainWindow", "\346\234\200\345\260\217\345\214\226DFA\345\233\276\350\241\250", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabMinDFA), QCoreApplication::translate("MainWindow", "\346\234\200\345\260\217\345\214\226DFA", nullptr));
         btnGenerateLexer->setText(QCoreApplication::translate("MainWindow", "\347\224\237\346\210\220\350\257\215\346\263\225\345\210\206\346\236\220\345\231\250", nullptr));
         btnSaveLexer->setText(QCoreApplication::translate("MainWindow", "\344\277\235\345\255\230\344\270\272.cpp", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tabLexer), QCoreApplication::translate("MainWindow", "\350\257\215\346\263\225\345\210\206\346\236\220\345\231\250", nullptr));
-        QTableWidgetItem *___qtablewidgetitem9 = tableTestOutput->horizontalHeaderItem(0);
-        ___qtablewidgetitem9->setText(QCoreApplication::translate("MainWindow", "\350\241\214\345\217\267", nullptr));
-        QTableWidgetItem *___qtablewidgetitem10 = tableTestOutput->horizontalHeaderItem(1);
-        ___qtablewidgetitem10->setText(QCoreApplication::translate("MainWindow", "\345\215\225\350\257\215", nullptr));
-        QTableWidgetItem *___qtablewidgetitem11 = tableTestOutput->horizontalHeaderItem(2);
-        ___qtablewidgetitem11->setText(QCoreApplication::translate("MainWindow", "\347\274\226\347\240\201", nullptr));
+        QTableWidgetItem *___qtablewidgetitem = tableTestOutput->horizontalHeaderItem(0);
+        ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "\350\241\214\345\217\267", nullptr));
+        QTableWidgetItem *___qtablewidgetitem1 = tableTestOutput->horizontalHeaderItem(1);
+        ___qtablewidgetitem1->setText(QCoreApplication::translate("MainWindow", "\345\215\225\350\257\215", nullptr));
+        QTableWidgetItem *___qtablewidgetitem2 = tableTestOutput->horizontalHeaderItem(2);
+        ___qtablewidgetitem2->setText(QCoreApplication::translate("MainWindow", "\347\274\226\347\240\201", nullptr));
         btnOpenTestFile->setText(QCoreApplication::translate("MainWindow", "\346\211\223\345\274\200\346\265\213\350\257\225\346\226\207\344\273\266", nullptr));
         btnRunLexer->setText(QCoreApplication::translate("MainWindow", "\350\277\220\350\241\214\350\257\215\346\263\225\345\210\206\346\236\220", nullptr));
         btnSaveTestOutput->setText(QCoreApplication::translate("MainWindow", "\344\277\235\345\255\230\347\273\223\346\236\234", nullptr));

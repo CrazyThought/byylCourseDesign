@@ -9,22 +9,62 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_dynamicTableNFA(nullptr)
+    , m_dynamicTableDFA(nullptr)
+    , m_dynamicTableMinDFA(nullptr)
 {
     ui->setupUi(this);
     
-    // 初始化表格
-    initTableWidget(ui->tableNFA, QStringList() << "状态" << "输入字符" << "目标状态");
-    initTableWidget(ui->tableDFA, QStringList() << "状态集合" << "输入字符" << "目标状态集合");
-    initTableWidget(ui->tableMinDFA, QStringList() << "状态" << "输入字符" << "目标状态");
+    // 创建动态表格
+    createDynamicTables();
+    
+    // 初始化测试输出表格
     initTableWidget(ui->tableTestOutput, QStringList() << "行号" << "单词" << "编码");
     
     // 初始化成员变量
     m_currentRegexName = "";
     m_isTotalView = false;
+    
+    // 添加信号槽连接
+    connect(ui->comboBoxNFA, SIGNAL(currentTextChanged(const QString &)), this, SLOT(on_comboBoxNFA_currentIndexChanged(const QString &)));
+    connect(ui->comboBoxDFA, SIGNAL(currentTextChanged(const QString &)), this, SLOT(on_comboBoxDFA_currentIndexChanged(const QString &)));
+    connect(ui->comboBoxMinDFA, SIGNAL(currentTextChanged(const QString &)), this, SLOT(on_comboBoxMinDFA_currentIndexChanged(const QString &)));
+    
+    // 创建刷新按钮
+    QPushButton *btnRefreshNFA = new QPushButton(tr("刷新NFA"), this);
+    btnRefreshNFA->setObjectName("btnRefreshNFA");
+    connect(btnRefreshNFA, SIGNAL(clicked()), this, SLOT(on_btnRefreshNFA_clicked()));
+    
+    QPushButton *btnRefreshDFA = new QPushButton(tr("刷新DFA"), this);
+    btnRefreshDFA->setObjectName("btnRefreshDFA");
+    connect(btnRefreshDFA, SIGNAL(clicked()), this, SLOT(on_btnRefreshDFA_clicked()));
+    
+    QPushButton *btnRefreshMinDFA = new QPushButton(tr("刷新最小DFA"), this);
+    btnRefreshMinDFA->setObjectName("btnRefreshMinDFA");
+    connect(btnRefreshMinDFA, SIGNAL(clicked()), this, SLOT(on_btnRefreshMinDFA_clicked()));
+    
+    // 找到NFA标签页的水平布局并添加刷新按钮
+    QHBoxLayout *nfaLayout = qobject_cast<QHBoxLayout*>(ui->tabNFA->layout()->itemAt(0)->layout());
+    if (nfaLayout) {
+        nfaLayout->addWidget(btnRefreshNFA);
+    }
+    
+    // 找到DFA标签页的水平布局并添加刷新按钮
+    QHBoxLayout *dfaLayout = qobject_cast<QHBoxLayout*>(ui->tabDFA->layout()->itemAt(0)->layout());
+    if (dfaLayout) {
+        dfaLayout->addWidget(btnRefreshDFA);
+    }
+    
+    // 找到最小化DFA标签页的水平布局并添加刷新按钮
+    QHBoxLayout *minDfaLayout = qobject_cast<QHBoxLayout*>(ui->tabMinDFA->layout()->itemAt(0)->layout());
+    if (minDfaLayout) {
+        minDfaLayout->addWidget(btnRefreshMinDFA);
+    }
 }
 
 MainWindow::~MainWindow()
 {
+    cleanupDynamicTables();
     delete ui;
 }
 
@@ -120,6 +160,7 @@ void MainWindow::on_btnGenerateNFA_clicked()
     }
     
     QList<RegexItem> regexItems = m_regexProcessor.getRegexItems();
+    m_currentRegexItems = regexItems;
     if (regexItems.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("没有找到有效的正则表达式"));
         return;
@@ -146,13 +187,13 @@ void MainWindow::on_btnGenerateNFA_clicked()
         return;
     }
     
-    // 更新正则表达式下拉列表
-    updateRegexComboBox();
-    
     // 如果当前没有选中的正则表达式，选择第一个
     if (m_currentRegexName.isEmpty() && !m_nfaMap.isEmpty()) {
         m_currentRegexName = m_nfaMap.keys().first();
     }
+    
+    // 更新正则表达式下拉列表
+    updateRegexComboBox();
     
     // 生成总NFA
     if (generatedCount > 0) {
@@ -374,6 +415,34 @@ void MainWindow::on_btnRunLexer_clicked()
     if (success) {
         ui->statusbar->showMessage("词法分析器编译成功", 3000);
         QMessageBox::information(this, tr("编译成功"), tr("词法分析器编译成功！\n输出：\n") + m_lexerTester.getCompileOutput());
+        
+        // 如果textEditTestInput中有内容，运行词法分析器
+        QString testInput = ui->textEditTestInput->toPlainText();
+        if (!testInput.isEmpty()) {
+            // 保存测试输入到临时文件
+            QString tempFile = "temp_test.txt";
+            QFile file(tempFile);
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QTextStream out(&file);
+                out << testInput;
+                file.close();
+                
+                // 运行词法分析器
+                ui->statusbar->showMessage("正在进行词法分析...", 0);
+                m_currentLexicalResults = m_lexerTester.testLexer(tempFile);
+                
+                if (m_currentLexicalResults.isEmpty() && !m_lexerTester.getError().isEmpty()) {
+                    ui->statusbar->showMessage("词法分析执行失败", 3000);
+                    QMessageBox::warning(this, tr("执行失败"), tr("词法分析执行失败！\n错误：\n") + m_lexerTester.getError());
+                } else {
+                    ui->statusbar->showMessage("词法分析完成", 3000);
+                    displayLexicalResults(m_currentLexicalResults);
+                }
+                
+                // 删除临时文件
+                QFile::remove(tempFile);
+            }
+        }
     } else {
         ui->statusbar->showMessage("词法分析器编译失败", 3000);
         QMessageBox::warning(this, tr("编译失败"), tr("词法分析器编译失败！\n错误：\n") + m_lexerTester.getError());
@@ -455,9 +524,111 @@ void MainWindow::clearTable(QTableWidget *table)
     table->setRowCount(0);
 }
 
-void MainWindow::displayNFA(const NFA &nfa)
+// 处理正则表达式引用，返回字符到引用名称的映射
+QMap<QString, QString> MainWindow::processRegexReferences(const QList<RegexItem> &regexItems)
 {
-    clearTable(ui->tableNFA);
+    QMap<QString, QString> charToRefMap;
+    
+    // 从正则表达式文本中提取引用定义
+    QString regexText = ui->textEditRegex->toPlainText();
+    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    
+    for (const QString &line : lines) {
+        QString trimmedLine = line.trimmed();
+        if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
+            continue; // 跳过空行和注释行
+        }
+        
+        // 寻找等号位置
+        int equalsPos = trimmedLine.indexOf('=');
+        if (equalsPos == -1) {
+            continue; // 跳过无效行
+        }
+        
+        // 提取名称和模式
+        QString name = trimmedLine.left(equalsPos).trimmed();
+        QString pattern = trimmedLine.mid(equalsPos + 1).trimmed();
+        
+        // 只处理不以下划线开头的名称
+        if (!name.startsWith('_')) {
+            // 处理字符集格式，如 [a-z] 或 [0-9] 或 [!@#$%^&*()]
+            if (pattern.startsWith('[') && pattern.endsWith(']')) {
+                // 提取字符集内容
+                QString charset = pattern.mid(1, pattern.length() - 2);
+                
+                // 处理范围格式，如 a-z, A-Z, 0-9
+                int dashPos = charset.indexOf('-');
+                if (dashPos > 0 && dashPos < charset.length() - 1) {
+                    char start = charset.at(dashPos - 1).toLatin1();
+                    char end = charset.at(dashPos + 1).toLatin1();
+                    
+                    // 添加范围内的所有字符
+                    for (char c = start; c <= end; ++c) {
+                        charToRefMap[QString(c)] = name;
+                    }
+                } else {
+                    // 处理单个字符集，如 [abc] 或 [!@#$%^&*()]
+                    for (int i = 0; i < charset.length(); ++i) {
+                        QChar c = charset.at(i);
+                        // 处理转义字符
+                        if (c == '\\' && i < charset.length() - 1) {
+                            // 下一个字符是转义字符
+                            QChar nextC = charset.at(i + 1);
+                            if (nextC == 't') {
+                                charToRefMap[QString('\t')] = name;
+                            } else if (nextC == 'n') {
+                                charToRefMap[QString('\n')] = name;
+                            } else if (nextC == 'r') {
+                                charToRefMap[QString('\r')] = name;
+                            } else if (nextC == '\\') {
+                                charToRefMap[QString('\\')] = name;
+                            } else {
+                                // 其他转义字符，如 \a, \b, \f, \v
+                                charToRefMap[nextC] = name;
+                            }
+                            i++; // 跳过下一个字符
+                        } else {
+                            // 普通字符
+                            charToRefMap[c] = name;
+                        }
+                    }
+                }
+            } else if (pattern.length() == 1) {
+                // 处理单个字符
+                charToRefMap[pattern] = name;
+            }
+        }
+    }
+    
+    return charToRefMap;
+}
+
+// 合并相同引用名称的转移
+QMap<QString, QList<QString>> MainWindow::mergeTransitionsByRef(const QSet<QString> &transitions, const QMap<QString, QString> &charToRefMap)
+{
+    QMap<QString, QList<QString>> refToCharsMap;
+    
+    // 遍历所有转移字符
+    for (const QString &transition : transitions) {
+        if (transition == "#") {
+            // 保持空转移不变
+            refToCharsMap["#"] = {"#"};
+        } else if (charToRefMap.contains(transition)) {
+            // 将字符映射到引用名称
+            QString refName = charToRefMap[transition];
+            refToCharsMap[refName].append(transition);
+        } else {
+            // 没有引用的字符保持不变
+            refToCharsMap[transition] = {transition};
+        }
+    }
+    
+    return refToCharsMap;
+}
+
+void MainWindow::displayNFA(const NFA &nfa, QTableWidget *table)
+{
+    clearTable(table);
     
     // 收集所有转移名称（输入字符）
     QSet<QString> transitions;
@@ -465,18 +636,48 @@ void MainWindow::displayNFA(const NFA &nfa)
         transitions.insert(transition.input);
     }
     
-    // 将转移名称转换为列表并排序
-    QStringList transitionList = transitions.values();
-    std::sort(transitionList.begin(), transitionList.end());
+    // 处理正则表达式引用
+    QMap<QString, QString> charToRefMap = processRegexReferences(m_currentRegexItems);
+    
+    // 合并相同引用名称的转移
+    QMap<QString, QList<QString>> refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
+    
+    // 收集所有引用名称
+    QSet<QString> referenceNames;
+    QString regexText = ui->textEditRegex->toPlainText();
+    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    for (const QString &line : lines) {
+        QString trimmedLine = line.trimmed();
+        if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
+            continue;
+        }
+        int equalsPos = trimmedLine.indexOf('=');
+        if (equalsPos == -1) {
+            continue;
+        }
+        QString name = trimmedLine.left(equalsPos).trimmed();
+        if (!name.startsWith('_')) {
+            referenceNames.insert(name);
+        }
+    }
+    
+    // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+    QStringList refList;
+    for (const QString &key : refToCharsMap.keys()) {
+        if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
+            refList << key;
+        }
+    }
+    std::sort(refList.begin(), refList.end());
     
     // 设置表头
     QStringList headers;
     headers << "状态标记" << "状态编号";
-    for (const QString &transition : transitionList) {
-        headers << (transition == "#" ? "#" : transition);
+    for (const QString &ref : refList) {
+        headers << ref;
     }
-    ui->tableNFA->setColumnCount(headers.size());
-    ui->tableNFA->setHorizontalHeaderLabels(headers);
+    table->setColumnCount(headers.size());
+    table->setHorizontalHeaderLabels(headers);
     
     // 收集所有状态并排序
     QList<NFAState> allStates = nfa.states;
@@ -500,29 +701,41 @@ void MainWindow::displayNFA(const NFA &nfa)
         rowData << QString::number(state);
         
         // 后续列：转移对应的目标状态
-        for (const QString &transition : transitionList) {
-            QString targetStates = "";
-            for (const NFATransition &t : nfa.transitions) {
-                if (t.fromState == state && t.input == transition) {
-                    if (!targetStates.isEmpty()) {
-                        targetStates += ",";
+        for (const QString &ref : qAsConst(refList)) {
+            QList<QString> chars = refToCharsMap[ref];
+            QSet<int> uniqueTargetStates;
+            
+            // 收集所有匹配字符的转移
+            for (const QString &charStr : chars) {
+                for (const NFATransition &t : nfa.transitions) {
+                    if (t.fromState == state && t.input == charStr) {
+                        uniqueTargetStates.insert(t.toState);
                     }
-                    targetStates += QString::number(t.toState);
                 }
             }
+            
+            // 将唯一的目标状态转换为字符串
+            QString targetStates;
+            for (int ts : uniqueTargetStates) {
+                if (!targetStates.isEmpty()) {
+                    targetStates += ",";
+                }
+                targetStates += QString::number(ts);
+            }
+            
             rowData << targetStates;
         }
         
-        addTableRow(ui->tableNFA, rowData);
+        addTableRow(table, rowData);
     }
     
     // 调整列宽
-    ui->tableNFA->resizeColumnsToContents();
+    table->resizeColumnsToContents();
 }
 
-void MainWindow::displayDFA(const DFA &dfa)
+void MainWindow::displayDFA(const DFA &dfa, QTableWidget *table)
 {
-    clearTable(ui->tableDFA);
+    clearTable(table);
     
     // 收集所有转移名称（输入字符）
     QSet<QString> transitions;
@@ -530,18 +743,48 @@ void MainWindow::displayDFA(const DFA &dfa)
         transitions.insert(transition.input);
     }
     
-    // 将转移名称转换为列表并排序
-    QStringList transitionList = transitions.values();
-    std::sort(transitionList.begin(), transitionList.end());
+    // 处理正则表达式引用
+    QMap<QString, QString> charToRefMap = processRegexReferences(m_currentRegexItems);
+    
+    // 合并相同引用名称的转移
+    QMap<QString, QList<QString>> refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
+    
+    // 收集所有引用名称
+    QSet<QString> referenceNames;
+    QString regexText = ui->textEditRegex->toPlainText();
+    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    for (const QString &line : lines) {
+        QString trimmedLine = line.trimmed();
+        if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
+            continue;
+        }
+        int equalsPos = trimmedLine.indexOf('=');
+        if (equalsPos == -1) {
+            continue;
+        }
+        QString name = trimmedLine.left(equalsPos).trimmed();
+        if (!name.startsWith('_')) {
+            referenceNames.insert(name);
+        }
+    }
+    
+    // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+    QStringList refList;
+    for (const QString &key : refToCharsMap.keys()) {
+        if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
+            refList << key;
+        }
+    }
+    std::sort(refList.begin(), refList.end());
     
     // 设置表头
     QStringList headers;
     headers << "状态标记" << "状态编号";
-    for (const QString &transition : transitionList) {
-        headers << (transition == "#" ? "#" : transition);
+    for (const QString &ref : refList) {
+        headers << ref;
     }
-    ui->tableDFA->setColumnCount(headers.size());
-    ui->tableDFA->setHorizontalHeaderLabels(headers);
+    table->setColumnCount(headers.size());
+    table->setHorizontalHeaderLabels(headers);
     
     // 收集所有状态并排序
     QList<DFAState> allStates = dfa.states;
@@ -565,27 +808,36 @@ void MainWindow::displayDFA(const DFA &dfa)
         rowData << QString::number(state);
         
         // 后续列：转移对应的目标状态
-        for (const QString &transition : transitionList) {
+        for (const QString &ref : refList) {
+            QList<QString> chars = refToCharsMap[ref];
             QString targetState = "";
-            for (const DFATransition &t : dfa.transitions) {
-                if (t.fromState == state && t.input == transition) {
-                    targetState = QString::number(t.toState);
+            
+            // 查找匹配字符的转移，DFA每个状态和转移只有一个目标状态
+            for (const QString &charStr : chars) {
+                for (const DFATransition &t : dfa.transitions) {
+                    if (t.fromState == state && t.input == charStr) {
+                        targetState = QString::number(t.toState);
+                        break;
+                    }
+                }
+                if (!targetState.isEmpty()) {
                     break;
                 }
             }
+            
             rowData << targetState;
         }
         
-        addTableRow(ui->tableDFA, rowData);
+        addTableRow(table, rowData);
     }
     
     // 调整列宽
-    ui->tableDFA->resizeColumnsToContents();
+    table->resizeColumnsToContents();
 }
 
-void MainWindow::displayMinimizedDFA(const DFA &dfa)
+void MainWindow::displayMinimizedDFA(const DFA &dfa, QTableWidget *table)
 {
-    clearTable(ui->tableMinDFA);
+    clearTable(table);
     
     // 收集所有转移名称（输入字符）
     QSet<QString> transitions;
@@ -593,18 +845,48 @@ void MainWindow::displayMinimizedDFA(const DFA &dfa)
         transitions.insert(transition.input);
     }
     
-    // 将转移名称转换为列表并排序
-    QStringList transitionList = transitions.values();
-    std::sort(transitionList.begin(), transitionList.end());
+    // 处理正则表达式引用
+    QMap<QString, QString> charToRefMap = processRegexReferences(m_currentRegexItems);
+    
+    // 合并相同引用名称的转移
+    QMap<QString, QList<QString>> refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
+    
+    // 收集所有引用名称
+    QSet<QString> referenceNames;
+    QString regexText = ui->textEditRegex->toPlainText();
+    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    for (const QString &line : lines) {
+        QString trimmedLine = line.trimmed();
+        if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
+            continue;
+        }
+        int equalsPos = trimmedLine.indexOf('=');
+        if (equalsPos == -1) {
+            continue;
+        }
+        QString name = trimmedLine.left(equalsPos).trimmed();
+        if (!name.startsWith('_')) {
+            referenceNames.insert(name);
+        }
+    }
+    
+    // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+    QStringList refList;
+    for (const QString &key : refToCharsMap.keys()) {
+        if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
+            refList << key;
+        }
+    }
+    std::sort(refList.begin(), refList.end());
     
     // 设置表头
     QStringList headers;
     headers << "状态标记" << "状态编号";
-    for (const QString &transition : transitionList) {
-        headers << (transition == "#" ? "#" : transition);
+    for (const QString &ref : refList) {
+        headers << ref;
     }
-    ui->tableMinDFA->setColumnCount(headers.size());
-    ui->tableMinDFA->setHorizontalHeaderLabels(headers);
+    table->setColumnCount(headers.size());
+    table->setHorizontalHeaderLabels(headers);
     
     // 收集所有状态
     QSet<DFAState> allStates;
@@ -630,22 +912,31 @@ void MainWindow::displayMinimizedDFA(const DFA &dfa)
         rowData << QString::number(state);
         
         // 后续列：转移对应的目标状态
-        for (const QString &transition : transitionList) {
+        for (const QString &ref : refList) {
+            QList<QString> chars = refToCharsMap[ref];
             QString targetState = "";
-            for (const DFATransition &t : dfa.transitions) {
-                if (t.fromState == state && t.input == transition) {
-                    targetState = QString::number(t.toState);
+            
+            // 查找匹配字符的转移
+            for (const QString &charStr : chars) {
+                for (const DFATransition &t : dfa.transitions) {
+                    if (t.fromState == state && t.input == charStr) {
+                        targetState = QString::number(t.toState);
+                        break;
+                    }
+                }
+                if (!targetState.isEmpty()) {
                     break;
                 }
             }
+            
             rowData << targetState;
         }
         
-        addTableRow(ui->tableMinDFA, rowData);
+        addTableRow(table, rowData);
     }
     
     // 调整列宽
-    ui->tableMinDFA->resizeColumnsToContents();
+    table->resizeColumnsToContents();
 }
 
 void MainWindow::displayLexicalResults(const QList<LexicalResult> &results)
@@ -675,92 +966,647 @@ void MainWindow::displayLexicalResults(const QList<LexicalResult> &results)
 // 更新正则表达式下拉列表
 void MainWindow::updateRegexComboBox()
 {
-    // 清空现有选项
-    ui->comboBoxRegex->clear();
-    
-    // 添加总表选项
-    ui->comboBoxRegex->addItem("总表");
+    QStringList allItems;
+    allItems << "总表";
     
     // 添加所有以下划线开头的正则表达式名称
     for (const RegexItem &item : m_currentRegexItems) {
         if (item.name.startsWith('_')) {
-            ui->comboBoxRegex->addItem(item.name);
+            allItems << item.name;
         }
     }
     
-    // 如果当前选中的正则表达式名称存在，设置为当前选项
+    // 更新所有下拉列表
+    ui->comboBoxNFA->clear();
+    ui->comboBoxNFA->addItems(allItems);
+    
+    ui->comboBoxDFA->clear();
+    ui->comboBoxDFA->addItems(allItems);
+    
+    ui->comboBoxMinDFA->clear();
+    ui->comboBoxMinDFA->addItems(allItems);
+    
+    // 设置当前选中项
     if (m_isTotalView) {
-        ui->comboBoxRegex->setCurrentText("总表");
-    } else if (!m_currentRegexName.isEmpty() && ui->comboBoxRegex->findText(m_currentRegexName) != -1) {
-        ui->comboBoxRegex->setCurrentText(m_currentRegexName);
+        ui->comboBoxNFA->setCurrentText("总表");
+        ui->comboBoxDFA->setCurrentText("总表");
+        ui->comboBoxMinDFA->setCurrentText("总表");
+    } else if (!m_currentRegexName.isEmpty() && ui->comboBoxNFA->findText(m_currentRegexName) != -1) {
+        ui->comboBoxNFA->setCurrentText(m_currentRegexName);
+        ui->comboBoxDFA->setCurrentText(m_currentRegexName);
+        ui->comboBoxMinDFA->setCurrentText(m_currentRegexName);
     }
 }
 
-// 更新NFA显示
+void MainWindow::updateRegexComboBoxWithoutChangingSelection(const QString &currentRegexName, bool isTotalView)
+{
+    QStringList allItems;
+    allItems << "总表";
+    
+    // 添加所有以下划线开头的正则表达式名称
+    for (const RegexItem &item : m_currentRegexItems) {
+        if (item.name.startsWith('_')) {
+            allItems << item.name;
+        }
+    }
+    
+    // 保存当前选中的索引
+    int currentNFAIndex = ui->comboBoxNFA->currentIndex();
+    int currentDFAIndex = ui->comboBoxDFA->currentIndex();
+    int currentMinDFAIndex = ui->comboBoxMinDFA->currentIndex();
+    
+    // 更新所有下拉列表
+    ui->comboBoxNFA->clear();
+    ui->comboBoxNFA->addItems(allItems);
+    
+    ui->comboBoxDFA->clear();
+    ui->comboBoxDFA->addItems(allItems);
+    
+    ui->comboBoxMinDFA->clear();
+    ui->comboBoxMinDFA->addItems(allItems);
+    
+    // 尝试恢复之前的选中项
+    if (isTotalView && ui->comboBoxNFA->count() > 0) {
+        ui->comboBoxNFA->setCurrentText("总表");
+        ui->comboBoxDFA->setCurrentText("总表");
+        ui->comboBoxMinDFA->setCurrentText("总表");
+    } else if (!currentRegexName.isEmpty() && ui->comboBoxNFA->findText(currentRegexName) != -1) {
+        ui->comboBoxNFA->setCurrentText(currentRegexName);
+        ui->comboBoxDFA->setCurrentText(currentRegexName);
+        ui->comboBoxMinDFA->setCurrentText(currentRegexName);
+    } else if (ui->comboBoxNFA->count() > 0) {
+        // 如果之前的选项不存在，选择第一个有效选项
+        ui->comboBoxNFA->setCurrentIndex(0);
+        ui->comboBoxDFA->setCurrentIndex(0);
+        ui->comboBoxMinDFA->setCurrentIndex(0);
+    }
+}
+
+// 重置图表状态到初始加载状态
+void MainWindow::resetChartDisplayState()
+{
+    // 重置动态表格
+    if (m_dynamicTableNFA) {
+        m_dynamicTableNFA->clear();
+        m_dynamicTableNFA->setRowCount(0);
+        m_dynamicTableNFA->setColumnCount(0);
+    }
+    
+    if (m_dynamicTableDFA) {
+        m_dynamicTableDFA->clear();
+        m_dynamicTableDFA->setRowCount(0);
+        m_dynamicTableDFA->setColumnCount(0);
+    }
+    
+    if (m_dynamicTableMinDFA) {
+        m_dynamicTableMinDFA->clear();
+        m_dynamicTableMinDFA->setRowCount(0);
+        m_dynamicTableMinDFA->setColumnCount(0);
+    }
+    
+    // 重置分组框标题
+    ui->groupBoxNFA->setTitle("NFA图表");
+    ui->groupBoxDFA->setTitle("DFA图表");
+    ui->groupBoxMinDFA->setTitle("最小化DFA图表");
+    
+    // 强制UI更新
+    ui->groupBoxNFA->update();
+    ui->groupBoxDFA->update();
+    ui->groupBoxMinDFA->update();
+}
+
+// 更新NFA表格显示
 void MainWindow::updateNFADisplay()
 {
+    if (!m_dynamicTableNFA) {
+        return;
+    }
+    
+    // 清空表格
+    m_dynamicTableNFA->setRowCount(0);
+    m_dynamicTableNFA->setColumnCount(0);
+    
     if (m_isTotalView) {
         // 显示总NFA
-        displayNFA(m_totalNFA);
-    } else {
-        // 检查当前选中的正则表达式名称是否有对应的NFA
-        if (m_currentRegexName.isEmpty() || !m_nfaMap.contains(m_currentRegexName)) {
-            clearTable(ui->tableNFA);
-            return;
+        if (m_totalNFA.states.size() > 0) {
+            try {
+                displayNFA(m_totalNFA, m_dynamicTableNFA);
+                ui->groupBoxNFA->setTitle("总NFA图表");
+            } catch (const std::exception &e) {
+                ui->groupBoxNFA->setTitle("NFA图表（生成失败）");
+                ui->statusbar->showMessage(tr("NFA图表生成失败: %1").arg(e.what()), 3000);
+            }
+        } else {
+            ui->groupBoxNFA->setTitle("NFA图表（未生成）");
         }
-        
-        // 显示当前选中的NFA
-        const NFA &nfa = m_nfaMap[m_currentRegexName];
-        displayNFA(nfa);
+    } else {
+        // 显示单个NFA
+        if (!m_currentRegexName.isEmpty() && m_nfaMap.contains(m_currentRegexName)) {
+            const NFA &nfa = m_nfaMap[m_currentRegexName];
+            try {
+                displayNFA(nfa, m_dynamicTableNFA);
+                ui->groupBoxNFA->setTitle(QString("单个正则表达式NFA图表 - %1").arg(m_currentRegexName));
+            } catch (const std::exception &e) {
+                ui->groupBoxNFA->setTitle(QString("NFA图表（生成失败 - %1）").arg(m_currentRegexName));
+                ui->statusbar->showMessage(tr("NFA图表生成失败: %1").arg(e.what()), 3000);
+            }
+        } else {
+            ui->groupBoxNFA->setTitle("NFA图表（未选择）");
+        }
     }
+    
+    // 调整表格大小以适应内容
+    m_dynamicTableNFA->resizeColumnsToContents();
+    m_dynamicTableNFA->resizeRowsToContents();
 }
 
-// 更新DFA显示
+// 更新DFA表格显示
 void MainWindow::updateDFADisplay()
 {
+    if (!m_dynamicTableDFA) {
+        return;
+    }
+    
+    // 清空表格
+    m_dynamicTableDFA->setRowCount(0);
+    m_dynamicTableDFA->setColumnCount(0);
+    
     if (m_isTotalView) {
         // 显示总DFA
-        displayDFA(m_totalDFA);
-    } else {
-        // 检查当前选中的正则表达式名称是否有对应的DFA
-        if (m_currentRegexName.isEmpty() || !m_dfaMap.contains(m_currentRegexName)) {
-            clearTable(ui->tableDFA);
-            return;
+        if (m_totalDFA.states.size() > 0) {
+            try {
+                displayDFA(m_totalDFA, m_dynamicTableDFA);
+                ui->groupBoxDFA->setTitle("总DFA图表");
+            } catch (const std::exception &e) {
+                ui->groupBoxDFA->setTitle("DFA图表（生成失败）");
+                ui->statusbar->showMessage(tr("DFA图表生成失败: %1").arg(e.what()), 3000);
+            }
+        } else {
+            ui->groupBoxDFA->setTitle("DFA图表（未生成）");
         }
-        
-        // 显示当前选中的DFA
-        const DFA &dfa = m_dfaMap[m_currentRegexName];
-        displayDFA(dfa);
+    } else {
+        // 显示单个DFA
+        if (!m_currentRegexName.isEmpty() && m_dfaMap.contains(m_currentRegexName)) {
+            const DFA &dfa = m_dfaMap[m_currentRegexName];
+            try {
+                displayDFA(dfa, m_dynamicTableDFA);
+                ui->groupBoxDFA->setTitle(QString("单个正则表达式DFA图表 - %1").arg(m_currentRegexName));
+            } catch (const std::exception &e) {
+                ui->groupBoxDFA->setTitle(QString("DFA图表（生成失败 - %1）").arg(m_currentRegexName));
+                ui->statusbar->showMessage(tr("DFA图表生成失败: %1").arg(e.what()), 3000);
+            }
+        } else {
+            ui->groupBoxDFA->setTitle("DFA图表（未选择）");
+        }
     }
+    
+    // 调整表格大小以适应内容
+    m_dynamicTableDFA->resizeColumnsToContents();
+    m_dynamicTableDFA->resizeRowsToContents();
 }
 
-// 更新最小化DFA显示
+// 更新最小化DFA表格显示
 void MainWindow::updateMinimizedDFADisplay()
 {
+    if (!m_dynamicTableMinDFA) {
+        return;
+    }
+    
+    // 清空表格
+    m_dynamicTableMinDFA->setRowCount(0);
+    m_dynamicTableMinDFA->setColumnCount(0);
+    
     if (m_isTotalView) {
         // 显示总最小化DFA
-        displayMinimizedDFA(m_totalMinimizedDFA);
-    } else {
-        // 检查当前选中的正则表达式名称是否有对应的最小化DFA
-        if (m_currentRegexName.isEmpty() || !m_minimizedDfaMap.contains(m_currentRegexName)) {
-            clearTable(ui->tableMinDFA);
-            return;
+        if (m_totalMinimizedDFA.states.size() > 0) {
+            try {
+                displayMinimizedDFA(m_totalMinimizedDFA, m_dynamicTableMinDFA);
+                ui->groupBoxMinDFA->setTitle("总最小化DFA图表");
+            } catch (const std::exception &e) {
+                ui->groupBoxMinDFA->setTitle("最小化DFA图表（生成失败）");
+                ui->statusbar->showMessage(tr("最小化DFA图表生成失败: %1").arg(e.what()), 3000);
+            }
+        } else {
+            ui->groupBoxMinDFA->setTitle("最小化DFA图表（未生成）");
         }
-        
-        // 显示当前选中的最小化DFA
-        const DFA &minimizedDFA = m_minimizedDfaMap[m_currentRegexName];
-        displayMinimizedDFA(minimizedDFA);
+    } else {
+        // 显示单个最小化DFA
+        if (!m_currentRegexName.isEmpty() && m_minimizedDfaMap.contains(m_currentRegexName)) {
+            const DFA &minimizedDFA = m_minimizedDfaMap[m_currentRegexName];
+            try {
+                displayMinimizedDFA(minimizedDFA, m_dynamicTableMinDFA);
+                ui->groupBoxMinDFA->setTitle(QString("单个正则表达式最小化DFA图表 - %1").arg(m_currentRegexName));
+            } catch (const std::exception &e) {
+                ui->groupBoxMinDFA->setTitle(QString("最小化DFA图表（生成失败 - %1）").arg(m_currentRegexName));
+                ui->statusbar->showMessage(tr("最小化DFA图表生成失败: %1").arg(e.what()), 3000);
+            }
+        } else {
+            ui->groupBoxMinDFA->setTitle("最小化DFA图表（未选择）");
+        }
     }
+    
+    // 调整表格大小以适应内容
+    m_dynamicTableMinDFA->resizeColumnsToContents();
+    m_dynamicTableMinDFA->resizeRowsToContents();
 }
 
 // 正则表达式选择切换
-void MainWindow::on_comboBoxRegex_currentIndexChanged(const QString &arg1)
+void MainWindow::on_comboBoxNFA_currentIndexChanged(const QString &arg1)
 {
+    // 显示加载状态
+    ui->statusbar->showMessage(tr("正在加载图表..."), 0);
+    
     m_currentRegexName = arg1;
     m_isTotalView = (arg1 == "总表");
     
-    // 更新NFA、DFA和最小化DFA的显示
+    // 同步其他下拉列表，避免信号循环
+    ui->comboBoxDFA->blockSignals(true);
+    ui->comboBoxMinDFA->blockSignals(true);
+    ui->comboBoxDFA->setCurrentText(arg1);
+    ui->comboBoxMinDFA->setCurrentText(arg1);
+    ui->comboBoxDFA->blockSignals(false);
+    ui->comboBoxMinDFA->blockSignals(false);
+    
+    // 先清空所有表格内容，准备更新
+    if (m_dynamicTableNFA) {
+        m_dynamicTableNFA->clearContents();
+        m_dynamicTableNFA->setRowCount(0);
+    }
+    if (m_dynamicTableDFA) {
+        m_dynamicTableDFA->clearContents();
+        m_dynamicTableDFA->setRowCount(0);
+    }
+    if (m_dynamicTableMinDFA) {
+        m_dynamicTableMinDFA->clearContents();
+        m_dynamicTableMinDFA->setRowCount(0);
+    }
+    
+    // 处理UI更新，确保清空操作立即生效
+    QApplication::processEvents();
+    
+    // 更新图表显示
     updateNFADisplay();
     updateDFADisplay();
     updateMinimizedDFADisplay();
+    
+    // 显示加载完成状态
+    ui->statusbar->showMessage(tr("图表加载完成"), 3000);
+}
+
+// DFA标签页的正则表达式选择切换
+void MainWindow::on_comboBoxDFA_currentIndexChanged(const QString &arg1)
+{
+    // 显示加载状态
+    ui->statusbar->showMessage(tr("正在加载图表..."), 0);
+    
+    m_currentRegexName = arg1;
+    m_isTotalView = (arg1 == "总表");
+
+    // 同步其他下拉列表，避免信号循环
+    ui->comboBoxNFA->blockSignals(true);
+    ui->comboBoxMinDFA->blockSignals(true);
+    ui->comboBoxNFA->setCurrentText(arg1);
+    ui->comboBoxMinDFA->setCurrentText(arg1);
+    ui->comboBoxNFA->blockSignals(false);
+    ui->comboBoxMinDFA->blockSignals(false);
+    
+    // 先清空所有表格内容，准备更新
+    if (m_dynamicTableNFA) {
+        m_dynamicTableNFA->clearContents();
+        m_dynamicTableNFA->setRowCount(0);
+    }
+    if (m_dynamicTableDFA) {
+        m_dynamicTableDFA->clearContents();
+        m_dynamicTableDFA->setRowCount(0);
+    }
+    if (m_dynamicTableMinDFA) {
+        m_dynamicTableMinDFA->clearContents();
+        m_dynamicTableMinDFA->setRowCount(0);
+    }
+    
+    // 处理UI更新，确保清空操作立即生效
+    QApplication::processEvents();
+    
+    // 更新图表显示
+    updateNFADisplay();
+    updateDFADisplay();
+    updateMinimizedDFADisplay();
+    
+    // 显示加载完成状态
+    ui->statusbar->showMessage(tr("图表加载完成"), 3000);
+}
+
+// 最小化DFA标签页的正则表达式选择切换
+void MainWindow::on_comboBoxMinDFA_currentIndexChanged(const QString &arg1)
+{
+    // 显示加载状态
+    ui->statusbar->showMessage(tr("正在加载图表..."), 0);
+    
+    m_currentRegexName = arg1;
+    m_isTotalView = (arg1 == "总表");
+
+    // 同步其他下拉列表，避免信号循环
+    ui->comboBoxNFA->blockSignals(true);
+    ui->comboBoxDFA->blockSignals(true);
+    ui->comboBoxNFA->setCurrentText(arg1);
+    ui->comboBoxDFA->setCurrentText(arg1);
+    ui->comboBoxNFA->blockSignals(false);
+    ui->comboBoxDFA->blockSignals(false);
+    
+    // 先清空所有表格内容，准备更新
+    if (m_dynamicTableNFA) {
+        m_dynamicTableNFA->clearContents();
+        m_dynamicTableNFA->setRowCount(0);
+    }
+    if (m_dynamicTableDFA) {
+        m_dynamicTableDFA->clearContents();
+        m_dynamicTableDFA->setRowCount(0);
+    }
+    if (m_dynamicTableMinDFA) {
+        m_dynamicTableMinDFA->clearContents();
+        m_dynamicTableMinDFA->setRowCount(0);
+    }
+    
+    // 处理UI更新，确保清空操作立即生效
+    QApplication::processEvents();
+    
+    // 更新图表显示
+    updateNFADisplay();
+    updateDFADisplay();
+    updateMinimizedDFADisplay();
+    
+    // 显示加载完成状态
+    ui->statusbar->showMessage(tr("图表加载完成"), 3000);
+}
+
+
+
+// 手动刷新NFA图表
+void MainWindow::on_btnRefreshNFA_clicked()
+{
+    // 显示加载状态
+    ui->statusbar->showMessage(tr("正在刷新NFA图表..."), 0);
+    
+    // 保存当前选中的正则表达式名称和视图状态
+    QString currentRegexName = m_currentRegexName;
+    bool currentIsTotalView = m_isTotalView;
+    
+    // 重置图表状态到初始加载状态
+    ui->statusbar->showMessage(tr("正在重置图表状态..."), 0);
+    resetChartDisplayState();
+    
+    // 首先解析正则表达式
+    ui->statusbar->showMessage(tr("正在解析正则表达式..."), 0);
+    QString regexText = ui->textEditRegex->toPlainText();
+    if (regexText.isEmpty()) {
+        QMessageBox::warning(this, tr("警告"), tr("请输入正则表达式"));
+        ui->statusbar->showMessage(tr("刷新失败：正则表达式为空"), 3000);
+        return;
+    }
+    
+    if (!m_regexProcessor.parse(regexText)) {
+        QMessageBox::warning(this, tr("错误"), tr("正则表达式解析失败: %1").arg(m_regexProcessor.getErrorMessage()));
+        ui->statusbar->showMessage(tr("刷新失败：正则表达式解析错误"), 3000);
+        return;
+    }
+    
+    QList<RegexItem> regexItems = m_regexProcessor.getRegexItems();
+    m_currentRegexItems = regexItems;
+    if (regexItems.isEmpty()) {
+        QMessageBox::warning(this, tr("警告"), tr("没有找到有效的正则表达式"));
+        ui->statusbar->showMessage(tr("刷新失败：未找到有效正则表达式"), 3000);
+        return;
+    }
+    
+    // 清空之前的NFA映射
+    ui->statusbar->showMessage(tr("正在清空NFA数据..."), 0);
+    m_nfaMap.clear();
+    m_totalNFA = NFA();
+    
+    // 为每个以下划线开头的正则表达式构建NFA
+    ui->statusbar->showMessage(tr("正在构建NFA..."), 0);
+    int generatedCount = 0;
+    for (const RegexItem &item : regexItems) {
+        // 仅为下划线开头的正则表达式生成NFA
+        if (item.name.startsWith('_')) {
+            NFA nfa = m_nfaBuilder.buildNFA(item);
+            if (!nfa.states.isEmpty()) {
+                m_nfaMap[item.name] = nfa;
+                generatedCount++;
+            }
+        }
+    }
+    
+    if (generatedCount == 0) {
+        QMessageBox::warning(this, tr("错误"), tr("NFA构建失败: %1").arg(m_nfaBuilder.getErrorMessage()));
+        ui->statusbar->showMessage(tr("刷新失败：NFA构建错误"), 3000);
+        return;
+    }
+    
+    // 生成总NFA
+    ui->statusbar->showMessage(tr("正在生成总NFA..."), 0);
+    if (generatedCount > 0) {
+        m_totalNFA = mergeNFAs(m_nfaMap.values());
+    }
+    
+    // 更新正则表达式下拉列表（不改变当前选择）
+    ui->statusbar->showMessage(tr("正在更新下拉列表..."), 0);
+    updateRegexComboBoxWithoutChangingSelection(currentRegexName, currentIsTotalView);
+    
+    // 恢复当前选择状态
+    m_currentRegexName = currentRegexName;
+    m_isTotalView = currentIsTotalView;
+    
+    // 更新NFA图表显示
+    ui->statusbar->showMessage(tr("正在更新图表显示..."), 0);
+    updateNFADisplay();
+    
+    // 强制更新UI
+    ui->groupBoxNFA->update();
+    
+    // 显示加载完成状态
+    ui->statusbar->showMessage(tr("NFA图表刷新完成，共生成 %1 个NFA").arg(generatedCount), 5000);
+}
+
+// 手动刷新DFA图表
+void MainWindow::on_btnRefreshDFA_clicked()
+{
+    // 显示加载状态
+    ui->statusbar->showMessage(tr("正在刷新DFA图表..."), 0);
+    
+    // 保存当前选中的正则表达式名称和视图状态
+    QString currentRegexName = m_currentRegexName;
+    bool currentIsTotalView = m_isTotalView;
+    
+    // 重置图表状态到初始加载状态
+    ui->statusbar->showMessage(tr("正在重置图表状态..."), 0);
+    resetChartDisplayState();
+    
+    // 检查是否已生成NFA
+    if (m_nfaMap.isEmpty()) {
+        QMessageBox::warning(this, tr("警告"), tr("请先生成NFA"));
+        ui->statusbar->showMessage(tr("刷新失败：请先生成NFA"), 3000);
+        return;
+    }
+    
+    // 清空之前的DFA映射
+    ui->statusbar->showMessage(tr("正在清空DFA数据..."), 0);
+    m_dfaMap.clear();
+    m_totalDFA = DFA();
+    
+    // 为每个NFA生成DFA
+    ui->statusbar->showMessage(tr("正在转换NFA到DFA..."), 0);
+    int generatedCount = 0;
+    for (auto it = m_nfaMap.constBegin(); it != m_nfaMap.constEnd(); ++it) {
+        const QString &regexName = it.key();
+        const NFA &nfa = it.value();
+        
+        DFA dfa = m_dfaBuilder.convertNFAToDFA(nfa);
+        if (!dfa.states.isEmpty()) {
+            m_dfaMap[regexName] = dfa;
+            generatedCount++;
+        }
+    }
+    
+    // 生成总DFA
+    ui->statusbar->showMessage(tr("正在生成总DFA..."), 0);
+    if (!m_totalNFA.states.isEmpty()) {
+        m_totalDFA = m_dfaBuilder.convertNFAToDFA(m_totalNFA);
+    }
+    
+    // 更新正则表达式下拉列表（不改变当前选择）
+    ui->statusbar->showMessage(tr("正在更新下拉列表..."), 0);
+    updateRegexComboBoxWithoutChangingSelection(currentRegexName, currentIsTotalView);
+    
+    // 恢复当前选择状态
+    m_currentRegexName = currentRegexName;
+    m_isTotalView = currentIsTotalView;
+    
+    // 更新DFA图表显示
+    ui->statusbar->showMessage(tr("正在更新图表显示..."), 0);
+    updateDFADisplay();
+    
+    // 强制更新UI
+    ui->groupBoxDFA->update();
+    
+    // 显示加载完成状态
+    ui->statusbar->showMessage(tr("DFA图表刷新完成，共生成 %1 个DFA").arg(generatedCount), 5000);
+}
+
+// 手动刷新最小化DFA图表
+void MainWindow::on_btnRefreshMinDFA_clicked()
+{
+    // 显示加载状态
+    ui->statusbar->showMessage(tr("正在刷新最小化DFA图表..."), 0);
+    
+    // 保存当前选中的正则表达式名称和视图状态
+    QString currentRegexName = m_currentRegexName;
+    bool currentIsTotalView = m_isTotalView;
+    
+    // 重置图表状态到初始加载状态
+    ui->statusbar->showMessage(tr("正在重置图表状态..."), 0);
+    resetChartDisplayState();
+    
+    // 检查是否已生成DFA
+    if (m_dfaMap.isEmpty()) {
+        QMessageBox::warning(this, tr("警告"), tr("请先生成DFA"));
+        ui->statusbar->showMessage(tr("刷新失败：请先生成DFA"), 3000);
+        return;
+    }
+    
+    // 清空之前的最小化DFA映射
+    ui->statusbar->showMessage(tr("正在清空最小化DFA数据..."), 0);
+    m_minimizedDfaMap.clear();
+    m_totalMinimizedDFA = DFA();
+    
+    // 为每个DFA生成最小化DFA
+    ui->statusbar->showMessage(tr("正在最小化DFA..."), 0);
+    int generatedCount = 0;
+    for (auto it = m_dfaMap.constBegin(); it != m_dfaMap.constEnd(); ++it) {
+        const QString &regexName = it.key();
+        const DFA &dfa = it.value();
+        
+        DFA minimizedDFA = m_dfaMinimizer.minimizeDFA(dfa);
+        if (!minimizedDFA.states.isEmpty()) {
+            m_minimizedDfaMap[regexName] = minimizedDFA;
+            generatedCount++;
+        }
+    }
+    
+    // 生成总最小化DFA
+    ui->statusbar->showMessage(tr("正在生成总最小化DFA..."), 0);
+    if (!m_totalDFA.states.isEmpty()) {
+        m_totalMinimizedDFA = m_dfaMinimizer.minimizeDFA(m_totalDFA);
+    }
+    
+    // 更新正则表达式下拉列表（不改变当前选择）
+    ui->statusbar->showMessage(tr("正在更新下拉列表..."), 0);
+    updateRegexComboBoxWithoutChangingSelection(currentRegexName, currentIsTotalView);
+    
+    // 恢复当前选择状态
+    m_currentRegexName = currentRegexName;
+    m_isTotalView = currentIsTotalView;
+    
+    // 更新最小化DFA图表显示
+    ui->statusbar->showMessage(tr("正在更新图表显示..."), 0);
+    updateMinimizedDFADisplay();
+    
+    // 强制更新UI
+    ui->groupBoxMinDFA->update();
+    
+    // 显示加载完成状态
+    ui->statusbar->showMessage(tr("最小化DFA图表刷新完成，共生成 %1 个最小化DFA").arg(generatedCount), 5000);
+}
+
+// 创建动态表格
+void MainWindow::createDynamicTables()
+{
+    // 清理之前的动态表格（如果存在）
+    cleanupDynamicTables();
+    
+    // 创建NFA表格
+    m_dynamicTableNFA = new QTableWidget(this);
+    m_dynamicTableNFA->setAlternatingRowColors(true);
+    
+    // 创建DFA表格
+    m_dynamicTableDFA = new QTableWidget(this);
+    m_dynamicTableDFA->setAlternatingRowColors(true);
+    
+    // 创建最小化DFA表格
+    m_dynamicTableMinDFA = new QTableWidget(this);
+    m_dynamicTableMinDFA->setAlternatingRowColors(true);
+    
+    // 将表格添加到对应的GroupBox布局中
+    QVBoxLayout *nfaLayout = qobject_cast<QVBoxLayout*>(ui->groupBoxNFA->layout());
+    if (nfaLayout) {
+        nfaLayout->addWidget(m_dynamicTableNFA);
+    }
+    
+    QVBoxLayout *dfaLayout = qobject_cast<QVBoxLayout*>(ui->groupBoxDFA->layout());
+    if (dfaLayout) {
+        dfaLayout->addWidget(m_dynamicTableDFA);
+    }
+    
+    QVBoxLayout *minDFALayout = qobject_cast<QVBoxLayout*>(ui->groupBoxMinDFA->layout());
+    if (minDFALayout) {
+        minDFALayout->addWidget(m_dynamicTableMinDFA);
+    }
+}
+
+// 清理动态表格
+void MainWindow::cleanupDynamicTables()
+{
+    // 删除所有动态表格对象
+    if (m_dynamicTableNFA) {
+        delete m_dynamicTableNFA;
+        m_dynamicTableNFA = nullptr;
+    }
+    if (m_dynamicTableDFA) {
+        delete m_dynamicTableDFA;
+        m_dynamicTableDFA = nullptr;
+    }
+    if (m_dynamicTableMinDFA) {
+        delete m_dynamicTableMinDFA;
+        m_dynamicTableMinDFA = nullptr;
+    }
 }
