@@ -18,15 +18,21 @@ INCLUDEPATH += . include
 # Input
 HEADERS += include/dfabuilder.h \
            include/dfaminimizer.h \
+           include/task1window.h \
+           include/task2window.h \
            include/lexergenerator.h \
            include/lexertester.h \
            include/mainwindow.h \
            include/nfabuilder.h \
            include/regexprocessor.h
-FORMS += ui/mainwindow.ui
+FORMS += ui/mainwindow.ui \
+          ui/task1window.ui \
+          ui/task2window.ui
 SOURCES += main.cpp \
            src/dfabuilder.cpp \
            src/dfaminimizer.cpp \
+           src/task1window.cpp \
+           src/task2window.cpp \
            src/lexergenerator.cpp \
            src/lexertester.cpp \
            src/mainwindow.cpp \

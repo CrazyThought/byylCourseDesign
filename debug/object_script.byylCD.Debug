@@ -1,0 +1,13 @@
+debug/main.o
+debug/dfabuilder.o
+debug/dfaminimizer.o
+debug/task1window.o
+debug/task2window.o
+debug/lexergenerator.o
+debug/lexertester.o
+debug/mainwindow.o
+debug/nfabuilder.o
+debug/regexprocessor.o
+debug/moc_task1window.o
+debug/moc_task2window.o
+debug/moc_mainwindow.o

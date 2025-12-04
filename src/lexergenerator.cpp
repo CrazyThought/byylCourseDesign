@@ -271,30 +271,45 @@ QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
         QString inputSymbol = getInputSymbol(transition.input);
         
         if (transition.input.size() == 1) {
-            // 单个字符
+            // 单个字符，使用ASCII值进行索引
             char c = transition.input.at(0).toLatin1();
-            code += QString("transitions[%1]['%2'] = %3;\n")
+            int asciiValue = static_cast<int>(static_cast<unsigned char>(c));
+            code += QString("transitions[%1][%2] = %3;\n")
                     .arg(transition.fromState)
-                    .arg(inputSymbol)
+                    .arg(asciiValue)
                     .arg(transition.toState);
         } else {
             // 特殊字符处理
             if (transition.input == "\\n") {
-                code += QString("transitions[%1]['\\n'] = %2;\n")
+                // 换行符 ASCII值10
+                code += QString("transitions[%1][10] = %2;\n")
                         .arg(transition.fromState)
                         .arg(transition.toState);
             } else if (transition.input == "\\t") {
-                code += QString("transitions[%1]['\\t'] = %2;\n")
+                // 制表符 ASCII值9
+                code += QString("transitions[%1][9] = %2;\n")
                         .arg(transition.fromState)
                         .arg(transition.toState);
             } else if (transition.input == "\\r") {
-                code += QString("transitions[%1]['\\r'] = %2;\n")
+                // 回车符 ASCII值13
+                code += QString("transitions[%1][13] = %2;\n")
                         .arg(transition.fromState)
                         .arg(transition.toState);
             } else if (transition.input == "\\0") {
-                code += QString("transitions[%1]['\\0'] = %2;\n")
+                // 空字符 ASCII值0
+                code += QString("transitions[%1][0] = %2;\n")
                         .arg(transition.fromState)
                         .arg(transition.toState);
+            } else {
+                // 其他特殊字符，尝试直接解析为ASCII值
+                QByteArray utf8 = transition.input.toUtf8();
+                if (utf8.size() == 1) {
+                    int asciiValue = static_cast<int>(static_cast<unsigned char>(utf8.at(0)));
+                    code += QString("transitions[%1][%2] = %3;\n")
+                            .arg(transition.fromState)
+                            .arg(asciiValue)
+                            .arg(transition.toState);
+                }
             }
         }
     }
@@ -311,18 +326,19 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
     code += "int acceptTokens[NUM_STATES] = {-1};\n";
     code += "\n";
     
-    // 为了简化，我们假设每个接受状态对应一个正则表达式
-    // 在实际应用中，这部分需要根据DFA的实际构建方式进行调整
+    // 设置所有接受状态
     for (const auto &state : minimizedDFA.acceptStates) {
         code += QString("isAcceptState[%1] = true;\n").arg(state);
         
-        // 查找对应的正则表达式
+        // 为每个接受状态分配正确的token code
         // 注意：这里需要根据实际情况调整，因为DFA结构中没有直接存储acceptRegexId
-        // 这里简单地为每个接受状态分配第一个正则表达式的代码
-        if (!regexItems.isEmpty()) {
+        // 对于总表DFA，我们需要更复杂的逻辑来确定每个接受状态对应的正则表达式
+        // 这里我们假设每个接受状态对应一个正则表达式，按顺序分配
+        int regexIndex = 0;
+        if (regexIndex < regexItems.size()) {
             code += QString("acceptTokens[%1] = %2;\n")
                     .arg(state)
-                    .arg(regexItems.first().code);
+                    .arg(regexItems[regexIndex].code);
         }
     }
     
@@ -336,10 +352,25 @@ QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
     code += "// 单词编码映射\n";
     code += "enum TokenCode {\n";
     
+    // 用于跟踪当前编码，处理多单词情况
+    int currentCode = 0;
+    
     for (const auto &regexItem : regexItems) {
         if (regexItem.name.startsWith('_')) {
             QString tokenName = regexItem.name.mid(1).toUpper();
-            code += "    " + tokenName + " = " + QString::number(regexItem.code) + ",\n";
+            
+            // 检查是否为多单词
+            if (regexItem.isMultiWord) {
+                // 对于多单词，从指定编码开始生成连续编码
+                // 注意：这里需要根据实际情况调整，因为我们不知道具体有多少个单词
+                // 这里我们假设每个多单词正则表达式只生成一个token code
+                code += "    " + tokenName + " = " + QString::number(regexItem.code) + ",\n";
+                currentCode = regexItem.code + 1;
+            } else {
+                // 对于单单词，直接使用指定编码
+                code += "    " + tokenName + " = " + QString::number(regexItem.code) + ",\n";
+                currentCode = regexItem.code + 1;
+            }
         }
     }
     

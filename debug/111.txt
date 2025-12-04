@@ -1,0 +1,26 @@
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1window.cpp:1013: error: no declaration matches 'void Task1Window::updateRegexComboBoxWithoutChangingSelection(const QString&, bool)'
+..\..\src\task1window.cpp: At global scope:
+..\..\src\task1window.cpp:1013:6: error: no declaration matches 'void Task1Window::updateRegexComboBoxWithoutChangingSelection(const QString&, bool)'
+ 1013 | void Task1Window::updateRegexComboBoxWithoutChangingSelection(const QString &currentRegexName, bool isTotalView)
+      |      ^~~~~~~~~~~
+..\..\src\task1window.cpp:1013:6: note: no functions named 'void Task1Window::updateRegexComboBoxWithoutChangingSelection(const QString&, bool)'
+../../include/task1window.h:17:7: note: 'class Task1Window' defined here
+   17 | class Task1Window : public QMainWindow
+      |       ^~~~~~~~~~~
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1window.cpp:1058: error: no declaration matches 'void Task1Window::resetChartDisplayState()'
+..\..\src\task1window.cpp:1058:6: error: no declaration matches 'void Task1Window::resetChartDisplayState()'
+ 1058 | void Task1Window::resetChartDisplayState()
+      |      ^~~~~~~~~~~
+..\..\src\task1window.cpp:1058:6: note: no functions named 'void Task1Window::resetChartDisplayState()'
+../../include/task1window.h:17:7: note: 'class Task1Window' defined here
+   17 | class Task1Window : public QMainWindow
+      |       ^~~~~~~~~~~
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1window.cpp:1368: error: 'resetChartDisplayState' was not declared in this scope
+..\..\src\task1window.cpp: In member function 'void Task1Window::on_btnRefreshNFA_clicked()':
+..\..\src\task1window.cpp:1368:5: error: 'resetChartDisplayState' was not declared in this scope
+ 1368 |     resetChartDisplayState();
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1window.cpp:1426: error: 'updateRegexComboBoxWithoutChangingSelection' was not declared in this scope
+..\..\src\task1window.cpp:1426:5: error: 'updateRegexComboBoxWithoutChangingSelection' was not declared in this scope
+ 1426 |     updateRegexComboBoxWithoutChangingSelection(currentRegexName, currentIsTotalView);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
