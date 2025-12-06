@@ -10,12 +10,26 @@ NFABuilder::~NFABuilder()
 {
 }
 
+// 构建邻接表
+void NFABuilder::buildTransitionTable(NFA &nfa)
+{
+    // 清空现有邻接表
+    nfa.transitionTable.clear();
+    
+    // 遍历所有转换，构建邻接表
+    for (const NFATransition &transition : nfa.transitions) {
+        nfa.transitionTable[transition.fromState][transition.input].insert(transition.toState);
+    }
+}
+
 NFA NFABuilder::buildNFA(const RegexItem &regexItem)
 {
     resetStateCounter();
     m_errorMessage.clear();
     
-    return parseRegex(regexItem.pattern);
+    NFA nfa = parseRegex(regexItem.pattern);
+    buildTransitionTable(nfa); // 构建邻接表
+    return nfa;
 }
 
 QString NFABuilder::getErrorMessage() const

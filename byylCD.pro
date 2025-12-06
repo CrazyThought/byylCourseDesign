@@ -8,6 +8,7 @@ TEMPLATE = app
 TARGET = byylCD
 INCLUDEPATH += . include
 
+
 # You can make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # Please consult the documentation of the deprecated API in order to know
@@ -16,35 +17,43 @@ INCLUDEPATH += . include
 #DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x060000 # disables all APIs deprecated in Qt 6.0.0 and earlier
 
 # Input
-HEADERS += include/task1/dfabuilder.h \
-           include/task1/dfaminimizer.h \
-           include/task1/task1window.h \
-           include/task2/task2window.h \
-           include/task2/bnfparser.h \
-           include/task2/firstfollow.h \
-           include/task2/lr0dfa.h \
-           include/task2/slr1checker.h \
-           include/task2/lr1dfa.h \
-           include/task2/lr1table.h \
-           include/task2/syntaxanalyzer.h \
-           include/task1/lexergenerator.h \
-           include/task1/lexertester.h \
-           include/task1/mainwindow.h \
-           include/task1/nfabuilder.h \
-           include/task1/regexprocessor.h \
-           include/task1/regexengine.h
+HEADERS += include/task1/dfabuilder.h \ 
+           include/task1/dfaminimizer.h \ 
+           include/task1/task1window.h \ 
+           include/task2/task2window.h \ 
+           include/task2/bnfparser.h \ 
+           include/task2/firstfollow.h \ 
+           include/task2/lr0dfa.h \ 
+           include/task2/slr1checker.h \ 
+           include/task2/lr1dfa.h \ 
+           include/task2/lr1table.h \ 
+           include/task2/syntaxanalyzer.h \ 
+           include/task1/lexergenerator.h \ 
+           include/task1/lexertester.h \ 
+           include/task1/mainwindow.h \ 
+           include/task1/nfabuilder.h \ 
+           include/task1/regexprocessor.h \ 
+           include/task1/regexengine.h \ 
+           include/task1/dotgenerator.h
 FORMS += ui/mainwindow.ui \
           ui/task1window.ui \
           ui/task2window.ui
-SOURCES += main.cpp \
-           src/task1/dfabuilder.cpp \
-           src/task1/dfaminimizer.cpp \
-           src/task1/task1window.cpp \
-           src/task2/task2window.cpp \
-           src/task2/bnfparser.cpp \
-           src/task1/lexergenerator.cpp \
-           src/task1/lexertester.cpp \
-           src/task1/mainwindow.cpp \
-           src/task1/nfabuilder.cpp \
-           src/task1/regexprocessor.cpp \
-           src/task1/regexengine.cpp
+SOURCES += main.cpp \ 
+           src/task1/dfabuilder.cpp \ 
+           src/task1/dfaminimizer.cpp \ 
+           src/task1/task1window.cpp \ 
+           src/task2/task2window.cpp \ 
+           src/task2/bnfparser.cpp \ 
+           src/task2/firstfollow.cpp \ 
+           src/task2/lr0dfa.cpp \ 
+           src/task2/slr1checker.cpp \ 
+           src/task2/lr1dfa.cpp \ 
+           src/task2/lr1table.cpp \ 
+           src/task2/syntaxanalyzer.cpp \ 
+           src/task1/lexergenerator.cpp \ 
+           src/task1/lexertester.cpp \ 
+           src/task1/mainwindow.cpp \ 
+           src/task1/nfabuilder.cpp \ 
+           src/task1/regexprocessor.cpp \ 
+           src/task1/regexengine.cpp \ 
+           src/task1/dotgenerator.cpp

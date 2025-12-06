@@ -6,6 +6,9 @@
 #include <QList>
 #include <QMap>
 
+// 包含BNFParser头文件以获取Production定义
+#include "bnfparser.h"
+
 // 前向声明
 class LR1DFA;
 class BNFParser;
@@ -238,7 +241,7 @@ private:
     BNFParser *m_parser;                     // BNF解析器指针
     QMap<int, QMap<QString, Action>> m_actionTable; // Action表
     QMap<int, QMap<QString, int>> m_gotoTable;    // Goto表
-    QString m_errorMessage;                  // 错误信息
+    mutable QString m_errorMessage;          // 错误信息，声明为mutable以便在const函数中修改
     QList<QString> m_conflicts;              // 冲突信息列表
     int m_conflictCount;                     // 冲突数量
     QSet<QString> m_terminals;              // 终结符集合

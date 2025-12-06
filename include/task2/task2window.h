@@ -83,6 +83,7 @@ private:
     
     // 辅助函数
     void initUI();
+    void loadExampleGrammar();
     void displayFirstSet();
     void displayFollowSet();
     void displayLR0DFA();

@@ -6,9 +6,9 @@
 #include <QList>
 #include <QMap>
 
-// 前向声明
+// 包含BNFParser头文件以获取Production定义
+#include "bnfparser.h"
 class BNFParser;
-struct Production;
 
 // LR(0)项目结构
 struct LR0Item {
@@ -72,6 +72,16 @@ struct LR0Item {
      */
     QString toString() const;
 };
+
+/**
+ * @brief 为LR0Item提供qHash函数，以便在QSet和QMap中使用
+ * @param item LR0Item实例
+ * @return 哈希值
+ */
+inline uint qHash(const LR0Item &item, uint seed = 0)
+{
+    return qHash(item.productionIndex, seed) ^ qHash(item.dotPosition, seed);
+}
 
 // LR(0)项目集结构
 struct LR0ItemSet {

@@ -6,32 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>800</height>
+    <width>1200</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>实验二 - 未来扩展</string>
+   <string>实验二 - 语法分析器生成器</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
-      <widget class="QWidget" name="tabRegexInput">
+      <widget class="QWidget" name="tabBNF">
        <attribute name="title">
-        <string>正则表达式输入与解析</string>
+        <string>BNF文法处理</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QGroupBox" name="groupBox_Input">
+           <widget class="QGroupBox" name="groupBoxBNFInput">
             <property name="title">
-             <string>正则表达式输入</string>
+             <string>BNF文法输入</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QTextEdit" name="textEditRegexInput">
+              <widget class="QTextEdit" name="textEditBNF">
                <property name="font">
                 <font>
                  <family>Courier New</family>
@@ -43,9 +43,9 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
-                <widget class="QPushButton" name="pushButtonParse">
+                <widget class="QPushButton" name="pushButtonParseBNF">
                  <property name="text">
-                  <string>解析</string>
+                  <string>解析文法</string>
                  </property>
                 </widget>
                </item>
@@ -57,7 +57,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonClear">
+                <widget class="QPushButton" name="pushButtonClearBNF">
                  <property name="text">
                   <string>清空</string>
                  </property>
@@ -69,51 +69,18 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_ParseResult">
+           <widget class="QGroupBox" name="groupBoxGrammarInfo">
             <property name="title">
-             <string>解析结果</string>
+             <string>文法信息</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QTableWidget" name="tableWidgetParseResult">
-               <property name="horizontalScrollMode">
-                <enum>QAbstractItemView::ScrollPerItem</enum>
-               </property>
-               <property name="columnCount">
-                <number>4</number>
-               </property>
-               <attribute name="horizontalHeaderStretchLastSection">
-                <bool>true</bool>
-               </attribute>
-               <column>
-                <property name="text">
-                 <string>名称</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>模式</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>编码</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>是否为多单词</string>
-                </property>
-               </column>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="labelErrorMessage">
-               <property name="text">
-                <string>错误信息：</string>
-               </property>
-               <property name="styleSheet">
-                <string>color: red;</string>
+              <widget class="QTextBrowser" name="textBrowserGrammarInfo">
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                 <pointsize>10</pointsize>
+                </font>
                </property>
               </widget>
              </item>
@@ -124,24 +91,24 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabNFA">
+      <widget class="QWidget" name="tabFirstFollow">
        <attribute name="title">
-        <string>NFA可视化</string>
+        <string>First与Follow集合</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QPushButton" name="pushButtonBuildNFA">
+           <widget class="QPushButton" name="pushButtonCalculateFirst">
             <property name="text">
-             <string>构建NFA</string>
+             <string>计算First集合</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonExportNFA">
+           <widget class="QPushButton" name="pushButtonCalculateFollow">
             <property name="text">
-             <string>导出NFA</string>
+             <string>计算Follow集合</string>
             </property>
            </widget>
           </item>
@@ -158,58 +125,102 @@
             </property>
            </spacer>
           </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLabel" name="labelNFAInfo">
-            <property name="text">
-             <string>NFA信息：状态数: 0, 转移数: 0</string>
+           <widget class="QGroupBox" name="groupBoxFirst">
+            <property name="title">
+             <string>First集合</string>
             </property>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="QTableWidget" name="tableWidgetFirst">
+               <property name="editTriggers">
+                <enum>QAbstractItemView::NoEditTriggers</enum>
+               </property>
+               <property name="horizontalScrollMode">
+                <enum>QAbstractItemView::ScrollPerPixel</enum>
+               </property>
+               <property name="columnCount">
+                <number>2</number>
+               </property>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>非终结符</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>First集合</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBoxFollow">
+            <property name="title">
+             <string>Follow集合</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QTableWidget" name="tableWidgetFollow">
+               <property name="editTriggers">
+                <enum>QAbstractItemView::NoEditTriggers</enum>
+               </property>
+               <property name="horizontalScrollMode">
+                <enum>QAbstractItemView::ScrollPerPixel</enum>
+               </property>
+               <property name="columnCount">
+                <number>2</number>
+               </property>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>非终结符</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Follow集合</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
         </item>
-        <item>
-         <widget class="QTableWidget" name="tableWidgetNFA">
-          <property name="horizontalScrollMode">
-           <enum>QAbstractItemView::ScrollPerItem</enum>
-          </property>
-          <property name="columnCount">
-           <number>2</number>
-          </property>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-          <column>
-           <property name="text">
-            <string>状态标记</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>状态编号</string>
-           </property>
-          </column>
-         </widget>
-        </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabDFA">
+      <widget class="QWidget" name="tabLR0DFA">
        <attribute name="title">
-        <string>DFA可视化</string>
+        <string>LR(0) DFA</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
+       <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QPushButton" name="pushButtonConvertDFA">
+           <widget class="QPushButton" name="pushButtonGenerateLR0DFA">
             <property name="text">
-             <string>转换DFA</string>
+             <string>生成LR(0) DFA</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonExportDFA">
-            <property name="text">
-             <string>导出DFA</string>
+           <widget class="QComboBox" name="comboBoxLR0View">
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
             </property>
            </widget>
           </item>
@@ -226,58 +237,101 @@
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QLabel" name="labelDFAInfo">
-            <property name="text">
-             <string>DFA信息：状态数: 0, 转移数: 0</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>
-         <widget class="QTableWidget" name="tableWidgetDFA">
-          <property name="horizontalScrollMode">
-           <enum>QAbstractItemView::ScrollPerItem</enum>
+         <widget class="QGroupBox" name="groupBoxLR0DFA">
+          <property name="title">
+           <string>LR(0) DFA</string>
           </property>
-          <property name="columnCount">
-           <number>2</number>
-          </property>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-          <column>
-           <property name="text">
-            <string>状态标记</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>状态编号</string>
-           </property>
-          </column>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QTableWidget" name="tableWidgetLR0">
+             <property name="editTriggers">
+              <enum>QAbstractItemView::NoEditTriggers</enum>
+             </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
+              <property name="columnCount">
+               <number>3</number>
+              </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>状态ID</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>项目集</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>转移关系</string>
+               </property>
+              </column>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabMinDFA">
+      <widget class="QWidget" name="tabSLR1">
        <attribute name="title">
-        <string>最小化DFA可视化</string>
+        <string>SLR(1)文法判断</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_7">
+       <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <widget class="QPushButton" name="pushButtonCheckSLR1">
+          <property name="text">
+           <string>检查SLR(1)文法</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxSLR1Result">
+          <property name="title">
+           <string>SLR(1)判断结果</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <item>
+            <widget class="QTextBrowser" name="textBrowserSLR1Result">
+             <property name="font">
+              <font>
+               <family>Courier New</family>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabLR1DFA">
+       <attribute name="title">
+        <string>LR(1) DFA</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_12">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
-           <widget class="QPushButton" name="pushButtonMinimizeDFA">
+           <widget class="QPushButton" name="pushButtonGenerateLR1DFA">
             <property name="text">
-             <string>最小化DFA</string>
+             <string>生成LR(1) DFA</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonExportMinDFA">
-            <property name="text">
-             <string>导出最小化DFA</string>
+           <widget class="QComboBox" name="comboBoxLR1View">
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
             </property>
            </widget>
           </item>
@@ -294,37 +348,266 @@
             </property>
            </spacer>
           </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxLR1DFA">
+          <property name="title">
+           <string>LR(1) DFA</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_13">
+           <item>
+            <widget class="QTableWidget" name="tableWidgetLR1">
+             <property name="editTriggers">
+              <enum>QAbstractItemView::NoEditTriggers</enum>
+             </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
+              <property name="columnCount">
+               <number>3</number>
+              </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>状态ID</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>项目集</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>转移关系</string>
+               </property>
+              </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabLR1Table">
+       <attribute name="title">
+        <string>LR(1)分析表</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_14">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
-           <widget class="QLabel" name="labelMinDFAInfo">
+           <widget class="QPushButton" name="pushButtonGenerateLR1Table">
             <property name="text">
-             <string>最小化DFA信息：状态数: 0, 转移数: 0</string>
+             <string>生成LR(1)分析表</string>
             </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonSaveLR1Table">
+            <property name="text">
+             <string>保存分析表</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxLR1Table">
+          <property name="title">
+           <string>LR(1)分析表</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_15">
+           <item>
+            <widget class="QTableWidget" name="tableWidgetLR1Table">
+             <property name="editTriggers">
+              <enum>QAbstractItemView::NoEditTriggers</enum>
+             </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
+              <property name="columnCount">
+               <number>2</number>
+              </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>状态ID</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Action/Goto</string>
+               </property>
+              </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabSyntaxAnalysis">
+       <attribute name="title">
+        <string>语法分析</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_16">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QPushButton" name="pushButtonOpenTokenFile">
+            <property name="text">
+             <string>打开词法单元文件</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonAnalyzeSyntax">
+            <property name="text">
+             <string>进行语法分析</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonSaveSyntaxTree">
+            <property name="text">
+             <string>保存语法树</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QGroupBox" name="groupBoxTokenFile">
+            <property name="title">
+             <string>词法单元文件</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_17">
+             <item>
+              <widget class="QTextEdit" name="textEditTokenFile">
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QTableWidget" name="tableWidgetMinDFA">
-          <property name="horizontalScrollMode">
-           <enum>QAbstractItemView::ScrollPerItem</enum>
-          </property>
-          <property name="columnCount">
-           <number>2</number>
-          </property>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-          <column>
-           <property name="text">
-            <string>状态标记</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>状态编号</string>
-           </property>
-          </column>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QGroupBox" name="groupBoxAnalysisSteps">
+            <property name="title">
+             <string>分析步骤</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_18">
+             <item>
+              <widget class="QTableWidget" name="tableWidgetAnalysisSteps">
+               <property name="editTriggers">
+                <enum>QAbstractItemView::NoEditTriggers</enum>
+               </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
+              <property name="columnCount">
+               <number>5</number>
+              </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>步骤</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>状态栈</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>符号栈</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>输入串</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>动作</string>
+               </property>
+              </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBoxSyntaxTree">
+            <property name="title">
+             <string>语法树</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_19">
+             <item>
+              <widget class="QTreeWidget" name="treeWidgetSyntaxTree">
+               <property name="editTriggers">
+                <enum>QAbstractItemView::NoEditTriggers</enum>
+               </property>
+               <property name="headerHidden">
+                <bool>false</bool>
+               </property>
+               <column>
+                <property name="text">
+                 <string>语法树</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -337,7 +620,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1200</width>
      <height>21</height>
     </rect>
    </property>
@@ -345,6 +628,8 @@
     <property name="title">
      <string>文件</string>
     </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -353,6 +638,16 @@
   <action name="actionExit">
    <property name="text">
     <string>退出</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>打开</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>保存</string>
    </property>
   </action>
  </widget>

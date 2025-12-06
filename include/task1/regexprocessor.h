@@ -48,6 +48,12 @@ private:
     
     // 提取多单词列表
     QStringList extractMultiWords(const QString &pattern);
+    
+    // 生成所有可能的大小写组合
+    static QStringList generateAllCaseCombinations(const QString &pattern);
+    
+    // 从分组的正则表达式中生成所有可能的单词变体
+    QStringList generateWordsFromGroupedRegex(const QString &pattern, int depth = 0);
 
 private:
     QList<RegexItem> m_regexItems;

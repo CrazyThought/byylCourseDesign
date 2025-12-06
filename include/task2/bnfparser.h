@@ -93,6 +93,20 @@ public:
      * @return 产生式列表
      */
     QList<Production> getProductionsByNonTerminal(const QString &nonTerminal) const;
+    
+    /**
+     * @brief 检查符号是否为非终结符
+     * @param symbol 符号
+     * @return 是否为非终结符
+     */
+    bool isNonTerminal(const QString &symbol) const;
+    
+    /**
+     * @brief 检查符号是否为终结符
+     * @param symbol 符号
+     * @return 是否为终结符
+     */
+    bool isTerminal(const QString &symbol) const;
 
 private:
     /**
@@ -116,26 +130,12 @@ private:
      */
     void extractSymbols();
     
-    /**
-     * @brief 检查符号是否为非终结符
-     * @param symbol 符号
-     * @return 是否为非终结符
-     */
-    bool isNonTerminal(const QString &symbol) const;
-    
-    /**
-     * @brief 检查符号是否为终结符
-     * @param symbol 符号
-     * @return 是否为终结符
-     */
-    bool isTerminal(const QString &symbol) const;
-    
 private:
     QList<Production> m_productions;    // 解析后的产生式列表
     QSet<QString> m_nonTerminals;        // 非终结符集合
     QSet<QString> m_terminals;           // 终结符集合
     QString m_startSymbol;               // 文法开始符号
-    QString m_errorMessage;              // 错误信息
+    mutable QString m_errorMessage;      // 错误信息，声明为mutable以便在const函数中修改
     QString m_originalText;              // 原始文本
     QMap<QString, int> m_productionIndices; // 产生式索引映射
 };

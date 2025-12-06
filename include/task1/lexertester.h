@@ -22,7 +22,7 @@ public:
     bool compileLexer(const QString &lexerCode, const QString &outputFileName = "lexer");
     
     // 测试词法分析器
-    QList<LexicalResult> testLexer(const QString &sourceFile);
+    QList<LexicalResult> testLexer(const QString &sourceFile, const QString &lexerExecutable = "lexer");
     
     // 获取错误信息
     QString getError() const;

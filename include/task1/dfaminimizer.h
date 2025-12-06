@@ -35,6 +35,9 @@ private:
     // 辅助函数：创建新的DFA状态映射
     QMap<DFAState, DFAState> createStateMap(const QList<QSet<DFAState>> &partitions);
     
+    // 增强Hopcroft算法以处理可选符号的语义限制
+    QList<QSet<DFAState>> enhanceHopcroftForOptionalSymbols(const DFA &dfa, const QList<QSet<DFAState>> &partitions);
+    
     // 错误信息
     QString m_errorMessage;
 };

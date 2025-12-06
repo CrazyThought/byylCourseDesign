@@ -17,7 +17,15 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
     m_errorMessage.clear();
     
     DFA dfa;
-    dfa.alphabet = nfa.alphabet; // DFA的字母表与NFA相同（不包含ε）
+    
+    // 构建DFA的字母表：收集NFA中所有非空转换字符
+    dfa.alphabet = nfa.alphabet;
+    // 额外检查NFA的所有转换，确保字母表包含所有必要字符
+    for (const NFATransition &transition : nfa.transitions) {
+        if (transition.input != "#") {
+            dfa.alphabet.insert(transition.input);
+        }
+    }
     
     // 计算起始状态的ε-闭包
     QSet<NFAState> startNFAStates;
@@ -95,6 +103,7 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
             transition.toState = targetDFAState;
             dfa.transitions.append(transition);
         }
+    }
     
     // 确保每个状态对每个输入字符都有转换（添加遗漏的转换）
     for (DFAState state : dfa.states) {
@@ -126,7 +135,7 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
     
     return dfa;
 }
-}
+
 QString DFABuilder::getErrorMessage() const
 {
     return m_errorMessage;
@@ -140,12 +149,16 @@ QSet<NFAState> DFABuilder::epsilonClosure(const NFA &nfa, const QSet<NFAState> &
     while (!toProcess.isEmpty()) {
         NFAState currentState = toProcess.takeFirst();
         
-        // 找到所有通过ε转换可达的状态
-        for (const NFATransition &transition : nfa.transitions) {
-            if (transition.fromState == currentState && transition.input == "#") {
-                if (!closure.contains(transition.toState)) {
-                    closure.insert(transition.toState);
-                    toProcess.append(transition.toState);
+        // 使用邻接表查找所有通过ε转换可达的状态
+        if (nfa.transitionTable.contains(currentState)) {
+            const QHash<QString, QSet<NFAState>> &transitions = nfa.transitionTable[currentState];
+            if (transitions.contains("#")) {
+                const QSet<NFAState> &epsilonStates = transitions["#"];
+                for (NFAState nextState : epsilonStates) {
+                    if (!closure.contains(nextState)) {
+                        closure.insert(nextState);
+                        toProcess.append(nextState);
+                    }
                 }
             }
         }
@@ -159,10 +172,11 @@ QSet<NFAState> DFABuilder::move(const NFA &nfa, const QSet<NFAState> &states, co
     QSet<NFAState> result;
     
     for (NFAState state : states) {
-        // 找到所有通过input转换可达的状态
-        for (const NFATransition &transition : nfa.transitions) {
-            if (transition.fromState == state && transition.input == input) {
-                result.insert(transition.toState);
+        // 使用邻接表查找所有通过input转换可达的状态
+        if (nfa.transitionTable.contains(state)) {
+            const QHash<QString, QSet<NFAState>> &transitions = nfa.transitionTable[state];
+            if (transitions.contains(input)) {
+                result.unite(transitions[input]);
             }
         }
     }

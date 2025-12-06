@@ -5,6 +5,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDir>
+#include <utility>
 
 Task1Window::Task1Window(QWidget *parent)
     : QMainWindow(parent)
@@ -18,8 +20,20 @@ Task1Window::Task1Window(QWidget *parent)
     // 创建动态表格
     createDynamicTables();
     
-    // 初始化测试输出表格
-    initTableWidget(ui->tableTestOutput, QStringList() << "行号" << "单词" << "编码");
+    // 初始化测试输出文本框（替换表格）
+    m_textEditTestOutput = new QTextEdit(this);
+    m_textEditTestOutput->setObjectName("textEditTestOutput");
+    m_textEditTestOutput->setReadOnly(true);
+    m_textEditTestOutput->setMinimumHeight(300);
+    
+    // 移除原来的表格
+    QHBoxLayout *layout = ui->horizontalLayout_3;
+    if (layout) {
+        layout->removeWidget(ui->tableTestOutput);
+        ui->tableTestOutput->setParent(nullptr);
+        delete ui->tableTestOutput;
+        layout->addWidget(m_textEditTestOutput);
+    }
     
     // 初始化成员变量
     m_currentRegexName = "";
@@ -265,6 +279,12 @@ NFA Task1Window::mergeNFAs(const QList<NFA> &nfAs)
         totalNFA.transitions.append(transition);
     }
     
+    // 构建总NFA的邻接表
+    totalNFA.transitionTable.clear();
+    for (const NFATransition &transition : totalNFA.transitions) {
+        totalNFA.transitionTable[transition.fromState][transition.input].insert(transition.toState);
+    }
+    
     return totalNFA;
 }
 
@@ -460,29 +480,17 @@ void Task1Window::on_btnRunLexer_clicked()
 
 void Task1Window::on_btnSaveTestOutput_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("保存测试结果"), ".", tr("文本文件 (*.txt)"));
-    if (!fileName.isEmpty()) {
-        QFile file(fileName);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream out(&file);
-            // 从表格中读取数据并保存
-            for (int row = 0; row < ui->tableTestOutput->rowCount(); ++row) {
-                for (int col = 0; col < ui->tableTestOutput->columnCount(); ++col) {
-                    QTableWidgetItem *item = ui->tableTestOutput->item(row, col);
-                    if (item) {
-                        out << item->text();
-                        if (col < ui->tableTestOutput->columnCount() - 1) {
-                            out << "\t";
-                        }
-                    }
-                }
-                out << "\n";
-            }
-            file.close();
-            QMessageBox::information(this, tr("成功"), tr("文件已保存"));
-        } else {
-            QMessageBox::warning(this, tr("错误"), tr("无法保存文件：") + file.errorString());
-        }
+    // 直接保存到sample.lex文件
+    QString fileName = "sample.lex";
+    QFile file(fileName);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        // 从文本框中读取数据并保存
+        out << m_textEditTestOutput->toPlainText();
+        file.close();
+        QMessageBox::information(this, tr("成功"), tr("结果已保存到sample.lex文件"));
+    } else {
+        QMessageBox::warning(this, tr("错误"), tr("无法保存文件：") + file.errorString());
     }
 }
 
@@ -534,7 +542,7 @@ void Task1Window::clearTable(QTableWidget *table)
 }
 
 // 处理正则表达式引用，返回字符到引用名称的映射
-QMap<QString, QString> Task1Window::processRegexReferences(const QList<RegexItem> &regexItems)
+QMap<QString, QString> Task1Window::processRegexReferences(const QList<RegexItem> &/*regexItems*/)
 {
     QMap<QString, QString> charToRefMap;
     
@@ -650,41 +658,70 @@ void Task1Window::displayNFA(const NFA &nfa, QTableWidget *table)
         transitions.insert(transition.input);
     }
     
+    // 检查当前处理的正则表达式是否为keyword（不区分大小写）
+    bool isKeywordRegex = false;
+    if (!m_isTotalView && m_currentRegexName.size() >= 8) {
+        QString regexName = m_currentRegexName.toLower();
+        // 提取正则表达式名称，忽略编号和S
+        int underscoreIndex = regexName.indexOf('_');
+        if (underscoreIndex != -1) {
+            QString baseName = regexName.mid(underscoreIndex + 1);
+            // 移除编号部分（从数字开始）
+            int digitIndex = 0;
+            while (digitIndex < baseName.size() && !baseName[digitIndex].isDigit()) {
+                digitIndex++;
+            }
+            baseName = baseName.left(digitIndex);
+            // 检查是否为keyword
+            isKeywordRegex = (baseName == "keyword");
+        }
+    }
+    
     // 处理正则表达式引用
-    QMap<QString, QString> charToRefMap = processRegexReferences(m_currentRegexItems);
-    
-    // 合并相同引用名称的转移
-    QMap<QString, QList<QString>> refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
-    
-    // 收集所有引用名称
-    QSet<QString> referenceNames;
-    QString regexText = ui->textEditRegex->toPlainText();
-    QStringList lines = regexText.split("\n");
-    for (const QString &line : lines) {
-        QString trimmedLine = line.trimmed();
-        // 移除可能存在的回车符
-        trimmedLine = trimmedLine.replace("\r", "");
-        if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
-            continue;
-        }
-        int equalsPos = trimmedLine.indexOf('=');
-        if (equalsPos == -1) {
-            continue;
-        }
-        QString name = trimmedLine.left(equalsPos).trimmed();
-        if (!name.startsWith('_')) {
-            referenceNames.insert(name);
-        }
-    }
-    
-    // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+    QMap<QString, QString> charToRefMap;
+    QMap<QString, QList<QString>> refToCharsMap;
     QStringList refList;
-    for (const QString &key : refToCharsMap.keys()) {
-        if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
-            refList << key;
+    
+    if (isKeywordRegex) {
+        // 直接使用原始转移字符，不合并
+        refList = QList<QString>(transitions.begin(), transitions.end());
+        std::sort(refList.begin(), refList.end());
+    } else {
+        // 处理正则表达式引用
+        charToRefMap = processRegexReferences(m_currentRegexItems);
+        
+        // 合并相同引用名称的转移
+        refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
+        
+        // 收集所有引用名称
+        QSet<QString> referenceNames;
+        QString regexText = ui->textEditRegex->toPlainText();
+        QStringList lines = regexText.split("\n");
+        for (const QString &line : lines) {
+            QString trimmedLine = line.trimmed();
+            // 移除可能存在的回车符
+            trimmedLine = trimmedLine.replace("\r", "");
+            if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
+                continue;
+            }
+            int equalsPos = trimmedLine.indexOf('=');
+            if (equalsPos == -1) {
+                continue;
+            }
+            QString name = trimmedLine.left(equalsPos).trimmed();
+            if (!name.startsWith('_')) {
+                referenceNames.insert(name);
+            }
         }
+        
+        // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+        for (const QString &key : refToCharsMap.keys()) {
+            if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
+                refList << key;
+            }
+        }
+        std::sort(refList.begin(), refList.end());
     }
-    std::sort(refList.begin(), refList.end());
     
     // 设置表头
     QStringList headers;
@@ -717,8 +754,16 @@ void Task1Window::displayNFA(const NFA &nfa, QTableWidget *table)
         rowData << QString::number(state);
         
         // 后续列：转移对应的目标状态
-        for (const QString &ref : qAsConst(refList)) {
-            QList<QString> chars = refToCharsMap[ref];
+        for (const QString &ref : std::as_const(refList)) {
+            QList<QString> chars;
+            if (isKeywordRegex) {
+                // 直接使用当前ref作为字符
+                chars << ref;
+            } else {
+                // 获取引用名称对应的字符列表
+                chars = refToCharsMap[ref];
+            }
+            
             QSet<int> uniqueTargetStates;
             
             // 收集所有匹配字符的转移
@@ -759,41 +804,70 @@ void Task1Window::displayDFA(const DFA &dfa, QTableWidget *table)
         transitions.insert(transition.input);
     }
     
+    // 检查当前处理的正则表达式是否为keyword（不区分大小写）
+    bool isKeywordRegex = false;
+    if (!m_isTotalView && m_currentRegexName.size() >= 8) {
+        QString regexName = m_currentRegexName.toLower();
+        // 提取正则表达式名称，忽略编号和S
+        int underscoreIndex = regexName.indexOf('_');
+        if (underscoreIndex != -1) {
+            QString baseName = regexName.mid(underscoreIndex + 1);
+            // 移除编号部分（从数字开始）
+            int digitIndex = 0;
+            while (digitIndex < baseName.size() && !baseName[digitIndex].isDigit()) {
+                digitIndex++;
+            }
+            baseName = baseName.left(digitIndex);
+            // 检查是否为keyword
+            isKeywordRegex = (baseName == "keyword");
+        }
+    }
+    
     // 处理正则表达式引用
-    QMap<QString, QString> charToRefMap = processRegexReferences(m_currentRegexItems);
-    
-    // 合并相同引用名称的转移
-    QMap<QString, QList<QString>> refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
-    
-    // 收集所有引用名称
-    QSet<QString> referenceNames;
-    QString regexText = ui->textEditRegex->toPlainText();
-    QStringList lines = regexText.split("\n");
-    for (const QString &line : lines) {
-        QString trimmedLine = line.trimmed();
-        // 移除可能存在的回车符
-        trimmedLine = trimmedLine.replace("\r", "");
-        if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
-            continue;
-        }
-        int equalsPos = trimmedLine.indexOf('=');
-        if (equalsPos == -1) {
-            continue;
-        }
-        QString name = trimmedLine.left(equalsPos).trimmed();
-        if (!name.startsWith('_')) {
-            referenceNames.insert(name);
-        }
-    }
-    
-    // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+    QMap<QString, QString> charToRefMap;
+    QMap<QString, QList<QString>> refToCharsMap;
     QStringList refList;
-    for (const QString &key : refToCharsMap.keys()) {
-        if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
-            refList << key;
+    
+    if (isKeywordRegex) {
+        // 直接使用原始转移字符，不合并
+        refList = QList<QString>(transitions.begin(), transitions.end());
+        std::sort(refList.begin(), refList.end());
+    } else {
+        // 处理正则表达式引用
+        charToRefMap = processRegexReferences(m_currentRegexItems);
+        
+        // 合并相同引用名称的转移
+        refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
+        
+        // 收集所有引用名称
+        QSet<QString> referenceNames;
+        QString regexText = ui->textEditRegex->toPlainText();
+        QStringList lines = regexText.split("\n");
+        for (const QString &line : lines) {
+            QString trimmedLine = line.trimmed();
+            // 移除可能存在的回车符
+            trimmedLine = trimmedLine.replace("\r", "");
+            if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
+                continue;
+            }
+            int equalsPos = trimmedLine.indexOf('=');
+            if (equalsPos == -1) {
+                continue;
+            }
+            QString name = trimmedLine.left(equalsPos).trimmed();
+            if (!name.startsWith('_')) {
+                referenceNames.insert(name);
+            }
         }
+        
+        // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+        for (const QString &key : refToCharsMap.keys()) {
+            if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
+                refList << key;
+            }
+        }
+        std::sort(refList.begin(), refList.end());
     }
-    std::sort(refList.begin(), refList.end());
     
     // 设置表头
     QStringList headers;
@@ -803,6 +877,14 @@ void Task1Window::displayDFA(const DFA &dfa, QTableWidget *table)
     }
     table->setColumnCount(headers.size());
     table->setHorizontalHeaderLabels(headers);
+    
+    // 创建DFA状态到NFA状态集合的反向映射
+    QMap<DFAState, QList<NFAState>> dfaToNfaStatesMap;
+    for (auto it = dfa.stateMap.constBegin(); it != dfa.stateMap.constEnd(); ++it) {
+        const QList<NFAState> &nfaStates = it.key();
+        DFAState dfaState = it.value();
+        dfaToNfaStatesMap[dfaState] = nfaStates;
+    }
     
     // 收集所有状态并排序
     QList<DFAState> allStates = dfa.states;
@@ -827,7 +909,15 @@ void Task1Window::displayDFA(const DFA &dfa, QTableWidget *table)
         
         // 后续列：转移对应的目标状态
         for (const QString &ref : refList) {
-            QList<QString> chars = refToCharsMap[ref];
+            QList<QString> chars;
+            if (isKeywordRegex) {
+                // 直接使用当前ref作为字符
+                chars << ref;
+            } else {
+                // 获取引用名称对应的字符列表
+                chars = refToCharsMap[ref];
+            }
+            
             QString targetState = "";
             
             // 查找匹配字符的转移，DFA每个状态和转移只有一个目标状态
@@ -863,41 +953,70 @@ void Task1Window::displayMinimizedDFA(const DFA &dfa, QTableWidget *table)
         transitions.insert(transition.input);
     }
     
+    // 检查当前处理的正则表达式是否为keyword（不区分大小写）
+    bool isKeywordRegex = false;
+    if (!m_isTotalView && m_currentRegexName.size() >= 8) {
+        QString regexName = m_currentRegexName.toLower();
+        // 提取正则表达式名称，忽略编号和S
+        int underscoreIndex = regexName.indexOf('_');
+        if (underscoreIndex != -1) {
+            QString baseName = regexName.mid(underscoreIndex + 1);
+            // 移除编号部分（从数字开始）
+            int digitIndex = 0;
+            while (digitIndex < baseName.size() && !baseName[digitIndex].isDigit()) {
+                digitIndex++;
+            }
+            baseName = baseName.left(digitIndex);
+            // 检查是否为keyword
+            isKeywordRegex = (baseName == "keyword");
+        }
+    }
+    
     // 处理正则表达式引用
-    QMap<QString, QString> charToRefMap = processRegexReferences(m_currentRegexItems);
-    
-    // 合并相同引用名称的转移
-    QMap<QString, QList<QString>> refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
-    
-    // 收集所有引用名称
-    QSet<QString> referenceNames;
-    QString regexText = ui->textEditRegex->toPlainText();
-    QStringList lines = regexText.split("\n");
-    for (const QString &line : lines) {
-        QString trimmedLine = line.trimmed();
-        // 移除可能存在的回车符
-        trimmedLine = trimmedLine.replace("\r", "");
-        if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
-            continue;
-        }
-        int equalsPos = trimmedLine.indexOf('=');
-        if (equalsPos == -1) {
-            continue;
-        }
-        QString name = trimmedLine.left(equalsPos).trimmed();
-        if (!name.startsWith('_')) {
-            referenceNames.insert(name);
-        }
-    }
-    
-    // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+    QMap<QString, QString> charToRefMap;
+    QMap<QString, QList<QString>> refToCharsMap;
     QStringList refList;
-    for (const QString &key : refToCharsMap.keys()) {
-        if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
-            refList << key;
+    
+    if (isKeywordRegex) {
+        // 直接使用原始转移字符，不合并
+        refList = QList<QString>(transitions.begin(), transitions.end());
+        std::sort(refList.begin(), refList.end());
+    } else {
+        // 处理正则表达式引用
+        charToRefMap = processRegexReferences(m_currentRegexItems);
+        
+        // 合并相同引用名称的转移
+        refToCharsMap = mergeTransitionsByRef(transitions, charToRefMap);
+        
+        // 收集所有引用名称
+        QSet<QString> referenceNames;
+        QString regexText = ui->textEditRegex->toPlainText();
+        QStringList lines = regexText.split("\n");
+        for (const QString &line : lines) {
+            QString trimmedLine = line.trimmed();
+            // 移除可能存在的回车符
+            trimmedLine = trimmedLine.replace("\r", "");
+            if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
+                continue;
+            }
+            int equalsPos = trimmedLine.indexOf('=');
+            if (equalsPos == -1) {
+                continue;
+            }
+            QString name = trimmedLine.left(equalsPos).trimmed();
+            if (!name.startsWith('_')) {
+                referenceNames.insert(name);
+            }
         }
+        
+        // 将引用名称转换为列表并排序，保留引用名称、"#"和没有映射到引用名称的字符
+        for (const QString &key : refToCharsMap.keys()) {
+            if (key == "#" || referenceNames.contains(key) || (refToCharsMap[key].size() == 1 && refToCharsMap[key].first() == key)) {
+                refList << key;
+            }
+        }
+        std::sort(refList.begin(), refList.end());
     }
-    std::sort(refList.begin(), refList.end());
     
     // 设置表头
     QStringList headers;
@@ -908,11 +1027,9 @@ void Task1Window::displayMinimizedDFA(const DFA &dfa, QTableWidget *table)
     table->setColumnCount(headers.size());
     table->setHorizontalHeaderLabels(headers);
     
-    // 收集所有状态
-    QSet<DFAState> allStates;
-    for (const DFAState &state : dfa.states) {
-        allStates.insert(state);
-    }
+    // 收集所有状态并排序
+    QList<DFAState> allStates = dfa.states;
+    std::sort(allStates.begin(), allStates.end());
     
     // 为每个状态创建一行
     for (const DFAState &state : allStates) {
@@ -933,7 +1050,15 @@ void Task1Window::displayMinimizedDFA(const DFA &dfa, QTableWidget *table)
         
         // 后续列：转移对应的目标状态
         for (const QString &ref : refList) {
-            QList<QString> chars = refToCharsMap[ref];
+            QList<QString> chars;
+            if (isKeywordRegex) {
+                // 直接使用当前ref作为字符
+                chars << ref;
+            } else {
+                // 获取引用名称对应的字符列表
+                chars = refToCharsMap[ref];
+            }
+            
             QString targetState = "";
             
             // 查找匹配字符的转移
@@ -961,26 +1086,27 @@ void Task1Window::displayMinimizedDFA(const DFA &dfa, QTableWidget *table)
 
 void Task1Window::displayLexicalResults(const QList<LexicalResult> &results)
 {
-    // 清空表格
-    ui->tableTestOutput->clearContents();
-    ui->tableTestOutput->setRowCount(0);
+    // 清空文本框
+    m_textEditTestOutput->clear();
     
-    // 设置表头
-    ui->tableTestOutput->setColumnCount(3);
-    ui->tableTestOutput->setHorizontalHeaderLabels(QStringList() << "行号" << "单词" << "编码");
+    // 构建结果字符串
+    QString resultText;
     
-    // 显示词法分析结果
-    int row = 0;
+    // 遍历所有结果
     for (const auto &result : results) {
-        ui->tableTestOutput->insertRow(row);
-        ui->tableTestOutput->setItem(row, 0, new QTableWidgetItem(QString::number(result.line)));
-        ui->tableTestOutput->setItem(row, 1, new QTableWidgetItem(result.lexeme));
-        ui->tableTestOutput->setItem(row, 2, new QTableWidgetItem(QString::number(result.tokenCode)));
-        row++;
+        // 显示单词编码
+        resultText += QString::number(result.tokenCode) + " ";
+        
+        // 判断是否为标识符或数字
+        // 这里假设tokenCode大于100的为标识符或数字
+        // 实际判断应该根据正则表达式的具体编码来确定
+        if (result.tokenCode >= 100) {
+            resultText += result.lexeme + " ";
+        }
     }
     
-    // 调整列宽
-    ui->tableTestOutput->resizeColumnsToContents();
+    // 设置到文本框
+    m_textEditTestOutput->setPlainText(resultText);
 }
 
 // 更新正则表达式下拉列表
@@ -1029,11 +1155,6 @@ void Task1Window::updateRegexComboBoxWithoutChangingSelection(const QString &cur
             allItems << item.name;
         }
     }
-    
-    // 保存当前选中的索引
-    int currentNFAIndex = ui->comboBoxNFA->currentIndex();
-    int currentDFAIndex = ui->comboBoxDFA->currentIndex();
-    int currentMinDFAIndex = ui->comboBoxMinDFA->currentIndex();
     
     // 更新所有下拉列表
     ui->comboBoxNFA->clear();
@@ -1630,3 +1751,5 @@ void Task1Window::cleanupDynamicTables()
         m_dynamicTableMinDFA = nullptr;
     }
 }
+
+

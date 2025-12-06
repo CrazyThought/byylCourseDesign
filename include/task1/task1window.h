@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTableWidgetItem>
+#include <QTextEdit>
 #include "regexprocessor.h"
 #include "nfabuilder.h"
 #include "dfabuilder.h"
@@ -42,6 +43,8 @@ private slots:
     // 最小化DFA模块
     void on_btnMinimizeDFA_clicked();
     void on_btnRefreshMinDFA_clicked();
+
+
 
     // 词法分析器生成模块
     void on_btnGenerateLexer_clicked();
@@ -127,6 +130,9 @@ private:
 private:
     Ui::Task1Window *ui;
 
+    // 测试输出文本框
+    QTextEdit *m_textEditTestOutput;
+
     // 正则表达式处理器
     RegexProcessor m_regexProcessor;
 
@@ -179,6 +185,8 @@ private:
 
     // 词法分析结果
     QList<LexicalResult> m_currentLexicalResults;
+
+
 };
 
 #endif // TASK1WINDOW_H

@@ -8,7 +8,7 @@
  * @details 实现了BNF文法的解析、验证和管理功能
  */
 
-#include "bnfparser.h"
+#include "task2/bnfparser.h"
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
@@ -27,7 +27,7 @@ bool BNFParser::parse(const QString &text)
     clear();
     m_originalText = text;
     
-    QStringList lines = text.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    QStringList lines = text.split(QRegularExpression("[\r\n]"), Qt::SkipEmptyParts);
     
     for (int i = 0; i < lines.size(); ++i) {
         QString line = lines[i].trimmed();
@@ -39,7 +39,7 @@ bool BNFParser::parse(const QString &text)
         
         Production production;
         if (!parseLine(line, production)) {
-            m_errorMessage = tr("第%1行解析失败: %2").arg(i + 1).arg(line);
+            m_errorMessage = QString("第%1行解析失败: %2").arg(i + 1).arg(line);
             return false;
         }
         
@@ -62,14 +62,14 @@ bool BNFParser::parseLine(const QString &line, Production &production)
     // 查找箭头符号 "->"
     int arrowPos = line.indexOf("->");
     if (arrowPos == -1) {
-        m_errorMessage = tr("未找到箭头符号 '->': %1").arg(line);
+        m_errorMessage = QString("未找到箭头符号 '->': %1").arg(line);
         return false;
     }
     
     // 解析非终结符
     QString nonTerminal = line.left(arrowPos).trimmed();
     if (nonTerminal.isEmpty()) {
-        m_errorMessage = tr("非终结符不能为空: %1").arg(line);
+        m_errorMessage = QString("非终结符不能为空: %1").arg(line);
         return false;
     }
     
@@ -78,14 +78,14 @@ bool BNFParser::parseLine(const QString &line, Production &production)
     // 解析候选式
     QString candidatesStr = line.mid(arrowPos + 2).trimmed();
     if (candidatesStr.isEmpty()) {
-        m_errorMessage = tr("候选式不能为空: %1").arg(line);
+        m_errorMessage = QString("候选式不能为空: %1").arg(line);
         return false;
     }
     
     // 拆分候选式（使用 | 分隔）
     QStringList candidateStrs = candidatesStr.split("|", Qt::SkipEmptyParts);
     if (candidateStrs.isEmpty()) {
-        m_errorMessage = tr("候选式列表为空: %1").arg(line);
+        m_errorMessage = QString("候选式列表为空: %1").arg(line);
         return false;
     }
     
@@ -103,7 +103,7 @@ bool BNFParser::parseLine(const QString &line, Production &production)
 bool BNFParser::splitCandidate(const QString &candidateStr, QStringList &candidate)
 {
     // 简单的空格分隔
-    candidate = candidateStr.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+    candidate = candidateStr.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
     
     if (candidate.isEmpty()) {
         // 空串用 # 表示
@@ -140,17 +140,17 @@ void BNFParser::extractSymbols()
 bool BNFParser::validateGrammar() const
 {
     if (m_productions.isEmpty()) {
-        m_errorMessage = tr("文法中没有产生式");
+        m_errorMessage = QString("文法中没有产生式");
         return false;
     }
     
     if (m_nonTerminals.isEmpty()) {
-        m_errorMessage = tr("文法中没有非终结符");
+        m_errorMessage = QString("文法中没有非终结符");
         return false;
     }
     
     if (m_startSymbol.isEmpty()) {
-        m_errorMessage = tr("无法确定文法开始符号");
+        m_errorMessage = QString("无法确定文法开始符号");
         return false;
     }
     
@@ -186,7 +186,7 @@ bool BNFParser::loadFromFile(const QString &filePath)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        m_errorMessage = tr("无法打开文件: %1").arg(file.errorString());
+        m_errorMessage = QString("无法打开文件: %1").arg(file.errorString());
         return false;
     }
     
@@ -201,7 +201,7 @@ bool BNFParser::saveToFile(const QString &filePath) const
 {
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        m_errorMessage = tr("无法打开文件: %1").arg(file.errorString());
+        m_errorMessage = QString("无法打开文件: %1").arg(file.errorString());
         return false;
     }
     
@@ -220,7 +220,7 @@ void BNFParser::clear()
     m_startSymbol.clear();
     m_errorMessage.clear();
     m_originalText.clear();
-    m_regexReferences.clear();
+
 }
 
 QString BNFParser::printGrammar() const

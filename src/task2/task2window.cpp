@@ -8,15 +8,15 @@
  * @details 实现了任务二的主窗口界面和事件处理
  */
 
-#include "task2window.h"
+#include "task2/task2window.h"
 #include "ui_task2window.h"
-#include "bnfparser.h"
-#include "firstfollow.h"
-#include "lr0dfa.h"
-#include "slr1checker.h"
-#include "lr1dfa.h"
-#include "lr1table.h"
-#include "syntaxanalyzer.h"
+#include "task2/bnfparser.h"
+#include "task2/firstfollow.h"
+#include "task2/lr0dfa.h"
+#include "task2/slr1checker.h"
+#include "task2/lr1dfa.h"
+#include "task2/lr1table.h"
+#include "task2/syntaxanalyzer.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTextStream>
@@ -66,27 +66,7 @@ Task2Window::~Task2Window()
     delete ui;
 }
 
-void Task2Window::initUI()
-{
-    // 设置表格属性
-    ui->tableWidgetFirst->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableWidgetFollow->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableWidgetLR0->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableWidgetLR1->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableWidgetLR1Table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableWidgetAnalysisSteps->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    
-    // 设置水平滚动模式
-    ui->tableWidgetFirst->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->tableWidgetFollow->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->tableWidgetLR0->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->tableWidgetLR1->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->tableWidgetLR1Table->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->tableWidgetAnalysisSteps->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-    
-    // 初始化示例文法
-    loadExampleGrammar();
-}
+
 
 void Task2Window::loadExampleGrammar()
 {

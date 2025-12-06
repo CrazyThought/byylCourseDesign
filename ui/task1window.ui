@@ -119,7 +119,8 @@
           <property name="title">
            <string>NFA图表</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8"/>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+          </layout>
          </widget>
         </item>
        </layout>
@@ -175,7 +176,8 @@
           <property name="title">
            <string>DFA图表</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_16"/>
+          <layout class="QVBoxLayout" name="verticalLayout_16">
+          </layout>
          </widget>
         </item>
        </layout>
@@ -231,7 +233,8 @@
           <property name="title">
            <string>最小化DFA图表</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_22"/>
+          <layout class="QVBoxLayout" name="verticalLayout_22">
+          </layout>
          </widget>
         </item>
        </layout>

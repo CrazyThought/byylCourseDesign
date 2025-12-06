@@ -5,6 +5,7 @@
 #include <QList>
 #include <QSet>
 #include <QMap>
+#include <QHash>
 #include "regexprocessor.h"
 
 // NFA状态
@@ -19,11 +20,14 @@ typedef struct {
 
 // NFA结构
 typedef struct {
-    QList<NFAState> states;
-    QSet<QString> alphabet;
-    QList<NFATransition> transitions;
-    NFAState startState;
-    QSet<NFAState> acceptStates;
+    QList<NFAState> states;               // 所有状态
+    QSet<QString> alphabet;               // 字母表
+    QList<NFATransition> transitions;     // 转换规则
+    NFAState startState;                  // 起始状态
+    QSet<NFAState> acceptStates;          // 接受状态集合
+    
+    // 邻接表：state -> (symbol -> state集合)，用于优化算法
+    QHash<NFAState, QHash<QString, QSet<NFAState>>> transitionTable;
 } NFA;
 
 class NFABuilder
@@ -80,6 +84,9 @@ private:
 
     // 重置状态计数器
     void resetStateCounter();
+    
+    // 构建邻接表
+    void buildTransitionTable(NFA &nfa);
 
 private:
     NFAState m_nextState;
