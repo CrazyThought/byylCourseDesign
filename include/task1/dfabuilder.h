@@ -26,6 +26,8 @@ typedef struct {
     QSet<DFAState> acceptStates;
     // 状态映射：NFA状态列表 -> DFA状态
     QMap<QList<NFAState>, DFAState> stateMap;
+    // 接受状态到正则表达式索引的映射
+    QMap<DFAState, int> acceptStateToRegexIndex;
 } DFA;
 
 class DFABuilder

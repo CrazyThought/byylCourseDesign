@@ -1,4 +1,4 @@
-#include "task1window.h"
+#include "task1/task1window.h"
 #include "ui_task1window.h"
 #include <QFileDialog>
 #include <QFile>
@@ -540,10 +540,12 @@ QMap<QString, QString> Task1Window::processRegexReferences(const QList<RegexItem
     
     // 从正则表达式文本中提取引用定义
     QString regexText = ui->textEditRegex->toPlainText();
-    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    QStringList lines = regexText.split("\n");
     
     for (const QString &line : lines) {
         QString trimmedLine = line.trimmed();
+        // 移除可能存在的回车符
+        trimmedLine = trimmedLine.replace("\r", "");
         if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
             continue; // 跳过空行和注释行
         }
@@ -657,9 +659,11 @@ void Task1Window::displayNFA(const NFA &nfa, QTableWidget *table)
     // 收集所有引用名称
     QSet<QString> referenceNames;
     QString regexText = ui->textEditRegex->toPlainText();
-    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    QStringList lines = regexText.split("\n");
     for (const QString &line : lines) {
         QString trimmedLine = line.trimmed();
+        // 移除可能存在的回车符
+        trimmedLine = trimmedLine.replace("\r", "");
         if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
             continue;
         }
@@ -764,9 +768,11 @@ void Task1Window::displayDFA(const DFA &dfa, QTableWidget *table)
     // 收集所有引用名称
     QSet<QString> referenceNames;
     QString regexText = ui->textEditRegex->toPlainText();
-    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    QStringList lines = regexText.split("\n");
     for (const QString &line : lines) {
         QString trimmedLine = line.trimmed();
+        // 移除可能存在的回车符
+        trimmedLine = trimmedLine.replace("\r", "");
         if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
             continue;
         }
@@ -866,9 +872,11 @@ void Task1Window::displayMinimizedDFA(const DFA &dfa, QTableWidget *table)
     // 收集所有引用名称
     QSet<QString> referenceNames;
     QString regexText = ui->textEditRegex->toPlainText();
-    QStringList lines = regexText.split(QRegularExpression("[\\r\\n]"));
+    QStringList lines = regexText.split("\n");
     for (const QString &line : lines) {
         QString trimmedLine = line.trimmed();
+        // 移除可能存在的回车符
+        trimmedLine = trimmedLine.replace("\r", "");
         if (trimmedLine.isEmpty() || trimmedLine.startsWith("//")) {
             continue;
         }

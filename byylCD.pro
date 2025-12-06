@@ -16,25 +16,35 @@ INCLUDEPATH += . include
 #DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x060000 # disables all APIs deprecated in Qt 6.0.0 and earlier
 
 # Input
-HEADERS += include/dfabuilder.h \
-           include/dfaminimizer.h \
-           include/task1window.h \
-           include/task2window.h \
-           include/lexergenerator.h \
-           include/lexertester.h \
-           include/mainwindow.h \
-           include/nfabuilder.h \
-           include/regexprocessor.h
+HEADERS += include/task1/dfabuilder.h \
+           include/task1/dfaminimizer.h \
+           include/task1/task1window.h \
+           include/task2/task2window.h \
+           include/task2/bnfparser.h \
+           include/task2/firstfollow.h \
+           include/task2/lr0dfa.h \
+           include/task2/slr1checker.h \
+           include/task2/lr1dfa.h \
+           include/task2/lr1table.h \
+           include/task2/syntaxanalyzer.h \
+           include/task1/lexergenerator.h \
+           include/task1/lexertester.h \
+           include/task1/mainwindow.h \
+           include/task1/nfabuilder.h \
+           include/task1/regexprocessor.h \
+           include/task1/regexengine.h
 FORMS += ui/mainwindow.ui \
           ui/task1window.ui \
           ui/task2window.ui
 SOURCES += main.cpp \
-           src/dfabuilder.cpp \
-           src/dfaminimizer.cpp \
-           src/task1window.cpp \
-           src/task2window.cpp \
-           src/lexergenerator.cpp \
-           src/lexertester.cpp \
-           src/mainwindow.cpp \
-           src/nfabuilder.cpp \
-           src/regexprocessor.cpp
+           src/task1/dfabuilder.cpp \
+           src/task1/dfaminimizer.cpp \
+           src/task1/task1window.cpp \
+           src/task2/task2window.cpp \
+           src/task2/bnfparser.cpp \
+           src/task1/lexergenerator.cpp \
+           src/task1/lexertester.cpp \
+           src/task1/mainwindow.cpp \
+           src/task1/nfabuilder.cpp \
+           src/task1/regexprocessor.cpp \
+           src/task1/regexengine.cpp

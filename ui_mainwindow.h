@@ -17,7 +17,6 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -30,12 +29,10 @@ public:
     QAction *actionExit;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
-    QSpacerItem *verticalSpacer_2;
     QLabel *labelTitle;
-    QSpacerItem *verticalSpacer;
+    QLabel *label;
     QPushButton *btnTask1;
     QPushButton *btnTask2;
-    QSpacerItem *verticalSpacer_3;
     QMenuBar *menubar;
     QMenu *menuFile;
     QStatusBar *statusbar;
@@ -51,29 +48,28 @@ public:
         centralwidget->setObjectName("centralwidget");
         verticalLayout = new QVBoxLayout(centralwidget);
         verticalLayout->setObjectName("verticalLayout");
-        verticalSpacer_2 = new QSpacerItem(20, 100, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer_2);
-
         labelTitle = new QLabel(centralwidget);
         labelTitle->setObjectName("labelTitle");
         QFont font;
         font.setFamilies({QString::fromUtf8("Arial")});
-        font.setPointSize(24);
+        font.setPointSize(32);
         font.setBold(true);
         labelTitle->setFont(font);
         labelTitle->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
         verticalLayout->addWidget(labelTitle);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+        label = new QLabel(centralwidget);
+        label->setObjectName("label");
+        QFont font1;
+        font1.setPointSize(16);
+        label->setFont(font1);
+        label->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        verticalLayout->addItem(verticalSpacer);
+        verticalLayout->addWidget(label);
 
         btnTask1 = new QPushButton(centralwidget);
         btnTask1->setObjectName("btnTask1");
-        QFont font1;
-        font1.setPointSize(16);
         btnTask1->setFont(font1);
 
         verticalLayout->addWidget(btnTask1);
@@ -83,10 +79,6 @@ public:
         btnTask2->setFont(font1);
 
         verticalLayout->addWidget(btnTask2);
-
-        verticalSpacer_3 = new QSpacerItem(20, 50, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer_3);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -112,6 +104,7 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "\347\274\226\350\257\221\345\216\237\347\220\206\350\257\276\347\250\213\350\256\276\350\256\241", nullptr));
         actionExit->setText(QCoreApplication::translate("MainWindow", "\351\200\200\345\207\272", nullptr));
         labelTitle->setText(QCoreApplication::translate("MainWindow", "\347\274\226\350\257\221\345\216\237\347\220\206\350\257\276\347\250\213\350\256\276\350\256\241", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "\351\203\255\346\242\223\347\203\275 20232131007", nullptr));
         btnTask1->setText(QCoreApplication::translate("MainWindow", "Task 1", nullptr));
         btnTask2->setText(QCoreApplication::translate("MainWindow", "Task 2", nullptr));
         menuFile->setTitle(QCoreApplication::translate("MainWindow", "\346\226\207\344\273\266", nullptr));

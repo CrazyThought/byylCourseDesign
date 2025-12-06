@@ -4,7 +4,7 @@
 #include <QString>
 #include <QList>
 #include <QMap>
-#include <QRegularExpression>
+#include <QStringList>
 
 // 正则表达式项结构
 typedef struct {
@@ -12,6 +12,7 @@ typedef struct {
     QString pattern;       // 正则表达式模式
     int code;              // 单词编码
     bool isMultiWord;      // 是否为多单词
+    QStringList wordList;  // 匹配的完整单词列表
 } RegexItem;
 
 class RegexProcessor
@@ -44,6 +45,9 @@ private:
 
     // 转换为标准正则表达式格式
     QString convertToStandardRegex(const QString &pattern);
+    
+    // 提取多单词列表
+    QStringList extractMultiWords(const QString &pattern);
 
 private:
     QList<RegexItem> m_regexItems;

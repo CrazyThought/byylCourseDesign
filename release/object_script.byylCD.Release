@@ -8,6 +8,7 @@ release/lexertester.o
 release/mainwindow.o
 release/nfabuilder.o
 release/regexprocessor.o
+release/regexengine.o
 release/moc_task1window.o
 release/moc_task2window.o
 release/moc_mainwindow.o

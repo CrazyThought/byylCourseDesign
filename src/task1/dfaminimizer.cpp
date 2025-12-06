@@ -1,4 +1,4 @@
-#include "dfaminimizer.h"
+#include "task1/dfaminimizer.h"
 #include <QDebug>
 
 DFAMinimizer::DFAMinimizer()

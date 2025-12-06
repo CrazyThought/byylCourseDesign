@@ -1,4 +1,4 @@
-#include "nfabuilder.h"
+#include "task1/nfabuilder.h"
 #include <QDebug>
 
 NFABuilder::NFABuilder()

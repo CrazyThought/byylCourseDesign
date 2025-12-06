@@ -73,10 +73,19 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
-# Directories with generated files
-.moc/
-.obj/
-.pch/
-.rcc/
-.uic/
-/build*/
+# Directories with generated files
+.moc/
+.obj/
+.pch/
+.rcc/
+.uic/
+/build*/
+
+# IDE and editor directories
+.qcreator/
+.vscode/
+.trae/
+
+# Debug and build directories
+debug/
+release/

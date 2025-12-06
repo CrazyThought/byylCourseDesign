@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "task1window.h"
-#include "task2window.h"
+#include "task1/task1window.h"
+#include "task2/task2window.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

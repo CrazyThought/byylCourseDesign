@@ -54,6 +54,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "#include <regex>\n";
     code += "#include <vector>\n";
     code += "#include <cctype>\n";
+    code += "#include <map>\n";
     code += "\n";
 
     // 生成词法单元结构
@@ -74,6 +75,9 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "    int line = 1;\n";
     code += "    size_t pos = 0;\n";
     code += "\n";
+    code += "    // 初始化多单词映射\n";
+    code += "    initMultiWordMap();\n";
+    code += "\n";
     code += "    while (pos < source.length()) {\n";
     code += "        // 跳过空白字符\n";
     code += "        if (std::isspace(source[pos])) {\n";
@@ -86,6 +90,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "        size_t maxMatchLen = 0;\n";
     code += "        int tokenCode = -1;\n";
     code += "        std::string matchedLexeme;\n";
+    code += "        int matchedRegexIndex = -1;\n";
     code += "\n";
 
     // 生成每个正则表达式的匹配逻辑
@@ -109,6 +114,26 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
 
     code += "\n";
     code += "        if (matched) {\n";
+    code += "            // 检查是否是多单词情况\n";
+    code += "            if (matchedRegexIndex >= 0) {\n";
+    code += "                const auto &regexItem = regexItems[matchedRegexIndex];\n";
+    code += "                if (regexItem.isMultiWord) {\n";
+    code += "                    // 多单词情况：根据匹配到的具体单词返回对应的编码\n";
+    code += "                    // 检查是否在多单词映射中\n";
+    code += "                    auto it = multiWordMap.find(matchedLexeme);\n";
+    code += "                    if (it != multiWordMap.end()) {\n";
+    code += "                        tokenCode = it->second;\n";
+    code += "                    } else {\n";
+    code += "                        // 如果不在映射中，动态生成编码\n";
+    code += "                        static std::map<int, int> nextCodeMap;\n";
+    code += "                        if (nextCodeMap.find(regexItem.code) == nextCodeMap.end()) {\n";
+    code += "                            nextCodeMap[regexItem.code] = regexItem.code + 1;\n";
+    code += "                        }\n";
+    code += "                        tokenCode = nextCodeMap[regexItem.code]++;\n";
+    code += "                        multiWordMap[matchedLexeme] = tokenCode;\n";
+    code += "                    }\n";
+    code += "                }\n";
+    code += "            }\n";
     code += "            tokens.push_back({tokenCode, matchedLexeme, line});\n";
     code += "            pos += maxMatchLen;\n";
     code += "        } else {\n";
@@ -149,6 +174,7 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "#include <vector>\n";
     code += "#include <cctype>\n";
     code += "#include <cstring>\n";
+    code += "#include <map>\n";
     code += "\n";
     
     // 生成词法单元结构
@@ -209,6 +235,32 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "\n";
     code += "        if (tokenCode != -1) {\n";
     code += "            std::string lexeme = source.substr(startPos, maxMatchPos - startPos);\n";
+    code += "            // 检查是否是多单词情况\n";
+    code += "            // 多单词情况：根据匹配到的具体单词返回对应的编码\n";
+    code += "            // 检查是否在多单词映射中\n";
+    code += "            auto it = multiWordMap.find(lexeme);\n";
+    code += "            if (it != multiWordMap.end()) {\n";
+    code += "                tokenCode = it->second;\n";
+    code += "            } else {\n";
+    code += "                // 动态处理多单词情况\n";
+    code += "                // 这里需要根据实际情况调整，为每个多单词生成连续编码\n";
+    code += "                // 我们假设tokenCode是多单词的基础编码\n";
+    code += "                static std::map<int, std::map<std::string, int>> multiWordCodeMap;\n";
+    code += "                if (multiWordCodeMap.find(tokenCode) == multiWordCodeMap.end()) {\n";
+    code += "                    // 初始化多单词编码映射\n";
+    code += "                    multiWordCodeMap[tokenCode] = std::map<std::string, int>();\n";
+    code += "                }\n";
+    code += "                if (multiWordCodeMap[tokenCode].find(lexeme) == multiWordCodeMap[tokenCode].end()) {\n";
+    code += "                    // 为新单词分配编码\n";
+    code += "                    int newCode = tokenCode + multiWordCodeMap[tokenCode].size() + 1;\n";
+    code += "                    multiWordCodeMap[tokenCode][lexeme] = newCode;\n";
+    code += "                    multiWordMap[lexeme] = newCode;\n";
+    code += "                    tokenCode = newCode;\n";
+    code += "                } else {\n";
+    code += "                    tokenCode = multiWordCodeMap[tokenCode][lexeme];\n";
+    code += "                    multiWordMap[lexeme] = tokenCode;\n";
+    code += "                }\n";
+    code += "            }\n";
     code += "            tokens.push_back({tokenCode, lexeme, line});\n";
     code += "            pos = maxMatchPos;\n";
     code += "        } else {\n";
@@ -327,14 +379,22 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
     code += "\n";
     
     // 设置所有接受状态
+    int stateIndex = 0;
     for (const auto &state : minimizedDFA.acceptStates) {
         code += QString("isAcceptState[%1] = true;\n").arg(state);
         
         // 为每个接受状态分配正确的token code
-        // 注意：这里需要根据实际情况调整，因为DFA结构中没有直接存储acceptRegexId
-        // 对于总表DFA，我们需要更复杂的逻辑来确定每个接受状态对应的正则表达式
-        // 这里我们假设每个接受状态对应一个正则表达式，按顺序分配
         int regexIndex = 0;
+        
+        // 优先使用DFA中的acceptStateToRegexIndex映射
+        if (minimizedDFA.acceptStateToRegexIndex.contains(state)) {
+            regexIndex = minimizedDFA.acceptStateToRegexIndex[state];
+        } else {
+            // 如果映射不存在，使用stateIndex作为备选方案
+            regexIndex = stateIndex % regexItems.size();
+            stateIndex++;
+        }
+        
         if (regexIndex < regexItems.size()) {
             code += QString("acceptTokens[%1] = %2;\n")
                     .arg(state)
@@ -352,9 +412,6 @@ QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
     code += "// 单词编码映射\n";
     code += "enum TokenCode {\n";
     
-    // 用于跟踪当前编码，处理多单词情况
-    int currentCode = 0;
-    
     for (const auto &regexItem : regexItems) {
         if (regexItem.name.startsWith('_')) {
             QString tokenName = regexItem.name.mid(1).toUpper();
@@ -362,14 +419,19 @@ QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
             // 检查是否为多单词
             if (regexItem.isMultiWord) {
                 // 对于多单词，从指定编码开始生成连续编码
-                // 注意：这里需要根据实际情况调整，因为我们不知道具体有多少个单词
-                // 这里我们假设每个多单词正则表达式只生成一个token code
                 code += "    " + tokenName + " = " + QString::number(regexItem.code) + ",\n";
-                currentCode = regexItem.code + 1;
+                
+                // 为每个单词生成编码
+                int currentCode = regexItem.code;
+                for (const QString &word : regexItem.wordList) {
+                    currentCode++;
+                    // 将单词转换为合法的枚举名称（替换特殊字符）
+                    QString wordTokenName = tokenName + "_" + word.toUpper().replace("+", "PLUS").replace("-", "MINUS").replace("*", "STAR").replace("/", "SLASH").replace(".", "DOT").replace("?", "QUESTION").replace("^", "CARET").replace("$", "DOLLAR").replace("(", "LPAREN").replace(")", "RPAREN").replace("[", "LBRACKET").replace("]", "RBRACKET").replace("{", "LBRACE").replace("}", "RBRACE").replace("|", "PIPE").replace("\\", "BACKSLASH");
+                    code += "    " + wordTokenName + " = " + QString::number(currentCode) + ",\n";
+                }
             } else {
                 // 对于单单词，直接使用指定编码
                 code += "    " + tokenName + " = " + QString::number(regexItem.code) + ",\n";
-                currentCode = regexItem.code + 1;
             }
         }
     }
@@ -381,6 +443,25 @@ QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
     }
     
     code += "};\n";
+    
+    // 为多单词添加特殊处理代码
+    code += "\n";
+    code += "// 多单词映射：从字符串到编码的映射\n";
+    code += "std::map<std::string, int> multiWordMap;\n";
+    code += "void initMultiWordMap() {\n";
+    
+    // 初始化多单词映射
+    for (const auto &regexItem : regexItems) {
+        if (regexItem.name.startsWith('_') && regexItem.isMultiWord) {
+            int currentCode = regexItem.code;
+            for (const QString &word : regexItem.wordList) {
+                currentCode++;
+                code += "    multiWordMap[\"" + word + "\"] = " + QString::number(currentCode) + ";\n";
+            }
+        }
+    }
+    
+    code += "}\n";
     
     return code;
 }
