@@ -34,7 +34,6 @@ HEADERS += include/task1/dfabuilder.h \
            include/task1/nfabuilder.h \ 
            include/task1/regexprocessor.h \ 
            include/task1/regexengine.h \ 
-           include/task1/dotgenerator.h
 FORMS += ui/mainwindow.ui \
           ui/task1window.ui \
           ui/task2window.ui
@@ -56,4 +55,3 @@ SOURCES += main.cpp \
            src/task1/nfabuilder.cpp \ 
            src/task1/regexprocessor.cpp \ 
            src/task1/regexengine.cpp \ 
-           src/task1/dotgenerator.cpp
