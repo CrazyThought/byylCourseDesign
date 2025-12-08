@@ -191,16 +191,26 @@ QList<LexicalResult> LexerTester::parseLexicalResult(const QString &output)
             continue;
         }
         
-        // 处理制表符分隔格式：行号\t单词\t编码
+        // 处理制表符分隔格式
         if (line.contains('\t')) {
             QStringList parts = line.split('\t');
             // 移除空部分
             parts.removeAll("");
+            
+            // 支持3列格式：行号\t单词\t编码
             if (parts.size() >= 3) {
                 LexicalResult result;
                 result.line = parts[0].toInt();
                 result.lexeme = parts[1];
                 result.tokenCode = parts[2].toInt();
+                results.append(result);
+            }
+            // 支持2列格式：单词\t编码
+            else if (parts.size() == 2) {
+                LexicalResult result;
+                result.line = 1; // 自动分配行号，仅用于内部数据结构
+                result.lexeme = parts[0];
+                result.tokenCode = parts[1].toInt();
                 results.append(result);
             }
             continue;

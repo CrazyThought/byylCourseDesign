@@ -436,41 +436,42 @@ void Task1Window::on_btnRunLexer_clicked()
         return;
     }
     
+    // 获取测试输入
+    QString testInput = ui->textEditTestInput->toPlainText();
+    if (testInput.isEmpty()) {
+        ui->statusbar->showMessage("请输入测试内容", 3000);
+        return;
+    }
+    
     ui->statusbar->showMessage("正在编译词法分析器...", 0);
     
     // 编译词法分析器代码
     bool success = m_lexerTester.compileLexer(lexerCode, "lexer");
     
     if (success) {
-        ui->statusbar->showMessage("词法分析器编译成功", 3000);
-        QMessageBox::information(this, tr("编译成功"), tr("词法分析器编译成功！\n输出：\n") + m_lexerTester.getCompileOutput());
+        ui->statusbar->showMessage("词法分析器编译成功，正在进行词法分析...", 0);
         
-        // 如果textEditTestInput中有内容，运行词法分析器
-        QString testInput = ui->textEditTestInput->toPlainText();
-        if (!testInput.isEmpty()) {
-            // 保存测试输入到临时文件
-            QString tempFile = "temp_test.txt";
-            QFile file(tempFile);
-            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                QTextStream out(&file);
-                out << testInput;
-                file.close();
-                
-                // 运行词法分析器
-                ui->statusbar->showMessage("正在进行词法分析...", 0);
-                m_currentLexicalResults = m_lexerTester.testLexer(tempFile);
-                
-                if (m_currentLexicalResults.isEmpty() && !m_lexerTester.getError().isEmpty()) {
-                    ui->statusbar->showMessage("词法分析执行失败", 3000);
-                    QMessageBox::warning(this, tr("执行失败"), tr("词法分析执行失败！\n错误：\n") + m_lexerTester.getError());
-                } else {
-                    ui->statusbar->showMessage("词法分析完成", 3000);
-                    displayLexicalResults(m_currentLexicalResults);
-                }
-                
-                // 删除临时文件
-                QFile::remove(tempFile);
+        // 保存测试输入到临时文件
+        QString tempFile = "temp_test.txt";
+        QFile file(tempFile);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            out << testInput;
+            file.close();
+            
+            // 运行词法分析器
+            m_currentLexicalResults = m_lexerTester.testLexer(tempFile);
+            
+            if (m_currentLexicalResults.isEmpty() && !m_lexerTester.getError().isEmpty()) {
+                ui->statusbar->showMessage("词法分析执行失败", 3000);
+                QMessageBox::warning(this, tr("执行失败"), tr("词法分析执行失败！\n错误：\n") + m_lexerTester.getError());
+            } else {
+                ui->statusbar->showMessage("词法分析完成", 3000);
+                displayLexicalResults(m_currentLexicalResults);
             }
+            
+            // 删除临时文件
+            QFile::remove(tempFile);
         }
     } else {
         ui->statusbar->showMessage("词法分析器编译失败", 3000);
@@ -1094,13 +1095,26 @@ void Task1Window::displayLexicalResults(const QList<LexicalResult> &results)
     
     // 遍历所有结果
     for (const auto &result : results) {
-        // 显示单词编码
+        // 添加单词编码
         resultText += QString::number(result.tokenCode) + " ";
         
-        // 判断是否为标识符或数字
-        // 这里假设tokenCode大于100的为标识符或数字
-        // 实际判断应该根据正则表达式的具体编码来确定
-        if (result.tokenCode >= 100) {
+        // 检查是否为标识符或数字
+        bool isIdentifierOrNumber = false;
+        
+        // 检查是否为标识符：字母或下划线开头，后跟字母、数字或下划线
+        if (!result.lexeme.isEmpty()) {
+            QChar firstChar = result.lexeme.at(0);
+            if (firstChar.isLetter() || firstChar == '_') {
+                isIdentifierOrNumber = true;
+            }
+            // 检查是否为数字：数字开头
+            else if (firstChar.isDigit()) {
+                isIdentifierOrNumber = true;
+            }
+        }
+        
+        // 对于标识符或数字，在编码后接着输出单词，中间使用空格分隔
+        if (isIdentifierOrNumber) {
             resultText += result.lexeme + " ";
         }
     }

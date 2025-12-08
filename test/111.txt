@@ -1,275 +1,615 @@
-lexer.cpp:540:84: warning: missing terminating ' character
-  540 |                         cout << line << '       ' << buf_err << '       ' << -1 << '
-      |                                                                                    ^
-lexer.cpp:540:84: error: missing terminating ' character
-lexer.cpp:541:1: warning: missing terminating ' character
-  541 | ';
-      | ^
-lexer.cpp:541:1: error: missing terminating ' character
-  541 | ';
-      | ^~
-lexer.cpp:554:85: warning: missing terminating ' character
-  554 |                 cout << line << '       ' << buf_suc << '       ' << currentCode << '
-      |                                                                                     ^
-lexer.cpp:554:85: error: missing terminating ' character
-lexer.cpp:555:1: warning: missing terminating ' character
-  555 | ';
-      | ^
-lexer.cpp:555:1: error: missing terminating ' character
-  555 | ';
-      | ^~
-lexer.cpp: In function 'int main(int, char**)':
-lexer.cpp:540:81: error: no match for 'operator<<' (operand types are 'std::basic_ostream<char>' and 'void')
-  540 |                         cout << line << '       ' << buf_err << '       ' << -1 << '
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~
-      |                                                                           |
-      |                                                                           std::basic_ostream<char>
-  541 | ';
-  542 |                         exit(1);
-      |                         ~~~~~~~
-      |                             |
-      |                             void
-lexer.cpp:540:81: note: there are 33 candidates
-  540 |                         cout << line << '       ' << buf_err << '       ' << -1 << '
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~
-  541 | ';
-      | ~~
-  542 |                         exit(1);
-      |                         ~~~~~~~
-In file included from D:/msys64/ucrt64/include/c++/15.2.0/ostream:42,
-                 from D:/msys64/ucrt64/include/c++/15.2.0/iostream:43,
-                 from lexer.cpp:1:
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:116:7: note: candidate 1: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(__ostream_type& (*)(__ostream_type&)) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  116 |       operator<<(__ostream_type& (*__pf)(__ostream_type&))
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:116:36: note: no known conversion for argument 1 from 'void' to 'std::basic_ostream<char>::__ostream_type& (*)(std::basic_ostream<char>::__ostream_type&)' {aka 'std::basic_ostream<char>& (*)(std::basic_ostream<char>&)'}
-  116 |       operator<<(__ostream_type& (*__pf)(__ostream_type&))
-      |                  ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:125:7: note: candidate 2: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(__ios_type& (*)(__ios_type&)) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>; __ios_type = std::basic_ios<char>]'
-  125 |       operator<<(__ios_type& (*__pf)(__ios_type&))
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:125:32: note: no known conversion for argument 1 from 'void' to 'std::basic_ostream<char>::__ios_type& (*)(std::basic_ostream<char>::__ios_type&)' {aka 'std::basic_ios<char>& (*)(std::basic_ios<char>&)'}
-  125 |       operator<<(__ios_type& (*__pf)(__ios_type&))
-      |                  ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:135:7: note: candidate 3: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(std::ios_base& (*)(std::ios_base&)) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  135 |       operator<<(ios_base& (*__pf) (ios_base&))
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:135:30: note: no known conversion for argument 1 from 'void' to 'std::ios_base& (*)(std::ios_base&)'
-  135 |       operator<<(ios_base& (*__pf) (ios_base&))
-      |                  ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:174:7: note: candidate 4: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(long int) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  174 |       operator<<(long __n)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:174:23: note: no known conversion for argument 1 from 'void' to 'long int'
-  174 |       operator<<(long __n)
-      |                  ~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:178:7: note: candidate 5: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(long unsigned int) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  178 |       operator<<(unsigned long __n)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:178:32: note: no known conversion for argument 1 from 'void' to 'long unsigned int'
-  178 |       operator<<(unsigned long __n)
-      |                  ~~~~~~~~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:182:7: note: candidate 6: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(bool) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  182 |       operator<<(bool __n)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:182:23: note: no known conversion for argument 1 from 'void' to 'boo'
-  182 |       operator<<(bool __n)
-      |                  ~~~~~^~~
-In file included from D:/msys64/ucrt64/include/c++/15.2.0/ostream:294:
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:100:5: note: candidate 7: 'std::basic_ostream<_CharT, _Traits>& std::basic_ostream<_CharT, _Traits>::operator<<(short int) [with _CharT = char; _Traits = std::char_traits<char>]'
-  100 |     basic_ostream<_CharT, _Traits>::
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:101:22: note: no known conversion for argument 1 from 'void' to 'short int'
-  101 |     operator<<(short __n)
-      |                ~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:189:7: note: candidate 8: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(short unsigned int) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  189 |       operator<<(unsigned short __n)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:189:33: note: no known conversion for argument 1 from 'void' to 'short unsigned int'
-  189 |       operator<<(unsigned short __n)
-      |                  ~~~~~~~~~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:114:5: note: candidate 9: 'std::basic_ostream<_CharT, _Traits>& std::basic_ostream<_CharT, _Traits>::operator<<(int) [with _CharT = char; _Traits = std::char_traits<char>]'
-  114 |     basic_ostream<_CharT, _Traits>::
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:115:20: note: no known conversion for argument 1 from 'void' to 'int'
-  115 |     operator<<(int __n)
-      |                ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:200:7: note: candidate 10: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(unsigned int) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  200 |       operator<<(unsigned int __n)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:200:31: note: no known conversion for argument 1 from 'void' to 'unsigned int'
-  200 |       operator<<(unsigned int __n)
-      |                  ~~~~~~~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:211:7: note: candidate 11: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(long long int) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  211 |       operator<<(long long __n)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:211:28: note: no known conversion for argument 1 from 'void' to 'long long int'
-  211 |       operator<<(long long __n)
-      |                  ~~~~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:215:7: note: candidate 12: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(long long unsigned int) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  215 |       operator<<(unsigned long long __n)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:215:37: note: no known conversion for argument 1 from 'void' to 'long long unsigned int'
-  215 |       operator<<(unsigned long long __n)
-      |                  ~~~~~~~~~~~~~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:231:7: note: candidate 13: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(double) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  231 |       operator<<(double __f)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:231:25: note: no known conversion for argument 1 from 'void' to 'double'
-  231 |       operator<<(double __f)
-      |                  ~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:235:7: note: candidate 14: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(float) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  235 |       operator<<(float __f)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:235:24: note: no known conversion for argument 1 from 'void' to 'float'
-  235 |       operator<<(float __f)
-      |                  ~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:243:7: note: candidate 15: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(long double) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  243 |       operator<<(long double __f)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:243:30: note: no known conversion for argument 1 from 'void' to 'long double'
-  243 |       operator<<(long double __f)
-      |                  ~~~~~~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:301:7: note: candidate 16: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(const void*) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>]'
-  301 |       operator<<(const void* __p)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:301:30: note: no known conversion for argument 1 from 'void' to 'const void*'
-  301 |       operator<<(const void* __p)
-      |                  ~~~~~~~~~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:306:7: note: candidate 17: 'std::basic_ostream<_CharT, _Traits>::__ostream_type& std::basic_ostream<_CharT, _Traits>::operator<<(std::nullptr_t) [with _CharT = char; _Traits = std::char_traits<char>; __ostream_type = std::basic_ostream<char>; std::nullptr_t = std::nullptr_t]'
-  306 |       operator<<(nullptr_t)
-      |       ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:306:18: note: no known conversion for argument 1 from 'void' to 'std::nullptr_t'
-  306 |       operator<<(nullptr_t)
-      |                  ^~~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:128:5: note: candidate 18: 'std::basic_ostream<_CharT, _Traits>& std::basic_ostream<_CharT, _Traits>::operator<<(__streambuf_type*) [with _CharT = char; _Traits = std::char_traits<char>; __streambuf_type = std::basic_streambuf<char>]'
-  128 |     basic_ostream<_CharT, _Traits>::
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:129:34: note: no known conversion for argument 1 from 'void' to 'std::basic_ostream<char>::__streambuf_type*' {aka 'std::basic_streambuf<char>*'}
-  129 |     operator<<(__streambuf_type* __sbin)
-      |                ~~~~~~~~~~~~~~~~~~^~~~~~
-In file included from D:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.h:51,
-                 from D:/msys64/ucrt64/include/c++/15.2.0/string:56,
-                 from D:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.h:42,
-                 from D:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h:43,
-                 from D:/msys64/ucrt64/include/c++/15.2.0/ios:46,
-                 from D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:43:
-D:/msys64/ucrt64/include/c++/15.2.0/string_view:767:5: note: candidate 19: 'template<class _CharT, class _Traits> std::basic_ostream<_CharT, _Traits>& std::operator<<(basic_ostream<_CharT, _Traits>&, basic_string_view<_CharT, _Traits>)'
-  767 |     operator<<(basic_ostream<_CharT, _Traits>& __os,
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/string_view:767:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:31: note:   mismatched types 'std::basic_string_view<_CharT, _Traits>' and 'void'
-  542 |                         exit(1);
-      |                               ^
-D:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.h:4367:5: note: candidate 20: 'template<class _CharT, class _Traits, class _Alloc> std::basic_ostream<_CharT, _Traits>& std::operator<<(basic_ostream<_CharT, _Traits>&, const __cxx11::basic_string<_CharT, _Traits, _Alloc>&)'
- 4367 |     operator<<(basic_ostream<_CharT, _Traits>& __os,
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.h:4367:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:31: note:   mismatched types 'const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>' and 'void'
-  542 |                         exit(1);
-      |                               ^
-In file included from D:/msys64/ucrt64/include/c++/15.2.0/bits/memory_resource.h:40,
-                 from D:/msys64/ucrt64/include/c++/15.2.0/string:72:
-D:/msys64/ucrt64/include/c++/15.2.0/cstddef:130:5: note: candidate 21: 'template<class _IntegerType> constexpr std::__byte_op_t<_IntegerType> std::operator<<(byte, _IntegerType)'
-  130 |     operator<<(byte __b, _IntegerType __shift) noexcept
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/cstddef:130:5: note: template argument deduction/substitution failed:
-lexer.cpp:540:75: note:   cannot convert '(& std::operator<< <char_traits<char> >((* & std::operator<< <char, char_traits<char>, allocator<char> >((* & std::operator<< <char_traits<char> >((* & std::cout.std::basic_ostream<char>::operator<<(line)), 9)), buf_err)), 9))->std::basic_ostream<char>::operator<<(-1)' (type 'std::basic_ostream<char>') to type 'std::byte'
-  540 |                         cout << line << '       ' << buf_err << '       ' << -1 << '
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
-In file included from D:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h:48:
-D:/msys64/ucrt64/include/c++/15.2.0/system_error:341:5: note: candidate 22: 'template<class _CharT, class _Traits> std::basic_ostream<_CharT, _Traits>& std::operator<<(basic_ostream<_CharT, _Traits>&, const error_code&)'
-  341 |     operator<<(basic_ostream<_CharT, _Traits>& __os, const error_code& __e)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/system_error:341:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'const std::error_code&'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:626:5: note: candidate 23: 'template<class _CharT, class _Traits> std::basic_ostream<_CharT, _Traits>& std::operator<<(basic_ostream<_CharT, _Traits>&, _CharT)'
-  626 |     operator<<(basic_ostream<_CharT, _Traits>& __out, _CharT __c)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:626:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:31: note:   deduced conflicting types for parameter '_CharT' ('char' and 'void')
-  542 |                         exit(1);
-      |                               ^
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:636:5: note: candidate 24: 'template<class _CharT, class _Traits> std::basic_ostream<_CharT, _Traits>& std::operator<<(basic_ostream<_CharT, _Traits>&, char)'
-  636 |     operator<<(basic_ostream<_CharT, _Traits>& __out, char __c)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:636:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'char'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:642:5: note: candidate 25: 'template<class _Traits> std::basic_ostream<char, _Traits>& std::operator<<(basic_ostream<char, _Traits>&, char)'
-  642 |     operator<<(basic_ostream<char, _Traits>& __out, char __c)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:642:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'char'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:653:5: note: candidate 26: 'template<class _Traits> std::basic_ostream<char, _Traits>& std::operator<<(basic_ostream<char, _Traits>&, signed char)'
-  653 |     operator<<(basic_ostream<char, _Traits>& __out, signed char __c)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:653:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'signed char'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:658:5: note: candidate 27: 'template<class _Traits> std::basic_ostream<char, _Traits>& std::operator<<(basic_ostream<char, _Traits>&, unsigned char)'
-  658 |     operator<<(basic_ostream<char, _Traits>& __out, unsigned char __c)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:658:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'unsigned char'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:717:5: note: candidate 28: 'template<class _CharT, class _Traits> std::basic_ostream<_CharT, _Traits>& std::operator<<(basic_ostream<_CharT, _Traits>&, const _CharT*)'
-  717 |     operator<<(basic_ostream<_CharT, _Traits>& __out, const _CharT* __s)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:717:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:31: note:   mismatched types 'const _CharT*' and 'void'
-  542 |                         exit(1);
-      |                               ^
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:311:5: note: candidate 29: 'template<class _CharT, class _Traits> std::basic_ostream<_CharT, _Traits>& std::operator<<(basic_ostream<_CharT, _Traits>&, const char*)'
-  311 |     operator<<(basic_ostream<_CharT, _Traits>& __out, const char* __s)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc:311:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'const char*'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:734:5: note: candidate 30: 'template<class _Traits> std::basic_ostream<char, _Traits>& std::operator<<(basic_ostream<char, _Traits>&, const char*)'
-  734 |     operator<<(basic_ostream<char, _Traits>& __out, const char* __s)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:734:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'const char*'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:747:5: note: candidate 31: 'template<class _Traits> std::basic_ostream<char, _Traits>& std::operator<<(basic_ostream<char, _Traits>&, const signed char*)'
-  747 |     operator<<(basic_ostream<char, _Traits>& __out, const signed char* __s)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:747:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'const signed char*'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:752:5: note: candidate 32: 'template<class _Traits> std::basic_ostream<char, _Traits>& std::operator<<(basic_ostream<char, _Traits>&, const unsigned char*)'
-  752 |     operator<<(basic_ostream<char, _Traits>& __out, const unsigned char* __s)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:752:5: note: template argument deduction/substitution failed:
-lexer.cpp:542:29: note:   cannot convert 'exit(1)' (type 'void') to type 'const unsigned char*'
-  542 |                         exit(1);
-      |                         ~~~~^~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:836:5: note: candidate 33: 'template<class _Ostream, class _Tp> _Ostream&& std::operator<<(_Ostream&&, const _Tp&)'
-  836 |     operator<<(_Ostream&& __os, const _Tp& __x)
-      |     ^~~~~~~~
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:836:5: note: template argument deduction/substitution failed:
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h: In substitution of 'template<class _Ostream, class _Tp> _Ostream&& std::operator<<(_Ostream&&, const _Tp&) [with _Ostream = std::basic_ostream<char>&; _Tp = void]':
-lexer.cpp:542:10:   required from here
-  542 |                         exit(1);
-      |                               ^
-D:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h:836:5: error: no type named 'type' in 'struct std::enable_if<false, void>'
-  836 |     operator<<(_Ostream&& __os, const _Tp& __x)
-      |     ^~~~~~~~
-lexer.cpp:556:26: error: no match for 'operator+=' (operand types are 'std::basic_ostream<char>' and 'std::__cxx11::basic_string<char>::size_type' {aka 'long long unsigned int'})
-  554 |                 cout << line << '       ' << buf_suc << '       ' << currentCode << '
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  555 | ';
-      | ~~
-  556 |                 read_cnt += buf_suc.size();
-      |                 ~~~~~~~~~^~~~~~~~~~~~~~~~~
+temp.cpp:51:1: error: '_identifier100' does not name a type
+   51 | _identifier100 = 100;
+      | ^~~~~~~~~~~~~~
+temp.cpp:52:1: error: '_number101' does not name a type
+   52 | _number101 = 101;
+      | ^~~~~~~~~~
+temp.cpp:53:1: error: '_comment102' does not name a type
+   53 | _comment102 = 102;
+      | ^~~~~~~~~~~
+temp.cpp:54:1: error: 'tokenCodeMap' does not name a type
+   54 | tokenCodeMap["%"] = 103;
+      | ^~~~~~~~~~~~
+temp.cpp:55:1: error: 'tokenCodeMap' does not name a type
+   55 | tokenCodeMap["-"] = 104;
+      | ^~~~~~~~~~~~
+temp.cpp:56:1: error: 'tokenCodeMap' does not name a type
+   56 | tokenCodeMap["/"] = 105;
+      | ^~~~~~~~~~~~
+temp.cpp:57:1: error: 'tokenCodeMap' does not name a type
+   57 | tokenCodeMap[":="] = 106;
+      | ^~~~~~~~~~~~
+temp.cpp:58:1: error: 'tokenCodeMap' does not name a type
+   58 | tokenCodeMap[";"] = 107;
+      | ^~~~~~~~~~~~
+temp.cpp:59:1: error: 'tokenCodeMap' does not name a type
+   59 | tokenCodeMap["<"] = 108;
+      | ^~~~~~~~~~~~
+temp.cpp:60:1: error: 'tokenCodeMap' does not name a type
+   60 | tokenCodeMap["<="] = 109;
+      | ^~~~~~~~~~~~
+temp.cpp:61:1: error: 'tokenCodeMap' does not name a type
+   61 | tokenCodeMap["<>"] = 110;
+      | ^~~~~~~~~~~~
+temp.cpp:62:1: error: 'tokenCodeMap' does not name a type
+   62 | tokenCodeMap["="] = 111;
+      | ^~~~~~~~~~~~
+temp.cpp:63:1: error: 'tokenCodeMap' does not name a type
+   63 | tokenCodeMap[">"] = 112;
+      | ^~~~~~~~~~~~
+temp.cpp:64:1: error: 'tokenCodeMap' does not name a type
+   64 | tokenCodeMap[">="] = 113;
+      | ^~~~~~~~~~~~
+temp.cpp:65:1: error: 'tokenCodeMap' does not name a type
+   65 | tokenCodeMap["\*"] = 114;
+      | ^~~~~~~~~~~~
+temp.cpp:66:1: error: 'tokenCodeMap' does not name a type
+   66 | tokenCodeMap["\+"] = 115;
+      | ^~~~~~~~~~~~
+temp.cpp:67:1: error: 'tokenCodeMap' does not name a type
+   67 | tokenCodeMap["\^"] = 116;
+      | ^~~~~~~~~~~~
+temp.cpp:68:1: error: 'tokenCodeMap' does not name a type
+   68 | tokenCodeMap["ELSE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:69:1: error: 'tokenCodeMap' does not name a type
+   69 | tokenCodeMap["ELSe"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:70:1: error: 'tokenCodeMap' does not name a type
+   70 | tokenCodeMap["ELsE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:71:1: error: 'tokenCodeMap' does not name a type
+   71 | tokenCodeMap["ELse"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:72:1: error: 'tokenCodeMap' does not name a type
+   72 | tokenCodeMap["END"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:73:1: error: 'tokenCodeMap' does not name a type
+   73 | tokenCodeMap["ENd"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:74:1: error: 'tokenCodeMap' does not name a type
+   74 | tokenCodeMap["ElSE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:75:1: error: 'tokenCodeMap' does not name a type
+   75 | tokenCodeMap["ElSe"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:76:1: error: 'tokenCodeMap' does not name a type
+   76 | tokenCodeMap["ElsE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:77:1: error: 'tokenCodeMap' does not name a type
+   77 | tokenCodeMap["Else"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:78:1: error: 'tokenCodeMap' does not name a type
+   78 | tokenCodeMap["EnD"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:79:1: error: 'tokenCodeMap' does not name a type
+   79 | tokenCodeMap["End"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:80:1: error: 'tokenCodeMap' does not name a type
+   80 | tokenCodeMap["IF"] = 202;
+      | ^~~~~~~~~~~~
+temp.cpp:81:1: error: 'tokenCodeMap' does not name a type
+   81 | tokenCodeMap["If"] = 202;
+      | ^~~~~~~~~~~~
+temp.cpp:82:1: error: 'tokenCodeMap' does not name a type
+   82 | tokenCodeMap["READ"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:83:1: error: 'tokenCodeMap' does not name a type
+   83 | tokenCodeMap["REAd"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:84:1: error: 'tokenCodeMap' does not name a type
+   84 | tokenCodeMap["REPEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:85:1: error: 'tokenCodeMap' does not name a type
+   85 | tokenCodeMap["REPEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:86:1: error: 'tokenCodeMap' does not name a type
+   86 | tokenCodeMap["REPEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:87:1: error: 'tokenCodeMap' does not name a type
+   87 | tokenCodeMap["REPEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:88:1: error: 'tokenCodeMap' does not name a type
+   88 | tokenCodeMap["REPeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:89:1: error: 'tokenCodeMap' does not name a type
+   89 | tokenCodeMap["REPeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:90:1: error: 'tokenCodeMap' does not name a type
+   90 | tokenCodeMap["REPeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:91:1: error: 'tokenCodeMap' does not name a type
+   91 | tokenCodeMap["REPeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:92:1: error: 'tokenCodeMap' does not name a type
+   92 | tokenCodeMap["REaD"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:93:1: error: 'tokenCodeMap' does not name a type
+   93 | tokenCodeMap["REad"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:94:1: error: 'tokenCodeMap' does not name a type
+   94 | tokenCodeMap["REpEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:95:1: error: 'tokenCodeMap' does not name a type
+   95 | tokenCodeMap["REpEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:96:1: error: 'tokenCodeMap' does not name a type
+   96 | tokenCodeMap["REpEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:97:1: error: 'tokenCodeMap' does not name a type
+   97 | tokenCodeMap["REpEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:98:1: error: 'tokenCodeMap' does not name a type
+   98 | tokenCodeMap["REpeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:99:1: error: 'tokenCodeMap' does not name a type
+   99 | tokenCodeMap["REpeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:100:1: error: 'tokenCodeMap' does not name a type
+  100 | tokenCodeMap["REpeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:101:1: error: 'tokenCodeMap' does not name a type
+  101 | tokenCodeMap["REpeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:102:1: error: 'tokenCodeMap' does not name a type
+  102 | tokenCodeMap["ReAD"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:103:1: error: 'tokenCodeMap' does not name a type
+  103 | tokenCodeMap["ReAd"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:104:1: error: 'tokenCodeMap' does not name a type
+  104 | tokenCodeMap["RePEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:105:1: error: 'tokenCodeMap' does not name a type
+  105 | tokenCodeMap["RePEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:106:1: error: 'tokenCodeMap' does not name a type
+  106 | tokenCodeMap["RePEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:107:1: error: 'tokenCodeMap' does not name a type
+  107 | tokenCodeMap["RePEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:108:1: error: 'tokenCodeMap' does not name a type
+  108 | tokenCodeMap["RePeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:109:1: error: 'tokenCodeMap' does not name a type
+  109 | tokenCodeMap["RePeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:110:1: error: 'tokenCodeMap' does not name a type
+  110 | tokenCodeMap["RePeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:111:1: error: 'tokenCodeMap' does not name a type
+  111 | tokenCodeMap["RePeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:112:1: error: 'tokenCodeMap' does not name a type
+  112 | tokenCodeMap["ReaD"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:113:1: error: 'tokenCodeMap' does not name a type
+  113 | tokenCodeMap["Read"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:114:1: error: 'tokenCodeMap' does not name a type
+  114 | tokenCodeMap["RepEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:115:1: error: 'tokenCodeMap' does not name a type
+  115 | tokenCodeMap["RepEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:116:1: error: 'tokenCodeMap' does not name a type
+  116 | tokenCodeMap["RepEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:117:1: error: 'tokenCodeMap' does not name a type
+  117 | tokenCodeMap["RepEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:118:1: error: 'tokenCodeMap' does not name a type
+  118 | tokenCodeMap["RepeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:119:1: error: 'tokenCodeMap' does not name a type
+  119 | tokenCodeMap["RepeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:120:1: error: 'tokenCodeMap' does not name a type
+  120 | tokenCodeMap["RepeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:121:1: error: 'tokenCodeMap' does not name a type
+  121 | tokenCodeMap["Repeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:122:1: error: 'tokenCodeMap' does not name a type
+  122 | tokenCodeMap["THEN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:123:1: error: 'tokenCodeMap' does not name a type
+  123 | tokenCodeMap["THEn"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:124:1: error: 'tokenCodeMap' does not name a type
+  124 | tokenCodeMap["THeN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:125:1: error: 'tokenCodeMap' does not name a type
+  125 | tokenCodeMap["THen"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:126:1: error: 'tokenCodeMap' does not name a type
+  126 | tokenCodeMap["ThEN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:127:1: error: 'tokenCodeMap' does not name a type
+  127 | tokenCodeMap["ThEn"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:128:1: error: 'tokenCodeMap' does not name a type
+  128 | tokenCodeMap["TheN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:129:1: error: 'tokenCodeMap' does not name a type
+  129 | tokenCodeMap["Then"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:130:1: error: 'tokenCodeMap' does not name a type
+  130 | tokenCodeMap["UNTIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:131:1: error: 'tokenCodeMap' does not name a type
+  131 | tokenCodeMap["UNTIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:132:1: error: 'tokenCodeMap' does not name a type
+  132 | tokenCodeMap["UNTiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:133:1: error: 'tokenCodeMap' does not name a type
+  133 | tokenCodeMap["UNTil"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:134:1: error: 'tokenCodeMap' does not name a type
+  134 | tokenCodeMap["UNtIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:135:1: error: 'tokenCodeMap' does not name a type
+  135 | tokenCodeMap["UNtIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:136:1: error: 'tokenCodeMap' does not name a type
+  136 | tokenCodeMap["UNtiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:137:1: error: 'tokenCodeMap' does not name a type
+  137 | tokenCodeMap["UNtil"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:138:1: error: 'tokenCodeMap' does not name a type
+  138 | tokenCodeMap["UnTIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:139:1: error: 'tokenCodeMap' does not name a type
+  139 | tokenCodeMap["UnTIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:140:1: error: 'tokenCodeMap' does not name a type
+  140 | tokenCodeMap["UnTiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:141:1: error: 'tokenCodeMap' does not name a type
+  141 | tokenCodeMap["UnTil"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:142:1: error: 'tokenCodeMap' does not name a type
+  142 | tokenCodeMap["UntIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:143:1: error: 'tokenCodeMap' does not name a type
+  143 | tokenCodeMap["UntIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:144:1: error: 'tokenCodeMap' does not name a type
+  144 | tokenCodeMap["UntiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:145:1: error: 'tokenCodeMap' does not name a type
+  145 | tokenCodeMap["Until"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:146:1: error: 'tokenCodeMap' does not name a type
+  146 | tokenCodeMap["WRITE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:147:1: error: 'tokenCodeMap' does not name a type
+  147 | tokenCodeMap["WRITe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:148:1: error: 'tokenCodeMap' does not name a type
+  148 | tokenCodeMap["WRItE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:149:1: error: 'tokenCodeMap' does not name a type
+  149 | tokenCodeMap["WRIte"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:150:1: error: 'tokenCodeMap' does not name a type
+  150 | tokenCodeMap["WRiTE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:151:1: error: 'tokenCodeMap' does not name a type
+  151 | tokenCodeMap["WRiTe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:152:1: error: 'tokenCodeMap' does not name a type
+  152 | tokenCodeMap["WRitE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:153:1: error: 'tokenCodeMap' does not name a type
+  153 | tokenCodeMap["WRite"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:154:1: error: 'tokenCodeMap' does not name a type
+  154 | tokenCodeMap["WrITE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:155:1: error: 'tokenCodeMap' does not name a type
+  155 | tokenCodeMap["WrITe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:156:1: error: 'tokenCodeMap' does not name a type
+  156 | tokenCodeMap["WrItE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:157:1: error: 'tokenCodeMap' does not name a type
+  157 | tokenCodeMap["WrIte"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:158:1: error: 'tokenCodeMap' does not name a type
+  158 | tokenCodeMap["WriTE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:159:1: error: 'tokenCodeMap' does not name a type
+  159 | tokenCodeMap["WriTe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:160:1: error: 'tokenCodeMap' does not name a type
+  160 | tokenCodeMap["WritE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:161:1: error: 'tokenCodeMap' does not name a type
+  161 | tokenCodeMap["Write"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:162:1: error: 'tokenCodeMap' does not name a type
+  162 | tokenCodeMap["eLSE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:163:1: error: 'tokenCodeMap' does not name a type
+  163 | tokenCodeMap["eLSe"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:164:1: error: 'tokenCodeMap' does not name a type
+  164 | tokenCodeMap["eLsE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:165:1: error: 'tokenCodeMap' does not name a type
+  165 | tokenCodeMap["eLse"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:166:1: error: 'tokenCodeMap' does not name a type
+  166 | tokenCodeMap["eND"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:167:1: error: 'tokenCodeMap' does not name a type
+  167 | tokenCodeMap["eNd"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:168:1: error: 'tokenCodeMap' does not name a type
+  168 | tokenCodeMap["elSE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:169:1: error: 'tokenCodeMap' does not name a type
+  169 | tokenCodeMap["elSe"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:170:1: error: 'tokenCodeMap' does not name a type
+  170 | tokenCodeMap["elsE"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:171:1: error: 'tokenCodeMap' does not name a type
+  171 | tokenCodeMap["else"] = 200;
+      | ^~~~~~~~~~~~
+temp.cpp:172:1: error: 'tokenCodeMap' does not name a type
+  172 | tokenCodeMap["enD"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:173:1: error: 'tokenCodeMap' does not name a type
+  173 | tokenCodeMap["end"] = 201;
+      | ^~~~~~~~~~~~
+temp.cpp:174:1: error: 'tokenCodeMap' does not name a type
+  174 | tokenCodeMap["iF"] = 202;
+      | ^~~~~~~~~~~~
+temp.cpp:175:1: error: 'tokenCodeMap' does not name a type
+  175 | tokenCodeMap["if"] = 202;
+      | ^~~~~~~~~~~~
+temp.cpp:176:1: error: 'tokenCodeMap' does not name a type
+  176 | tokenCodeMap["rEAD"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:177:1: error: 'tokenCodeMap' does not name a type
+  177 | tokenCodeMap["rEAd"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:178:1: error: 'tokenCodeMap' does not name a type
+  178 | tokenCodeMap["rEPEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:179:1: error: 'tokenCodeMap' does not name a type
+  179 | tokenCodeMap["rEPEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:180:1: error: 'tokenCodeMap' does not name a type
+  180 | tokenCodeMap["rEPEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:181:1: error: 'tokenCodeMap' does not name a type
+  181 | tokenCodeMap["rEPEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:182:1: error: 'tokenCodeMap' does not name a type
+  182 | tokenCodeMap["rEPeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:183:1: error: 'tokenCodeMap' does not name a type
+  183 | tokenCodeMap["rEPeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:184:1: error: 'tokenCodeMap' does not name a type
+  184 | tokenCodeMap["rEPeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:185:1: error: 'tokenCodeMap' does not name a type
+  185 | tokenCodeMap["rEPeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:186:1: error: 'tokenCodeMap' does not name a type
+  186 | tokenCodeMap["rEaD"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:187:1: error: 'tokenCodeMap' does not name a type
+  187 | tokenCodeMap["rEad"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:188:1: error: 'tokenCodeMap' does not name a type
+  188 | tokenCodeMap["rEpEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:189:1: error: 'tokenCodeMap' does not name a type
+  189 | tokenCodeMap["rEpEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:190:1: error: 'tokenCodeMap' does not name a type
+  190 | tokenCodeMap["rEpEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:191:1: error: 'tokenCodeMap' does not name a type
+  191 | tokenCodeMap["rEpEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:192:1: error: 'tokenCodeMap' does not name a type
+  192 | tokenCodeMap["rEpeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:193:1: error: 'tokenCodeMap' does not name a type
+  193 | tokenCodeMap["rEpeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:194:1: error: 'tokenCodeMap' does not name a type
+  194 | tokenCodeMap["rEpeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:195:1: error: 'tokenCodeMap' does not name a type
+  195 | tokenCodeMap["rEpeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:196:1: error: 'tokenCodeMap' does not name a type
+  196 | tokenCodeMap["reAD"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:197:1: error: 'tokenCodeMap' does not name a type
+  197 | tokenCodeMap["reAd"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:198:1: error: 'tokenCodeMap' does not name a type
+  198 | tokenCodeMap["rePEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:199:1: error: 'tokenCodeMap' does not name a type
+  199 | tokenCodeMap["rePEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:200:1: error: 'tokenCodeMap' does not name a type
+  200 | tokenCodeMap["rePEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:201:1: error: 'tokenCodeMap' does not name a type
+  201 | tokenCodeMap["rePEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:202:1: error: 'tokenCodeMap' does not name a type
+  202 | tokenCodeMap["rePeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:203:1: error: 'tokenCodeMap' does not name a type
+  203 | tokenCodeMap["rePeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:204:1: error: 'tokenCodeMap' does not name a type
+  204 | tokenCodeMap["rePeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:205:1: error: 'tokenCodeMap' does not name a type
+  205 | tokenCodeMap["rePeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:206:1: error: 'tokenCodeMap' does not name a type
+  206 | tokenCodeMap["reaD"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:207:1: error: 'tokenCodeMap' does not name a type
+  207 | tokenCodeMap["read"] = 203;
+      | ^~~~~~~~~~~~
+temp.cpp:208:1: error: 'tokenCodeMap' does not name a type
+  208 | tokenCodeMap["repEAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:209:1: error: 'tokenCodeMap' does not name a type
+  209 | tokenCodeMap["repEAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:210:1: error: 'tokenCodeMap' does not name a type
+  210 | tokenCodeMap["repEaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:211:1: error: 'tokenCodeMap' does not name a type
+  211 | tokenCodeMap["repEat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:212:1: error: 'tokenCodeMap' does not name a type
+  212 | tokenCodeMap["repeAT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:213:1: error: 'tokenCodeMap' does not name a type
+  213 | tokenCodeMap["repeAt"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:214:1: error: 'tokenCodeMap' does not name a type
+  214 | tokenCodeMap["repeaT"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:215:1: error: 'tokenCodeMap' does not name a type
+  215 | tokenCodeMap["repeat"] = 204;
+      | ^~~~~~~~~~~~
+temp.cpp:216:1: error: 'tokenCodeMap' does not name a type
+  216 | tokenCodeMap["tHEN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:217:1: error: 'tokenCodeMap' does not name a type
+  217 | tokenCodeMap["tHEn"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:218:1: error: 'tokenCodeMap' does not name a type
+  218 | tokenCodeMap["tHeN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:219:1: error: 'tokenCodeMap' does not name a type
+  219 | tokenCodeMap["tHen"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:220:1: error: 'tokenCodeMap' does not name a type
+  220 | tokenCodeMap["thEN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:221:1: error: 'tokenCodeMap' does not name a type
+  221 | tokenCodeMap["thEn"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:222:1: error: 'tokenCodeMap' does not name a type
+  222 | tokenCodeMap["theN"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:223:1: error: 'tokenCodeMap' does not name a type
+  223 | tokenCodeMap["then"] = 205;
+      | ^~~~~~~~~~~~
+temp.cpp:224:1: error: 'tokenCodeMap' does not name a type
+  224 | tokenCodeMap["uNTIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:225:1: error: 'tokenCodeMap' does not name a type
+  225 | tokenCodeMap["uNTIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:226:1: error: 'tokenCodeMap' does not name a type
+  226 | tokenCodeMap["uNTiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:227:1: error: 'tokenCodeMap' does not name a type
+  227 | tokenCodeMap["uNTil"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:228:1: error: 'tokenCodeMap' does not name a type
+  228 | tokenCodeMap["uNtIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:229:1: error: 'tokenCodeMap' does not name a type
+  229 | tokenCodeMap["uNtIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:230:1: error: 'tokenCodeMap' does not name a type
+  230 | tokenCodeMap["uNtiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:231:1: error: 'tokenCodeMap' does not name a type
+  231 | tokenCodeMap["uNtil"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:232:1: error: 'tokenCodeMap' does not name a type
+  232 | tokenCodeMap["unTIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:233:1: error: 'tokenCodeMap' does not name a type
+  233 | tokenCodeMap["unTIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:234:1: error: 'tokenCodeMap' does not name a type
+  234 | tokenCodeMap["unTiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:235:1: error: 'tokenCodeMap' does not name a type
+  235 | tokenCodeMap["unTil"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:236:1: error: 'tokenCodeMap' does not name a type
+  236 | tokenCodeMap["untIL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:237:1: error: 'tokenCodeMap' does not name a type
+  237 | tokenCodeMap["untIl"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:238:1: error: 'tokenCodeMap' does not name a type
+  238 | tokenCodeMap["untiL"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:239:1: error: 'tokenCodeMap' does not name a type
+  239 | tokenCodeMap["until"] = 206;
+      | ^~~~~~~~~~~~
+temp.cpp:240:1: error: 'tokenCodeMap' does not name a type
+  240 | tokenCodeMap["wRITE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:241:1: error: 'tokenCodeMap' does not name a type
+  241 | tokenCodeMap["wRITe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:242:1: error: 'tokenCodeMap' does not name a type
+  242 | tokenCodeMap["wRItE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:243:1: error: 'tokenCodeMap' does not name a type
+  243 | tokenCodeMap["wRIte"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:244:1: error: 'tokenCodeMap' does not name a type
+  244 | tokenCodeMap["wRiTE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:245:1: error: 'tokenCodeMap' does not name a type
+  245 | tokenCodeMap["wRiTe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:246:1: error: 'tokenCodeMap' does not name a type
+  246 | tokenCodeMap["wRitE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:247:1: error: 'tokenCodeMap' does not name a type
+  247 | tokenCodeMap["wRite"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:248:1: error: 'tokenCodeMap' does not name a type
+  248 | tokenCodeMap["wrITE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:249:1: error: 'tokenCodeMap' does not name a type
+  249 | tokenCodeMap["wrITe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:250:1: error: 'tokenCodeMap' does not name a type
+  250 | tokenCodeMap["wrItE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:251:1: error: 'tokenCodeMap' does not name a type
+  251 | tokenCodeMap["wrIte"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:252:1: error: 'tokenCodeMap' does not name a type
+  252 | tokenCodeMap["wriTE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:253:1: error: 'tokenCodeMap' does not name a type
+  253 | tokenCodeMap["wriTe"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:254:1: error: 'tokenCodeMap' does not name a type
+  254 | tokenCodeMap["writE"] = 207;
+      | ^~~~~~~~~~~~
+temp.cpp:255:1: error: 'tokenCodeMap' does not name a type
+  255 | tokenCodeMap["write"] = 207;
+      | ^~~~~~~~~~~~

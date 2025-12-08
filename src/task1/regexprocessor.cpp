@@ -143,21 +143,15 @@ bool RegexProcessor::parseLine(const QString &line, RegexItem &item)
     // 提取多单词列表（如果是多单词）
     QStringList wordList;
     if (isMultiWord) {
-        // 检查是否为分组的正则表达式，如 (i|I)(f|F)
-        if (standardPattern.contains('(') && standardPattern.contains(')')) {
-            // 使用新函数从分组的正则表达式中生成所有可能的单词变体
-            wordList = generateWordsFromGroupedRegex(standardPattern);
-        } else {
-            // 原有逻辑：处理简单的选择表达式，如 if|else|while
-            QStringList rawWordList = extractMultiWords(standardPattern);
-            // 生成所有大小写组合
-            QStringList combinedWordList;
-            for (const QString &rawWord : rawWordList) {
-                QStringList combinations = generateAllCaseCombinations(rawWord);
-                combinedWordList.append(combinations);
-            }
-            wordList = combinedWordList;
-        }
+        // 对于多单词情况，统一使用 generateWordsFromGroupedRegex 函数处理
+        // 该函数能处理各种复杂情况，包括分组表达式和选择表达式
+        wordList = generateWordsFromGroupedRegex(standardPattern);
+        
+        // 去重，确保每个单词只出现一次
+        wordList.removeDuplicates();
+        
+        // 排序，便于后续处理
+        wordList.sort();
     }
 
     // 设置结果
@@ -300,8 +294,45 @@ QString RegexProcessor::convertToStandardRegex(const QString &pattern)
         const QString &name = it.key();
         const QString &refPattern = it.value();
         
-        // 使用直接字符串替换，确保所有引用都能被正确替换
-        result.replace(name, refPattern, Qt::CaseSensitive);
+        // 改进：使用更安全的方式替换引用，避免误替换
+        // 只替换完整的引用名称，不替换表达式中的部分字符串
+        // 引用名称通常是由字母、数字和下划线组成的标识符
+        
+        // 不使用正则表达式，改用简单的字符串替换
+        // 遍历字符串，查找完整的引用名称并替换
+        int pos = 0;
+        while (pos != -1 && pos < result.length()) {
+            pos = result.indexOf(name, pos);
+            if (pos != -1) {
+                // 检查是否为完整的引用名称
+                bool isCompleteWord = true;
+                
+                // 检查前面的字符是否为字母、数字或下划线
+                if (pos > 0) {
+                    QChar prevChar = result.at(pos - 1);
+                    if (prevChar.isLetterOrNumber() || prevChar == '_') {
+                        isCompleteWord = false;
+                    }
+                }
+                
+                // 检查后面的字符是否为字母、数字或下划线
+                if (isCompleteWord && (pos + name.length()) < result.length()) {
+                    QChar nextChar = result.at(pos + name.length());
+                    if (nextChar.isLetterOrNumber() || nextChar == '_') {
+                        isCompleteWord = false;
+                    }
+                }
+                
+                // 如果是完整的引用名称，则替换
+                if (isCompleteWord) {
+                    result.replace(pos, name.length(), refPattern);
+                    pos += refPattern.length();
+                } else {
+                    // 否则继续查找下一个
+                    pos += name.length();
+                }
+            }
+        }
     }
     
     return result;
@@ -372,6 +403,7 @@ QStringList RegexProcessor::extractMultiWords(const QString &pattern)
 }
 
 // 生成所有可能的大小写组合
+// 注意：此函数只处理简单字符串，不处理包含 (、) 或 | 的复杂表达式
 QStringList RegexProcessor::generateAllCaseCombinations(const QString &pattern)
 {
     QStringList result;
@@ -382,38 +414,11 @@ QStringList RegexProcessor::generateAllCaseCombinations(const QString &pattern)
         return result;
     }
     
-    // 检查是否为选择表达式
-    if (pattern.contains('|')) {
-        // 只处理顶级选择表达式
-        int bracketCount = 0;
-        int lastSplitIndex = 0;
-        QList<QString> topLevelParts;
-        
-        for (int i = 0; i < pattern.length(); ++i) {
-            QChar c = pattern.at(i);
-            if (c == '(') {
-                bracketCount++;
-            } else if (c == ')') {
-                bracketCount--;
-            } else if (c == '|' && bracketCount == 0) {
-                topLevelParts.append(pattern.mid(lastSplitIndex, i - lastSplitIndex).trimmed());
-                lastSplitIndex = i + 1;
-            }
-        }
-        topLevelParts.append(pattern.mid(lastSplitIndex).trimmed());
-        
-        // 对于每个选择项，生成所有组合
-        for (const QString &part : topLevelParts) {
-            QStringList subCombinations = generateAllCaseCombinations(part);
-            result.append(subCombinations);
-        }
-        
+    // 检查是否包含复杂表达式符号
+    if (pattern.contains('(') || pattern.contains(')') || pattern.contains('|')) {
+        // 包含复杂表达式符号，直接返回原字符串
+        result.append(pattern);
         return result;
-    }
-    
-    // 检查是否为括号表达式
-    if (pattern.startsWith('(') && pattern.endsWith(')')) {
-        return generateAllCaseCombinations(pattern.mid(1, pattern.length() - 2));
     }
     
     // 处理普通字符串
@@ -440,6 +445,9 @@ QStringList RegexProcessor::generateAllCaseCombinations(const QString &pattern)
         }
     }
     
+    // 去重，确保每个组合只出现一次
+    result.removeDuplicates();
+    
     return result;
 }
 
@@ -450,7 +458,6 @@ QStringList RegexProcessor::generateWordsFromGroupedRegex(const QString &pattern
     
     // 添加递归深度限制，防止无限递归
     if (depth > 100) {
-        // 递归深度超过限制，返回空列表
         return result;
     }
     
@@ -460,123 +467,145 @@ QStringList RegexProcessor::generateWordsFromGroupedRegex(const QString &pattern
         return result;
     }
     
-    // 针对关键词的分组表达式，如 (i|I)(f|F)，生成所有可能的组合
-    // 使用更精确的方法来处理多个连续分组
+    // 检查是否为选择表达式
+    // 只在顶级括号外的|处分割
+    int bracketCount = 0;
+    bool isChoiceExpr = false;
+    for (int i = 0; i < pattern.length(); ++i) {
+        QChar c = pattern.at(i);
+        if (c == '(') {
+            bracketCount++;
+        } else if (c == ')') {
+            bracketCount--;
+        } else if (c == '|' && bracketCount == 0) {
+            isChoiceExpr = true;
+            break;
+        }
+    }
     
-    // 检查是否为类似 (i|I)(f|F) 这样的分组表达式
-    if (pattern.startsWith('(') && pattern.endsWith(')')) {
-        // 移除外层括号
-        QString innerPattern = pattern.mid(1, pattern.length() - 2);
+    // 如果是选择表达式，分割成多个选择项，为每个选择项生成单词列表，然后合并
+    if (isChoiceExpr) {
+        QList<QString> choices;
+        int lastChoiceStart = 0;
+        bracketCount = 0;
         
-        // 使用更精确的方法来识别和处理多个连续分组
-        // 例如：(i|I)(f|F) 应该被识别为两个独立的分组
-        
-        // 分割连续的分组
-        QList<QString> groups;
-        int bracketCount = 0;
-        int lastGroupStart = 0;
-        
-        for (int i = 0; i < innerPattern.length(); ++i) {
-            QChar c = innerPattern.at(i);
+        for (int i = 0; i < pattern.length(); ++i) {
+            QChar c = pattern.at(i);
             if (c == '(') {
-                if (bracketCount == 0) {
-                    // 新的分组开始
-                    lastGroupStart = i;
-                }
                 bracketCount++;
             } else if (c == ')') {
                 bracketCount--;
-                if (bracketCount == 0) {
-                    // 当前分组结束
-                    QString group = innerPattern.mid(lastGroupStart, i - lastGroupStart + 1);
-                    groups.append(group);
-                }
+            } else if (c == '|' && bracketCount == 0) {
+                choices.append(pattern.mid(lastChoiceStart, i - lastChoiceStart).trimmed());
+                lastChoiceStart = i + 1;
             }
         }
         
-        // 如果成功识别到多个分组
-        if (groups.size() >= 1) {
-            // 为每个分组生成可能的选项
-            QList<QStringList> groupOptions;
-            
-            for (const QString &group : groups) {
-                // 移除分组的外层括号
-                if (group.startsWith('(') && group.endsWith(')')) {
-                    QString innerGroup = group.mid(1, group.length() - 2);
-                    
-                    // 分割选择项
-                    QStringList choices;
-                    int innerBracketCount = 0;
-                    int lastChoiceStart = 0;
-                    
-                    for (int i = 0; i < innerGroup.length(); ++i) {
-                        QChar c = innerGroup.at(i);
-                        if (c == '(') {
-                            innerBracketCount++;
-                        } else if (c == ')') {
-                            innerBracketCount--;
-                        } else if (c == '|' && innerBracketCount == 0) {
-                            // 顶级选择符
-                            QString choice = innerGroup.mid(lastChoiceStart, i - lastChoiceStart);
-                            choices.append(choice);
-                            lastChoiceStart = i + 1;
-                        }
-                    }
-                    
-                    // 添加最后一个选择项
-                    QString lastChoice = innerGroup.mid(lastChoiceStart);
-                    choices.append(lastChoice);
-                    
-                    groupOptions.append(choices);
-                } else {
-                    // 不是分组的情况，直接添加
-                    groupOptions.append(QStringList() << group);
-                }
+        // 添加最后一个选择项
+        choices.append(pattern.mid(lastChoiceStart).trimmed());
+        
+        // 移除空选择项
+        choices.removeAll("");
+        
+        // 为每个选择项生成单词列表，并合并
+        for (const QString &choice : choices) {
+            QStringList choiceWords = generateWordsFromGroupedRegex(choice, depth + 1);
+            result.append(choiceWords);
+        }
+        
+        // 去重并排序
+        result.removeDuplicates();
+        result.sort();
+        
+        return result;
+    }
+    
+    // 检查是否为简单字符串
+    if (!pattern.contains('(') && !pattern.contains(')')) {
+        // 简单字符串，直接生成大小写组合
+        return generateAllCaseCombinations(pattern);
+    }
+    
+    // 否则，是分组表达式，需要生成笛卡尔积
+    // 1. 首先解析所有顶级分组和非分组部分
+    // 示例：(i|I)(f|F) -> ["(i|I)", "(f|F)"]
+    QList<QString> topLevelParts;
+    int lastGroupStart = 0;
+    bracketCount = 0;
+    
+    for (int i = 0; i < pattern.length(); ++i) {
+        QChar c = pattern.at(i);
+        
+        if (c == '(') {
+            bracketCount++;
+            if (bracketCount == 1 && i > lastGroupStart) {
+                // 分组前有非分组部分
+                topLevelParts.append(pattern.mid(lastGroupStart, i - lastGroupStart));
+                lastGroupStart = i;
             }
-            
-            // 生成所有可能的组合
-            if (!groupOptions.isEmpty()) {
-                // 初始化结果列表
-                result = groupOptions.first();
-                
-                // 依次与其他分组的选项进行笛卡尔积
-                for (int i = 1; i < groupOptions.size(); ++i) {
-                    QStringList newResult;
-                    const QStringList &currentOptions = groupOptions[i];
-                    
-                    for (const QString &existing : result) {
-                        for (const QString &option : currentOptions) {
-                            newResult.append(existing + option);
-                        }
-                    }
-                    
-                    result = newResult;
-                }
-                
-                // 添加变体数量限制，防止内存耗尽
-                if (result.size() > 1024) {
-                    result = result.mid(0, 1024);
-                }
-                
-                return result;
+        } else if (c == ')') {
+            bracketCount--;
+            if (bracketCount == 0) {
+                // 分组结束
+                topLevelParts.append(pattern.mid(lastGroupStart, i - lastGroupStart + 1));
+                lastGroupStart = i + 1;
             }
         }
     }
     
-    // 原有逻辑：处理简单的选择表达式，如 if|else|while
-    QStringList rawWordList = extractMultiWords(pattern);
-    
-    // 生成所有大小写组合
-    QStringList combinedWordList;
-    for (const QString &rawWord : rawWordList) {
-        QStringList combinations = generateAllCaseCombinations(rawWord);
-        combinedWordList.append(combinations);
+    // 添加最后一个部分
+    if (lastGroupStart < pattern.length()) {
+        topLevelParts.append(pattern.mid(lastGroupStart));
     }
     
-    // 添加变体数量限制，防止内存耗尽
-    if (combinedWordList.size() > 1024) {
-        combinedWordList = combinedWordList.mid(0, 1024);
+    // 移除空字符串
+    topLevelParts.removeAll("");
+    
+    // 2. 处理每个顶级部分，生成选项列表
+    QList<QStringList> allOptions;
+    
+    for (const QString &part : topLevelParts) {
+        if (part.startsWith('(') && part.endsWith(')')) {
+            // 处理分组：(i|I) -> ["i", "I"]
+            QString inner = part.mid(1, part.length() - 2);
+            
+            // 递归处理分组内容
+            QStringList groupOptions = generateWordsFromGroupedRegex(inner, depth + 1);
+            allOptions.append(groupOptions);
+        } else {
+            // 处理普通字符串：生成大小写组合
+            QStringList simpleOptions = generateAllCaseCombinations(part);
+            allOptions.append(simpleOptions);
+        }
     }
     
-    return combinedWordList;
+    // 3. 生成所有可能的组合（笛卡尔积）
+    if (allOptions.isEmpty()) {
+        return result;
+    }
+    
+    // 初始化结果列表
+    result = allOptions.first();
+    
+    // 依次与其他部分的选项进行笛卡尔积
+    for (int i = 1; i < allOptions.size(); ++i) {
+        QStringList newResult;
+        const QStringList &currentOptions = allOptions[i];
+        
+        for (const QString &existing : result) {
+            for (const QString &option : currentOptions) {
+                newResult.append(existing + option);
+            }
+        }
+        
+        result = newResult;
+    }
+    
+    // 4. 去重并限制变体数量
+    result.removeDuplicates();
+    if (result.size() > 1024) {
+        result = result.mid(0, 1024);
+    }
+    
+    return result;
 }
