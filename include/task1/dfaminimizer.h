@@ -19,6 +19,10 @@ public:
     // 获取错误信息
     QString getErrorMessage() const;
     
+    // 存储正则表达式与接受态之间的映射关系
+    // key: 正则表达式索引，value: 该正则表达式对应的所有接受态
+    QMap<int, QSet<DFAState>> regexToAcceptStatesMap;
+    
 private:
     // Hopcroft算法的实现
     QList<QSet<DFAState>> hopcroftAlgorithm(const DFA &dfa);

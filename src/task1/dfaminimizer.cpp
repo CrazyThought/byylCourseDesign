@@ -75,11 +75,30 @@ DFA DFAMinimizer::minimizeDFA(const DFA &dfa)
     // 设置新的接受状态集合，添加边界检查
     for (DFAState state : dfa.acceptStates) {
         if (stateMap.contains(state)) {
-            minimizedDFA.acceptStates.insert(stateMap[state]);
+            DFAState newState = stateMap[state];
+            minimizedDFA.acceptStates.insert(newState);
+            
+            // 传递接受状态到正则表达式索引的映射
+            if (dfa.acceptStateToRegexIndex.contains(state)) {
+                int regexIndex = dfa.acceptStateToRegexIndex[state];
+                minimizedDFA.acceptStateToRegexIndex[newState] = regexIndex;
+            }
         } else {
             // 记录错误，但继续执行
             m_errorMessage += QString("警告：接受状态 %1 不在状态映射中\n").arg(state);
         }
+    }
+    
+    // 填充正则表达式与接受态之间的映射关系
+    regexToAcceptStatesMap.clear();
+    for (const auto &state : minimizedDFA.acceptStates) {
+        // 获取该状态对应的正则表达式索引
+        int regexIndex = 0;
+        if (minimizedDFA.acceptStateToRegexIndex.contains(state)) {
+            regexIndex = minimizedDFA.acceptStateToRegexIndex[state];
+        }
+        // 将状态添加到对应正则表达式索引的集合中
+        regexToAcceptStatesMap[regexIndex].insert(state);
     }
     
     // 构建邻接表来加速转换查找

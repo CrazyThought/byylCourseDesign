@@ -185,11 +185,16 @@ void Task1Window::on_btnGenerateNFA_clicked()
     
     // 为每个以下划线开头的正则表达式构建NFA
     int generatedCount = 0;
-    for (const RegexItem &item : regexItems) {
+    for (int i = 0; i < regexItems.size(); i++) {
+        const RegexItem &item = regexItems[i];
         // 仅为下划线开头的正则表达式生成NFA
         if (item.name.startsWith('_')) {
             NFA nfa = m_nfaBuilder.buildNFA(item);
             if (!nfa.states.isEmpty()) {
+                // 设置接受状态的正则表达式索引
+                for (const NFAState &state : nfa.acceptStates) {
+                    nfa.acceptStateToRegexIndex[state] = i;
+                }
                 m_nfaMap[item.name] = nfa;
                 generatedCount++;
             }
@@ -253,6 +258,11 @@ NFA Task1Window::mergeNFAs(const QList<NFA> &nfAs)
         // 处理接受状态
         for (const NFAState &acceptState : nfa.acceptStates) {
             totalNFA.acceptStates.insert(acceptState + stateOffset);
+            // 处理接受状态到正则表达式索引的映射
+            if (nfa.acceptStateToRegexIndex.contains(acceptState)) {
+                int regexIndex = nfa.acceptStateToRegexIndex[acceptState];
+                totalNFA.acceptStateToRegexIndex[acceptState + stateOffset] = regexIndex;
+            }
         }
         
         // 处理字母表 - 合并所有NFA的字母表
@@ -1531,11 +1541,16 @@ void Task1Window::on_btnRefreshNFA_clicked()
     // 为每个以下划线开头的正则表达式构建NFA
     ui->statusbar->showMessage(tr("正在构建NFA..."), 0);
     int generatedCount = 0;
-    for (const RegexItem &item : regexItems) {
+    for (int i = 0; i < regexItems.size(); i++) {
+        const RegexItem &item = regexItems[i];
         // 仅为下划线开头的正则表达式生成NFA
         if (item.name.startsWith('_')) {
             NFA nfa = m_nfaBuilder.buildNFA(item);
             if (!nfa.states.isEmpty()) {
+                // 设置接受状态的正则表达式索引
+                for (const NFAState &state : nfa.acceptStates) {
+                    nfa.acceptStateToRegexIndex[state] = i;
+                }
                 m_nfaMap[item.name] = nfa;
                 generatedCount++;
             }

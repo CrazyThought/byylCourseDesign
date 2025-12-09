@@ -28,6 +28,9 @@ typedef struct {
     
     // 邻接表：state -> (symbol -> state集合)，用于优化算法
     QHash<NFAState, QHash<QString, QSet<NFAState>>> transitionTable;
+    
+    // 接受状态到正则表达式索引的映射
+    QMap<NFAState, int> acceptStateToRegexIndex;
 } NFA;
 
 class NFABuilder

@@ -444,45 +444,26 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
     }
     
     // 2. 为每个接受状态分配正确的tokenCode
-    // 收集所有非多单词正则表达式项，并按code值排序
-    QList<RegexItem> basicRegexItems;
-    for (const auto &item : regexItems) {
-        if (!item.isMultiWord) {
-            basicRegexItems.append(item);
+    // 初始化tokens数组为-1
+    for (int i = 0; i < numStates; i++) {
+        tokens[i] = -1;
+    }
+    
+    // 使用DFA的acceptStateToRegexIndex映射分配tokenCode
+    // 使用正确的QMap遍历方式
+    QMapIterator<DFAState, int> it(minimizedDFA.acceptStateToRegexIndex);
+    while (it.hasNext()) {
+        it.next();
+        DFAState state = it.key();
+        int regexIndex = it.value();
+        if (state >= 0 && state < numStates && regexIndex >= 0 && regexIndex < regexItems.size()) {
+            tokens[state] = regexItems[regexIndex].code;
         }
     }
     
-    // 按code值从小到大排序
-    std::sort(basicRegexItems.begin(), basicRegexItems.end(), [](const RegexItem &a, const RegexItem &b) {
-        return a.code < b.code;
-    });
-    
-    // 提取排序后的code值
-    QList<int> sortedTokenCodes;
-    for (const auto &item : basicRegexItems) {
-        sortedTokenCodes.append(item.code);
-    }
-    
-    // 将接受状态转换为列表，并按照数值大小排序
-    QList<DFAState> sortedAcceptStates = minimizedDFA.acceptStates.values();
-    std::sort(sortedAcceptStates.begin(), sortedAcceptStates.end());
-    
-    // 将排序后的tokenCode分配给排序后的接受状态
-    // 确保只分配给非多单词接受态
-    int tokenIndex = 0;
-    for (int i = 0; i < sortedAcceptStates.size(); i++) {
-        DFAState state = sortedAcceptStates[i];
-        if (state >= 0 && state < numStates) {
-            // 只分配给前三个接受态（非多单词接受态）
-            if (tokenIndex < sortedTokenCodes.size()) {
-                tokens[state] = sortedTokenCodes[tokenIndex];
-                tokenIndex++;
-            } else {
-                // 多余的接受态（多单词接受态）保持-1
-                tokens[state] = -1;
-            }
-        }
-    }
+    // 对于没有映射的接受态，保持-1，由tokenCodeMap覆盖
+    // 非多单词接受态应该已经通过映射获得了正确的tokenCode
+    // 多单词接受态由tokenCodeMap处理，不需要额外分配
     
     // 生成接受状态数组
     code += "bool isAcceptState[NUM_STATES] = {";

@@ -49,6 +49,11 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
     for (NFAState nfaState : startClosure) {
         if (nfa.acceptStates.contains(nfaState)) {
             dfa.acceptStates.insert(startDFAState);
+            // 设置起始状态的正则表达式索引
+            if (nfa.acceptStateToRegexIndex.contains(nfaState)) {
+                int regexIndex = nfa.acceptStateToRegexIndex[nfaState];
+                dfa.acceptStateToRegexIndex[startDFAState] = regexIndex;
+            }
             break;
         }
     }
@@ -88,12 +93,17 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
                 dfa.states.append(targetDFAState);
                 
                 // 检查是否为接受状态
-                for (NFAState nfaState : closureResult) {
-                    if (nfa.acceptStates.contains(nfaState)) {
-                        dfa.acceptStates.insert(targetDFAState);
-                        break;
+            for (NFAState nfaState : closureResult) {
+                if (nfa.acceptStates.contains(nfaState)) {
+                    dfa.acceptStates.insert(targetDFAState);
+                    // 设置接受状态的正则表达式索引
+                    if (nfa.acceptStateToRegexIndex.contains(nfaState)) {
+                        int regexIndex = nfa.acceptStateToRegexIndex[nfaState];
+                        dfa.acceptStateToRegexIndex[targetDFAState] = regexIndex;
                     }
+                    break;
                 }
+            }
             }
             
             // 添加DFA转换
