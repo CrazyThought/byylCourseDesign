@@ -1098,20 +1098,10 @@ void Task1Window::displayLexicalResults(const QList<LexicalResult> &results)
         // 添加单词编码
         resultText += QString::number(result.tokenCode) + " ";
         
-        // 检查是否为标识符或数字
-        bool isIdentifierOrNumber = false;
-        
-        // 检查是否为标识符：字母或下划线开头，后跟字母、数字或下划线
-        if (!result.lexeme.isEmpty()) {
-            QChar firstChar = result.lexeme.at(0);
-            if (firstChar.isLetter() || firstChar == '_') {
-                isIdentifierOrNumber = true;
-            }
-            // 检查是否为数字：数字开头
-            else if (firstChar.isDigit()) {
-                isIdentifierOrNumber = true;
-            }
-        }
+        // 检查是否为标识符或数字：根据tokenCode判断
+        // 标识符（tokenCode 100）和数字（tokenCode 101）：显示编码 单词
+        // 其他符号：只显示编码
+        bool isIdentifierOrNumber = (result.tokenCode == 100 || result.tokenCode == 101);
         
         // 对于标识符或数字，在编码后接着输出单词，中间使用空格分隔
         if (isIdentifierOrNumber) {

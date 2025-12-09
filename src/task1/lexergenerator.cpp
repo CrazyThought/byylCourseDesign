@@ -436,20 +436,50 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
     QVector<bool> isAccept(numStates, false);
     QVector<int> tokens(numStates, -1);
     
-    // 填充接受状态和对应的token代码
+    // 1. 遍历所有接受状态，将它们标记为接受状态
     for (const auto &state : minimizedDFA.acceptStates) {
         if (state >= 0 && state < numStates) {
             isAccept[state] = true;
-            
-            // 从DFA的映射中获取正则表达式索引
-            int regexIndex = 0;
-            if (minimizedDFA.acceptStateToRegexIndex.contains(state)) {
-                regexIndex = minimizedDFA.acceptStateToRegexIndex[state];
-            }
-            
-            // 确保索引有效
-            if (regexIndex >= 0 && regexIndex < regexItems.size()) {
-                tokens[state] = regexItems[regexIndex].code;
+        }
+    }
+    
+    // 2. 为每个接受状态分配正确的tokenCode
+    // 收集所有非多单词正则表达式项，并按code值排序
+    QList<RegexItem> basicRegexItems;
+    for (const auto &item : regexItems) {
+        if (!item.isMultiWord) {
+            basicRegexItems.append(item);
+        }
+    }
+    
+    // 按code值从小到大排序
+    std::sort(basicRegexItems.begin(), basicRegexItems.end(), [](const RegexItem &a, const RegexItem &b) {
+        return a.code < b.code;
+    });
+    
+    // 提取排序后的code值
+    QList<int> sortedTokenCodes;
+    for (const auto &item : basicRegexItems) {
+        sortedTokenCodes.append(item.code);
+    }
+    
+    // 将接受状态转换为列表，并按照数值大小排序
+    QList<DFAState> sortedAcceptStates = minimizedDFA.acceptStates.values();
+    std::sort(sortedAcceptStates.begin(), sortedAcceptStates.end());
+    
+    // 将排序后的tokenCode分配给排序后的接受状态
+    // 确保只分配给非多单词接受态
+    int tokenIndex = 0;
+    for (int i = 0; i < sortedAcceptStates.size(); i++) {
+        DFAState state = sortedAcceptStates[i];
+        if (state >= 0 && state < numStates) {
+            // 只分配给前三个接受态（非多单词接受态）
+            if (tokenIndex < sortedTokenCodes.size()) {
+                tokens[state] = sortedTokenCodes[tokenIndex];
+                tokenIndex++;
+            } else {
+                // 多余的接受态（多单词接受态）保持-1
+                tokens[state] = -1;
             }
         }
     }

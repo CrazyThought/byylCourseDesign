@@ -1,0 +1,12 @@
+{ 这是一个Tiny语言样例程序，包含所有Tiny语言的单词和语句类型 }
+
+BEGIN
+    READ X;
+    IF X <= 0 THEN
+        X := 1;
+    END;
+    REPEAT
+        X := X + 1;
+        WRITE X;
+    UNTIL X = 10;
+END.
