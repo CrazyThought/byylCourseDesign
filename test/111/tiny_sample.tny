@@ -1,67 +1,37 @@
-{ 这是一个Tiny语言样例程序，包含所有Tiny语言的单词和语句类型 }
+{123+*-/%^<><<=>>===;:=IfThenElseEndRepeatUntilReadWrite}
+{098765abcdefABCDEF$;:=<>+-*/%^}
 
-{ 变量声明和赋值 }
-x := 10
-y := 20
-z := 0
+Read num123
+Read _count
+Write 98765
+Write 0
 
-{ if语句示例 }
-if x < y then
-    z := x + y
-end
+sum:=0
+sum:=sum+100
+prod:=10*5
+rem:=20%3
+pow:=2^3
+diff:=50-8
+div:=100/4
 
-{ if-else语句示例 }
-if x > y then
-    z := x - y
-else
-    z := y - x
-end
+If num123<100Then
+    Write 12345
+Else If num123<=200Then
+    Write 67890
+Else If num123>300Then
+    Write _count
+Else If num123>=400Then
+    sum:=sum+1
+Else If num123=500Then
+    prod:=prod*2
+Else If num123<>600Then
+    diff:=diff-1
+End
 
-{ repeat语句示例 }
-repeat
-    x := x + 1
-    y := y - 1
-until x >= y
+Repeat
+    sum:=sum+1
+    _count:=_count-1
+Until _count<=0
 
-{ 输入语句示例 }
-read input_var
-
-{ 输出语句示例 }
-write x
-write y
-write z
-
-{ 复杂表达式示例 }
-result := (x + y) * (z - 5) / 2 % 3 ^ 2
-
-{ 比较运算符示例 }
-if x <> y then
-    write "x不等于y"
-end
-
-if x <= y then
-    write "x小于等于y"
-end
-
-if x >= y then
-    write "x大于等于y"
-end
-
-{ 算术运算符示例 }
-a := 15 + 3
-b := 20 - 5
-c := 4 * 6
-d := 30 / 2
-e := 17 % 5
-f := 2 ^ 3
-
-{ 语句序列示例 }
-var1 := 100; var2 := 200; var3 := var1 + var2
-
-{ 嵌套表达式示例 }
-complex_result := ((a + b) * c - d) / e ^ f
-
-{ 最终输出 }
-write "程序执行完毕"
-write result
-write complex_result
+temp:=100;
+flag:=$

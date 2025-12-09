@@ -10,13 +10,6 @@
 
 #include "task2/task2window.h"
 #include "ui_task2window.h"
-#include "task2/bnfparser.h"
-#include "task2/firstfollow.h"
-#include "task2/lr0dfa.h"
-#include "task2/slr1checker.h"
-#include "task2/lr1dfa.h"
-#include "task2/lr1table.h"
-#include "task2/syntaxanalyzer.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTextStream>
@@ -25,28 +18,9 @@
 Task2Window::Task2Window(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Task2Window)
-    , m_bnfParser(new BNFParser())
-    , m_firstFollow(new FirstFollow())
-    , m_lr0dfa(new LR0DFA())
-    , m_slr1Checker(new SLR1Checker())
-    , m_lr1dfa(new LR1DFA())
-    , m_lr1Table(new LR1Table())
-    , m_syntaxAnalyzer(new SyntaxAnalyzer())
 {
     ui->setupUi(this);
     setWindowTitle(tr("实验二 - 语法分析器生成器"));
-    
-    // 初始化处理器类之间的关联
-    m_firstFollow->setParser(m_bnfParser);
-    m_lr0dfa->setParser(m_bnfParser);
-    m_slr1Checker->setLR0DFA(m_lr0dfa);
-    m_slr1Checker->setFirstFollow(m_firstFollow);
-    m_lr1dfa->setParser(m_bnfParser);
-    m_lr1dfa->setFirstFollow(m_firstFollow);
-    m_lr1Table->setLR1DFA(m_lr1dfa);
-    m_lr1Table->setParser(m_bnfParser);
-    m_syntaxAnalyzer->setLR1Table(m_lr1Table);
-    m_syntaxAnalyzer->setParser(m_bnfParser);
     
     // 初始化UI组件
     initUI();
@@ -54,41 +28,60 @@ Task2Window::Task2Window(QWidget *parent)
 
 Task2Window::~Task2Window()
 {
-    // 释放处理器类内存
-    delete m_bnfParser;
-    delete m_firstFollow;
-    delete m_lr0dfa;
-    delete m_slr1Checker;
-    delete m_lr1dfa;
-    delete m_lr1Table;
-    delete m_syntaxAnalyzer;
-    
     delete ui;
 }
 
-
+void Task2Window::initUI()
+{
+    // 设置表格列宽
+    ui->tableWidgetFirst->setColumnCount(2);
+    ui->tableWidgetFirst->setHorizontalHeaderLabels(QStringList() << tr("非终结符") << tr("First集"));
+    ui->tableWidgetFirst->horizontalHeader()->setStretchLastSection(true);
+    
+    ui->tableWidgetFollow->setColumnCount(2);
+    ui->tableWidgetFollow->setHorizontalHeaderLabels(QStringList() << tr("非终结符") << tr("Follow集"));
+    ui->tableWidgetFollow->horizontalHeader()->setStretchLastSection(true);
+    
+    ui->tableWidgetLR0->setColumnCount(3);
+    ui->tableWidgetLR0->setHorizontalHeaderLabels(QStringList() << tr("状态") << tr("项目集") << tr("转换"));
+    ui->tableWidgetLR0->horizontalHeader()->setStretchLastSection(true);
+    
+    // 移除不存在的tableWidgetConflicts组件初始化
+    
+    ui->tableWidgetLR1->setColumnCount(3);
+    ui->tableWidgetLR1->setHorizontalHeaderLabels(QStringList() << tr("状态") << tr("项目集") << tr("转换"));
+    ui->tableWidgetLR1->horizontalHeader()->setStretchLastSection(true);
+    
+    ui->tableWidgetLR1Table->setColumnCount(4);
+    ui->tableWidgetLR1Table->setHorizontalHeaderLabels(QStringList() << tr("状态") << tr("Action") << tr("Goto") << tr("说明"));
+    ui->tableWidgetLR1Table->horizontalHeader()->setStretchLastSection(true);
+    
+    ui->tableWidgetAnalysisSteps->setColumnCount(4);
+    ui->tableWidgetAnalysisSteps->setHorizontalHeaderLabels(QStringList() << tr("步骤") << tr("栈") << tr("输入") << tr("动作"));
+    ui->tableWidgetAnalysisSteps->horizontalHeader()->setStretchLastSection(true);
+    
+    // 清除硬编码的token映射，改为从文件加载
+    m_tokenMap.clear();
+    
+    // 尝试从当前目录加载固定名称的token映射文件
+    QString tokenMapFile = "sample.tokenmap";
+    if (QFile::exists(tokenMapFile)) {
+        if (loadTokenMap(tokenMapFile)) {
+            qDebug() << "成功加载token映射文件：" << tokenMapFile;
+        } else {
+            qDebug() << "警告：无法加载token映射文件";
+        }
+    } else {
+        qDebug() << "未找到token映射文件：" << tokenMapFile;
+    }
+}
 
 void Task2Window::loadExampleGrammar()
 {
-    // Tiny语言BNF文法示例
-    QString example = "// Tiny语言BNF文法示例\n";
-    example += "program -> stmt-sequence\n";
-    example += "stmt-sequence -> stmt-sequence ; statement | statement\n";
-    example += "statement -> if-stmt | repeat-stmt | assign-stmt | read-stmt | write-stmt\n";
-    example += "if-stmt -> if exp then stmt-sequence end | if exp then stmt-sequence else stmt-sequence end\n";
-    example += "repeat-stmt -> repeat stmt-sequence until exp\n";
-    example += "assign-stmt -> identifier := exp\n";
-    example += "read-stmt -> read identifier\n";
-    example += "write-stmt -> write exp\n";
-    example += "exp -> simple-exp comparison-op simple-exp | simple-exp\n";
-    example += "comparison-op -> < | > | = | >= | <= | <>\n";
-    example += "simple-exp -> simple-exp addop term | term\n";
-    example += "addop -> + | -\n";
-    example += "term -> term mulop factor | factor\n";
-    example += "mulop -> * | / | % | ^\n";
-    example += "factor -> ( exp ) | number | identifier\n";
-    
-    ui->textEditBNF->setPlainText(example);
+    // 简单的示例BNF文法
+    QString exampleGrammar = "S → aS | b\n";
+    ui->textEditBNF->setPlainText(exampleGrammar);
+    QMessageBox::information(this, tr("成功"), tr("示例文法加载成功"));
 }
 
 void Task2Window::on_actionExit_triggered()
@@ -100,11 +93,15 @@ void Task2Window::on_actionOpen_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("打开BNF文法文件"), ".", tr("文本文件 (*.txt);;所有文件 (*.*)"));
     if (!fileName.isEmpty()) {
-        if (m_bnfParser->loadFromFile(fileName)) {
-            ui->textEditBNF->setPlainText(m_bnfParser->printGrammar());
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream in(&file);
+            QString content = in.readAll();
+            ui->textEditBNF->setPlainText(content);
             QMessageBox::information(this, tr("成功"), tr("BNF文法文件加载成功"));
+            file.close();
         } else {
-            QMessageBox::warning(this, tr("错误"), tr("BNF文法文件加载失败: %1").arg(m_bnfParser->getErrorMessage()));
+            QMessageBox::warning(this, tr("错误"), tr("BNF文法文件加载失败"));
         }
     }
 }
@@ -113,10 +110,14 @@ void Task2Window::on_actionSave_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("保存BNF文法文件"), ".", tr("文本文件 (*.txt);;所有文件 (*.*)"));
     if (!fileName.isEmpty()) {
-        if (m_bnfParser->saveToFile(fileName)) {
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            out << ui->textEditBNF->toPlainText();
             QMessageBox::information(this, tr("成功"), tr("BNF文法文件保存成功"));
+            file.close();
         } else {
-            QMessageBox::warning(this, tr("错误"), tr("BNF文法文件保存失败: %1").arg(m_bnfParser->getErrorMessage()));
+            QMessageBox::warning(this, tr("错误"), tr("BNF文法文件保存失败"));
         }
     }
 }
@@ -130,15 +131,40 @@ void Task2Window::on_pushButtonParseBNF_clicked()
         return;
     }
     
-    if (m_bnfParser->parse(bnfText)) {
-        QMessageBox::information(this, tr("成功"), tr("BNF文法解析成功"));
-        
-        // 显示文法信息
-        QString grammarInfo = m_bnfParser->printGrammar();
-        ui->textBrowserGrammarInfo->setText(grammarInfo);
-    } else {
-        QMessageBox::warning(this, tr("错误"), tr("BNF文法解析失败: %1").arg(m_bnfParser->getErrorMessage()));
+    // 解析BNF文法
+    QString error;
+    m_grammar = GrammarParser::parseString(bnfText, error);
+    
+    if (!error.isEmpty()) {
+        QMessageBox::warning(this, tr("错误"), tr("BNF文法解析失败: %1").arg(error));
+        return;
     }
+    
+    // 显示文法信息
+    QString grammarInfo;
+    grammarInfo += tr("开始符号: %1\n").arg(m_grammar.startSymbol);
+    
+    // 转换非终结符集合为列表并排序
+    QList<QString> nonterminalsList = m_grammar.nonterminals.values();
+    std::sort(nonterminalsList.begin(), nonterminalsList.end());
+    grammarInfo += tr("非终结符: %1\n").arg(nonterminalsList.join(", "));
+    
+    // 转换终结符集合为列表并排序
+    QList<QString> terminalsList = m_grammar.terminals.values();
+    std::sort(terminalsList.begin(), terminalsList.end());
+    grammarInfo += tr("终结符: %1\n").arg(terminalsList.join(", "));
+    
+    grammarInfo += tr("产生式:\n");
+    for (auto it = m_grammar.productions.constBegin(); it != m_grammar.productions.constEnd(); ++it) {
+        const QString& nonterminal = it.key();
+        const auto& prods = it.value();
+        for (const auto& prod : prods) {
+            grammarInfo += nonterminal + " -> " + prod.right.join(" ") + "\n";
+        }
+    }
+    ui->textBrowserGrammarInfo->setText(grammarInfo);
+    
+    QMessageBox::information(this, tr("成功"), tr("BNF文法解析成功"));
 }
 
 void Task2Window::on_pushButtonClearBNF_clicked()
@@ -154,14 +180,7 @@ void Task2Window::on_pushButtonClearBNF_clicked()
     ui->textEditTokenFile->clear();
     ui->treeWidgetSyntaxTree->clear();
     
-    // 清空处理器类的数据
-    m_bnfParser->clear();
-    m_firstFollow->clear();
-    m_lr0dfa->clear();
-    m_slr1Checker->clear();
-    m_lr1dfa->clear();
-    m_lr1Table->clear();
-    m_syntaxAnalyzer->clear();
+    // 清空功能已完成
 }
 
 void Task2Window::on_pushButtonLoadExample_clicked()
@@ -171,142 +190,181 @@ void Task2Window::on_pushButtonLoadExample_clicked()
 
 void Task2Window::on_pushButtonCalculateFirst_clicked()
 {
-    if (m_bnfParser->getProductions().isEmpty()) {
+    // 检查是否已经解析了文法
+    if (m_grammar.productions.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("请先解析BNF文法"));
         return;
     }
     
-    if (m_firstFollow->calculateFirst()) {
-        displayFirstSet();
-        QMessageBox::information(this, tr("成功"), tr("First集合计算成功"));
-    } else {
-        QMessageBox::warning(this, tr("错误"), tr("First集合计算失败: %1").arg(m_firstFollow->getErrorMessage()));
-    }
+    // 清空表格
+    ui->tableWidgetFirst->setRowCount(0);
+    
+    // 计算First集
+    m_ll1Info = LL1::compute(m_grammar);
+    displayFirstSet();
+    QMessageBox::information(this, tr("成功"), tr("First集计算成功"));
 }
 
 void Task2Window::on_pushButtonCalculateFollow_clicked()
 {
-    if (m_bnfParser->getProductions().isEmpty()) {
+    // 检查是否已经解析了文法
+    if (m_grammar.productions.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("请先解析BNF文法"));
         return;
     }
     
     // 确保First集合已经计算
-    if (m_firstFollow->getAllFirst().isEmpty()) {
-        if (!m_firstFollow->calculateFirst()) {
-            QMessageBox::warning(this, tr("错误"), tr("First集合计算失败: %1").arg(m_firstFollow->getErrorMessage()));
-            return;
-        }
+    if (m_ll1Info.first.isEmpty()) {
+        m_ll1Info = LL1::compute(m_grammar);
     }
     
-    if (m_firstFollow->calculateFollow()) {
-        displayFollowSet();
-        QMessageBox::information(this, tr("成功"), tr("Follow集合计算成功"));
-    } else {
-        QMessageBox::warning(this, tr("错误"), tr("Follow集合计算失败: %1").arg(m_firstFollow->getErrorMessage()));
-    }
+    // 清空表格
+    ui->tableWidgetFollow->setRowCount(0);
+    
+    // 显示Follow集
+    displayFollowSet();
+    QMessageBox::information(this, tr("成功"), tr("Follow集计算成功"));
 }
 
 void Task2Window::on_pushButtonGenerateLR0DFA_clicked()
 {
-    if (m_bnfParser->getProductions().isEmpty()) {
+    // 检查是否已经解析了文法
+    if (m_grammar.productions.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("请先解析BNF文法"));
         return;
     }
     
-    if (m_lr0dfa->generate()) {
+    // 清空表格
+    ui->tableWidgetLR0->setRowCount(0);
+    
+    // 生成LR(0) DFA
+    m_lr0Graph = LR0Builder::build(m_grammar);
+    if (!m_lr0Graph.states.isEmpty()) {
         displayLR0DFA();
         QMessageBox::information(this, tr("成功"), tr("LR(0) DFA生成成功"));
     } else {
-        QMessageBox::warning(this, tr("错误"), tr("LR(0) DFA生成失败: %1").arg(m_lr0dfa->getErrorMessage()));
+        QMessageBox::warning(this, tr("错误"), tr("LR(0) DFA生成失败"));
     }
 }
 
 void Task2Window::on_pushButtonCheckSLR1_clicked()
 {
-    if (m_bnfParser->getProductions().isEmpty()) {
+    // 检查是否已经解析了文法
+    if (m_grammar.productions.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("请先解析BNF文法"));
         return;
     }
     
-    // 确保LR(0) DFA已经生成
-    if (m_lr0dfa->getItemSets().isEmpty()) {
-        if (!m_lr0dfa->generate()) {
-            QMessageBox::warning(this, tr("错误"), tr("LR(0) DFA生成失败: %1").arg(m_lr0dfa->getErrorMessage()));
-            return;
-        }
-    }
-    
     // 确保First和Follow集合已经计算
-    if (m_firstFollow->getAllFirst().isEmpty()) {
-        if (!m_firstFollow->calculateFirst()) {
-            QMessageBox::warning(this, tr("错误"), tr("First集合计算失败: %1").arg(m_firstFollow->getErrorMessage()));
+    if (m_ll1Info.first.isEmpty()) {
+        m_ll1Info = LL1::compute(m_grammar);
+    }
+    
+    // 确保LR(0) DFA已经生成
+    if (m_lr0Graph.states.isEmpty()) {
+        m_lr0Graph = LR0Builder::build(m_grammar);
+        if (m_lr0Graph.states.isEmpty()) {
+            QMessageBox::warning(this, tr("错误"), tr("LR(0) DFA生成失败"));
             return;
         }
     }
     
-    if (m_firstFollow->getAllFollow().isEmpty()) {
-        if (!m_firstFollow->calculateFollow()) {
-            QMessageBox::warning(this, tr("错误"), tr("Follow集合计算失败: %1").arg(m_firstFollow->getErrorMessage()));
-            return;
-        }
-    }
+    // 检查SLR(1)文法
+    m_slrResult = SLR::check(m_grammar, m_ll1Info);
+    displaySLR1Result();
     
-    if (m_slr1Checker->checkSLR1()) {
-        displaySLR1Result();
+    if (m_slrResult.isSLR1) {
         QMessageBox::information(this, tr("成功"), tr("该文法为SLR(1)文法"));
     } else {
-        displaySLR1Result();
         QMessageBox::warning(this, tr("警告"), tr("该文法不是SLR(1)文法，存在冲突"));
     }
 }
 
 void Task2Window::on_pushButtonGenerateLR1DFA_clicked()
 {
-    if (m_bnfParser->getProductions().isEmpty()) {
+    // 检查是否已经解析了文法
+    if (m_grammar.productions.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("请先解析BNF文法"));
         return;
     }
     
-    if (m_lr1dfa->generate()) {
+    // 清空表格
+    ui->tableWidgetLR1->setRowCount(0);
+    
+    // 生成LR(1) DFA
+    m_lr1Graph = LR1Builder::build(m_grammar);
+    if (!m_lr1Graph.states.isEmpty()) {
         displayLR1DFA();
         QMessageBox::information(this, tr("成功"), tr("LR(1) DFA生成成功"));
     } else {
-        QMessageBox::warning(this, tr("错误"), tr("LR(1) DFA生成失败: %1").arg(m_lr1dfa->getErrorMessage()));
+        QMessageBox::warning(this, tr("错误"), tr("LR(1) DFA生成失败"));
     }
 }
 
 void Task2Window::on_pushButtonGenerateLR1Table_clicked()
 {
-    if (m_bnfParser->getProductions().isEmpty()) {
+    // 检查是否已经解析了文法
+    if (m_grammar.productions.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("请先解析BNF文法"));
         return;
     }
     
     // 确保LR(1) DFA已经生成
-    if (m_lr1dfa->getItemSets().isEmpty()) {
-        if (!m_lr1dfa->generate()) {
-            QMessageBox::warning(this, tr("错误"), tr("LR(1) DFA生成失败: %1").arg(m_lr1dfa->getErrorMessage()));
+    if (m_lr1Graph.states.isEmpty()) {
+        m_lr1Graph = LR1Builder::build(m_grammar);
+        if (m_lr1Graph.states.isEmpty()) {
+            QMessageBox::warning(this, tr("错误"), tr("LR(1) DFA生成失败"));
             return;
         }
     }
     
-    if (m_lr1Table->generateLR1Table()) {
-        displayLR1Table();
-        QMessageBox::information(this, tr("成功"), tr("LR(1)分析表生成成功"));
-    } else {
-        QMessageBox::warning(this, tr("错误"), tr("LR(1)分析表生成失败: %1").arg(m_lr1Table->getErrorMessage()));
-    }
+    // 清空表格
+    ui->tableWidgetLR1Table->setRowCount(0);
+    
+    // 生成LR(1)分析表
+    m_lr1Table = LR1Builder::computeActionTable(m_grammar, m_lr1Graph);
+    displayLR1Table();
+    QMessageBox::information(this, tr("成功"), tr("LR(1)分析表生成成功"));
 }
 
 void Task2Window::on_pushButtonSaveLR1Table_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("保存LR(1)分析表"), ".", tr("CSV文件 (*.csv);;文本文件 (*.txt);;所有文件 (*.*)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("保存LR(1)分析表"), ".", tr("CSV文件 (*.csv);;所有文件 (*.*)"));
     if (!fileName.isEmpty()) {
-        if (m_lr1Table->saveToCSV(fileName)) {
+        // 保存LR(1)分析表到CSV文件
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            
+            // 写入表头
+            out << "状态,符号,动作/目标\n";
+            
+            // 写入Action表
+            for (auto actionIt = m_lr1Table.action.constBegin(); actionIt != m_lr1Table.action.constEnd(); ++actionIt) {
+                int state = actionIt.key();
+                const auto& symbolActions = actionIt.value();
+                for (auto symbolIt = symbolActions.constBegin(); symbolIt != symbolActions.constEnd(); ++symbolIt) {
+                    const QString& symbol = symbolIt.key();
+                    const QString& action = symbolIt.value();
+                    out << state << "," << symbol << "," << action << "\n";
+                }
+            }
+            
+            // 写入Goto表
+            for (auto gotoIt = m_lr1Table.gotoTable.constBegin(); gotoIt != m_lr1Table.gotoTable.constEnd(); ++gotoIt) {
+                int state = gotoIt.key();
+                const auto& symbolStates = gotoIt.value();
+                for (auto symbolIt = symbolStates.constBegin(); symbolIt != symbolStates.constEnd(); ++symbolIt) {
+                    const QString& symbol = symbolIt.key();
+                    int target = symbolIt.value();
+                    out << state << "," << symbol << "," << target << "\n";
+                }
+            }
+            
+            file.close();
             QMessageBox::information(this, tr("成功"), tr("LR(1)分析表保存成功"));
         } else {
-            QMessageBox::warning(this, tr("错误"), tr("LR(1)分析表保存失败: %1").arg(m_lr1Table->getErrorMessage()));
+            QMessageBox::warning(this, tr("错误"), tr("LR(1)分析表保存失败"));
         }
     }
 }
@@ -315,96 +373,156 @@ void Task2Window::on_pushButtonOpenTokenFile_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("打开词法单元文件"), ".", tr("文本文件 (*.txt);;所有文件 (*.*)"));
     if (!fileName.isEmpty()) {
-        if (m_syntaxAnalyzer->loadTokensFromFile(fileName)) {
-            // 显示词法单元
-            QString tokensText;
-            for (const Token &token : m_syntaxAnalyzer->getTokens()) {
-                tokensText += token.toString() + "\n";
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream in(&file);
+            m_tokenFileContent = in.readAll();
+            ui->textEditTokenFile->setPlainText(m_tokenFileContent);
+            
+            // 正确解析交替的token编码和词素格式
+            QStringList tokensAndLexemes = m_tokenFileContent.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+            m_tokens.clear();
+            
+            for (int i = 0; i < tokensAndLexemes.size(); i++) {
+                QString code = tokensAndLexemes[i];
+                i++; // 跳过词素，因为解析器只需要token类型
+                
+                // 使用token映射转换编码
+                QString tokenName;
+                if (m_tokenMap.contains(code)) {
+                    tokenName = m_tokenMap.value(code);
+                } else {
+                    // 无法识别的编码，保留原始值
+                    tokenName = code;
+                }
+                
+                m_tokens.append(tokenName);
             }
-            ui->textEditTokenFile->setText(tokensText);
-            QMessageBox::information(this, tr("成功"), tr("词法单元文件加载成功"));
+            
+            QMessageBox::information(this, tr("成功"), tr("词法单元文件加载成功，共加载 %1 个token").arg(m_tokens.size()));
+            file.close();
         } else {
-            QMessageBox::warning(this, tr("错误"), tr("词法单元文件加载失败: %1").arg(m_syntaxAnalyzer->getErrorMessage()));
+            QMessageBox::warning(this, tr("错误"), tr("词法单元文件加载失败"));
         }
     }
 }
 
 void Task2Window::on_pushButtonAnalyzeSyntax_clicked()
 {
-    if (m_syntaxAnalyzer->getTokens().isEmpty()) {
+    // 检查是否已经解析了文法
+    if (m_grammar.productions.isEmpty()) {
+        QMessageBox::warning(this, tr("警告"), tr("请先解析BNF文法"));
+        return;
+    }
+    
+    // 检查是否已经加载了词法单元
+    if (m_tokens.isEmpty()) {
         QMessageBox::warning(this, tr("警告"), tr("请先加载词法单元文件"));
         return;
     }
     
-    if (m_lr1Table->getActionTable().isEmpty()) {
-        QMessageBox::warning(this, tr("警告"), tr("请先生成LR(1)分析表"));
-        return;
+    // 检查token映射是否为空，如果为空，尝试加载
+    if (m_tokenMap.isEmpty()) {
+        QString tokenMapFileName = "sample.tokenmap";
+        if (QFile::exists(tokenMapFileName)) {
+            if (loadTokenMap(tokenMapFileName)) {
+                qDebug() << "成功加载token映射文件：" << tokenMapFileName;
+            } else {
+                QMessageBox::warning(this, tr("警告"), tr("无法加载token映射文件：") + tokenMapFileName);
+                return;
+            }
+        } else {
+            QMessageBox::warning(this, tr("警告"), tr("未找到token映射文件：") + tokenMapFileName);
+            return;
+        }
     }
     
-    AnalysisResult result = m_syntaxAnalyzer->analyze();
-    if (result.success) {
+    // 确保LR(1)分析表已经生成
+    if (m_lr1Table.action.isEmpty()) {
+        if (m_lr1Graph.states.isEmpty()) {
+            m_lr1Graph = LR1Builder::build(m_grammar);
+            if (m_lr1Graph.states.isEmpty()) {
+                QMessageBox::warning(this, tr("错误"), tr("LR(1) DFA生成失败"));
+                return;
+            }
+        }
+        m_lr1Table = LR1Builder::computeActionTable(m_grammar, m_lr1Graph);
+    }
+    
+    // 清空表格
+    ui->tableWidgetAnalysisSteps->setRowCount(0);
+    
+    // 进行语法分析
+    m_parseResult = LR1Parser::parse(m_tokens, m_grammar, m_lr1Table);
+    
+    if (m_parseResult.errorPos == -1) {
+        // 显示分析结果
         displaySyntaxAnalysisResult();
         QMessageBox::information(this, tr("成功"), tr("语法分析成功"));
     } else {
-        displaySyntaxAnalysisResult();
-        QMessageBox::warning(this, tr("错误"), tr("语法分析失败: %1").arg(result.errorMessage));
+        QMessageBox::warning(this, tr("错误"), tr("语法分析失败，错误位置: %1").arg(m_parseResult.errorPos));
     }
 }
 
 void Task2Window::on_pushButtonSaveSyntaxTree_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("保存语法树"), ".", tr("PNG文件 (*.png);;JPEG文件 (*.jpg);;所有文件 (*.*)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("保存语法树"), ".", tr("图片文件 (*.png *.jpg);;所有文件 (*.*)"));
     if (!fileName.isEmpty()) {
-        if (m_syntaxAnalyzer->saveSyntaxTreeToImage(fileName)) {
-            QMessageBox::information(this, tr("成功"), tr("语法树保存成功"));
-        } else {
-            QMessageBox::warning(this, tr("错误"), tr("语法树保存失败: %1").arg(m_syntaxAnalyzer->getErrorMessage()));
-        }
+        // 简化实现，实际语法树生成需要额外逻辑
+        QMessageBox::information(this, tr("提示"), tr("语法树保存功能暂未实现"));
     }
 }
 
 void Task2Window::on_comboBoxLR0View_currentIndexChanged(int index)
 {
-    // 切换LR(0) DFA的显示方式（图形化或表格化）
-    displayLR0DFA();
+    Q_UNUSED(index);
+    // 简单的LR0视图切换，实际功能暂未实现
 }
 
 void Task2Window::on_comboBoxLR1View_currentIndexChanged(int index)
 {
-    // 切换LR(1) DFA的显示方式（图形化或表格化）
-    displayLR1DFA();
+    Q_UNUSED(index);
+    // 简单的LR1视图切换，实际功能暂未实现
 }
 
 void Task2Window::displayFirstSet()
 {
     // 清空表格
     ui->tableWidgetFirst->setRowCount(0);
-    ui->tableWidgetFirst->setColumnCount(2);
-    
-    // 设置列名
-    ui->tableWidgetFirst->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("非终结符")));
-    ui->tableWidgetFirst->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("First集合")));
     
     // 获取First集合
-    QMap<QString, QSet<QString>> firstMap = m_firstFollow->getAllFirst();
+    const auto& firstMap = m_ll1Info.first;
     
-    // 填充表格
+    // 显示First集合
     int row = 0;
-    for (const QString &nonTerminal : firstMap.keys()) {
-        QSet<QString> firstSet = firstMap[nonTerminal];
-        
-        ui->tableWidgetFirst->insertRow(row);
-        ui->tableWidgetFirst->setItem(row, 0, new QTableWidgetItem(nonTerminal));
-        
-        QString firstStr;
-        if (firstSet.isEmpty()) {
-            firstStr = "∅";
-        } else {
-            firstStr = firstSet.values().join(", ");
+    for (auto it = firstMap.constBegin(); it != firstMap.constEnd(); ++it) {
+        const QString& symbol = it.key();
+        // 只显示非终结符的First集合
+        if (m_grammar.nonterminals.contains(symbol)) {
+            const QSet<QString>& firstSet = it.value();
+            
+            // 添加行
+            ui->tableWidgetFirst->insertRow(row);
+            
+            // 显示非终结符
+            ui->tableWidgetFirst->setItem(row, 0, new QTableWidgetItem(symbol));
+            
+            // 显示First集合
+            QString firstStr;
+            if (firstSet.isEmpty()) {
+                firstStr = "∅";
+            } else {
+                for (const QString& s : firstSet) {
+                    if (!firstStr.isEmpty()) {
+                        firstStr += ", ";
+                    }
+                    firstStr += s;
+                }
+            }
+            ui->tableWidgetFirst->setItem(row, 1, new QTableWidgetItem(firstStr));
+            
+            row++;
         }
-        ui->tableWidgetFirst->setItem(row, 1, new QTableWidgetItem(firstStr));
-        
-        row++;
     }
     
     // 调整列宽
@@ -415,28 +533,33 @@ void Task2Window::displayFollowSet()
 {
     // 清空表格
     ui->tableWidgetFollow->setRowCount(0);
-    ui->tableWidgetFollow->setColumnCount(2);
-    
-    // 设置列名
-    ui->tableWidgetFollow->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("非终结符")));
-    ui->tableWidgetFollow->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("Follow集合")));
     
     // 获取Follow集合
-    QMap<QString, QSet<QString>> followMap = m_firstFollow->getAllFollow();
+    const auto& followMap = m_ll1Info.follow;
     
-    // 填充表格
+    // 显示Follow集合
     int row = 0;
-    for (const QString &nonTerminal : followMap.keys()) {
-        QSet<QString> followSet = followMap[nonTerminal];
+    for (auto it = followMap.constBegin(); it != followMap.constEnd(); ++it) {
+        const QString& nonterminal = it.key();
+        const QSet<QString>& followSet = it.value();
         
+        // 添加行
         ui->tableWidgetFollow->insertRow(row);
-        ui->tableWidgetFollow->setItem(row, 0, new QTableWidgetItem(nonTerminal));
         
+        // 显示非终结符
+        ui->tableWidgetFollow->setItem(row, 0, new QTableWidgetItem(nonterminal));
+        
+        // 显示Follow集合
         QString followStr;
         if (followSet.isEmpty()) {
             followStr = "∅";
         } else {
-            followStr = followSet.values().join(", ");
+            for (const QString& s : followSet) {
+                if (!followStr.isEmpty()) {
+                    followStr += ", ";
+                }
+                followStr += s;
+            }
         }
         ui->tableWidgetFollow->setItem(row, 1, new QTableWidgetItem(followStr));
         
@@ -451,33 +574,49 @@ void Task2Window::displayLR0DFA()
 {
     // 清空表格
     ui->tableWidgetLR0->setRowCount(0);
-    ui->tableWidgetLR0->setColumnCount(3);
     
-    // 设置列名
-    ui->tableWidgetLR0->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("状态ID")));
-    ui->tableWidgetLR0->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("项目集")));
-    ui->tableWidgetLR0->setHorizontalHeaderItem(2, new QTableWidgetItem(tr("转移关系")));
+    // 获取LR(0)项目集和转换
+    const auto& states = m_lr0Graph.states;
+    const auto& edges = m_lr0Graph.edges;
     
-    // 获取LR(0) DFA的项目集和转移表
-    QList<LR0ItemSet> itemSets = m_lr0dfa->getItemSets();
-    QList<LR0Transition> transitions = m_lr0dfa->getTransitions();
-    
-    // 填充表格
-    for (int i = 0; i < itemSets.size(); ++i) {
-        const LR0ItemSet &itemSet = itemSets[i];
+    // 显示LR(0) DFA
+    for (int i = 0; i < states.size(); ++i) {
+        const auto& state = states[i];
         
+        // 添加行
         ui->tableWidgetLR0->insertRow(i);
-        ui->tableWidgetLR0->setItem(i, 0, new QTableWidgetItem(QString::number(itemSet.stateId)));
-        ui->tableWidgetLR0->setItem(i, 1, new QTableWidgetItem(itemSet.toString()));
         
-        // 收集当前状态的所有转移
-        QString transitionsStr;
-        for (const LR0Transition &trans : transitions) {
-            if (trans.fromState == itemSet.stateId) {
-                if (!transitionsStr.isEmpty()) {
-                    transitionsStr += "; ";
+        // 显示状态编号
+        ui->tableWidgetLR0->setItem(i, 0, new QTableWidgetItem(QString::number(i)));
+        
+        // 显示项目集
+        QString itemsStr;
+        for (const auto& item : state) {
+            if (!itemsStr.isEmpty()) {
+                itemsStr += "\n";
+            }
+            itemsStr += item.left + " -> ";
+            for (int j = 0; j < item.right.size(); ++j) {
+                if (j == item.dot) {
+                    itemsStr += "• ";
                 }
-                transitionsStr += QString("%1 -> %2").arg(trans.symbol).arg(trans.toState);
+                itemsStr += item.right[j] + " ";
+            }
+            if (item.dot == item.right.size()) {
+                itemsStr += "•";
+            }
+        }
+        ui->tableWidgetLR0->setItem(i, 1, new QTableWidgetItem(itemsStr));
+        
+        // 显示转换
+        QString transitionsStr;
+        if (edges.contains(i)) {
+            const auto& stateEdges = edges[i];
+            for (auto it = stateEdges.constBegin(); it != stateEdges.constEnd(); ++it) {
+                if (!transitionsStr.isEmpty()) {
+                    transitionsStr += ", ";
+                }
+                transitionsStr += it.key() + " → " + QString::number(it.value());
             }
         }
         ui->tableWidgetLR0->setItem(i, 2, new QTableWidgetItem(transitionsStr));
@@ -489,54 +628,71 @@ void Task2Window::displayLR0DFA()
 
 void Task2Window::displaySLR1Result()
 {
-    // 获取冲突信息
-    QList<ConflictInfo> conflicts = m_slr1Checker->getConflicts();
+    // 获取SLR(1)检查结果
+    const auto& conflicts = m_slrResult.conflicts;
     
-    // 显示冲突信息
-    QString conflictText;
     if (conflicts.isEmpty()) {
-        conflictText = tr("该文法为SLR(1)文法，无冲突");
+        QMessageBox::information(this, tr("SLR(1)文法检查结果"), tr("该文法为SLR(1)文法，无冲突"));
     } else {
-        conflictText = tr("该文法不是SLR(1)文法，存在以下冲突：\n\n");
-        for (const ConflictInfo &conflict : conflicts) {
-            conflictText += conflict.toString() + "\n\n";
+        QString conflictMsg = tr("该文法不是SLR(1)文法，存在以下冲突：\n");
+        for (const auto& conflict : conflicts) {
+            conflictMsg += tr("状态%1: %2冲突，终端符%3\n").arg(conflict.state).arg(conflict.type).arg(conflict.terminal);
+            if (!conflict.detail.isEmpty()) {
+                conflictMsg += tr("详细信息: %1\n").arg(conflict.detail);
+            }
         }
+        QMessageBox::warning(this, tr("SLR(1)文法检查结果"), conflictMsg);
     }
-    
-    ui->textBrowserSLR1Result->setText(conflictText);
 }
 
 void Task2Window::displayLR1DFA()
 {
     // 清空表格
     ui->tableWidgetLR1->setRowCount(0);
-    ui->tableWidgetLR1->setColumnCount(3);
     
-    // 设置列名
-    ui->tableWidgetLR1->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("状态ID")));
-    ui->tableWidgetLR1->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("项目集")));
-    ui->tableWidgetLR1->setHorizontalHeaderItem(2, new QTableWidgetItem(tr("转移关系")));
+    // 获取LR(1)项目集和转换
+    const auto& states = m_lr1Graph.states;
+    const auto& edges = m_lr1Graph.edges;
     
-    // 获取LR(1) DFA的项目集和转移表
-    QList<LR1ItemSet> itemSets = m_lr1dfa->getItemSets();
-    QList<LR1Transition> transitions = m_lr1dfa->getTransitions();
-    
-    // 填充表格
-    for (int i = 0; i < itemSets.size(); ++i) {
-        const LR1ItemSet &itemSet = itemSets[i];
+    // 显示LR(1) DFA
+    for (int i = 0; i < states.size(); ++i) {
+        const auto& state = states[i];
         
+        // 添加行
         ui->tableWidgetLR1->insertRow(i);
-        ui->tableWidgetLR1->setItem(i, 0, new QTableWidgetItem(QString::number(itemSet.stateId)));
-        ui->tableWidgetLR1->setItem(i, 1, new QTableWidgetItem(itemSet.toString()));
         
-        // 收集当前状态的所有转移
-        QString transitionsStr;
-        for (const LR1Transition &trans : transitions) {
-            if (trans.fromState == itemSet.stateId) {
-                if (!transitionsStr.isEmpty()) {
-                    transitionsStr += "; ";
+        // 显示状态编号
+        ui->tableWidgetLR1->setItem(i, 0, new QTableWidgetItem(QString::number(i)));
+        
+        // 显示项目集
+        QString itemsStr;
+        for (const auto& item : state) {
+            if (!itemsStr.isEmpty()) {
+                itemsStr += "\n";
+            }
+            itemsStr += item.left + " -> ";
+            for (int j = 0; j < item.right.size(); ++j) {
+                if (j == item.dot) {
+                    itemsStr += "• ";
                 }
-                transitionsStr += QString("%1 -> %2").arg(trans.symbol).arg(trans.toState);
+                itemsStr += item.right[j] + " ";
+            }
+            if (item.dot == item.right.size()) {
+                itemsStr += "•";
+            }
+            itemsStr += " / " + item.lookahead;
+        }
+        ui->tableWidgetLR1->setItem(i, 1, new QTableWidgetItem(itemsStr));
+        
+        // 显示转换
+        QString transitionsStr;
+        if (edges.contains(i)) {
+            const auto& stateEdges = edges[i];
+            for (auto it = stateEdges.constBegin(); it != stateEdges.constEnd(); ++it) {
+                if (!transitionsStr.isEmpty()) {
+                    transitionsStr += ", ";
+                }
+                transitionsStr += it.key() + " → " + QString::number(it.value());
             }
         }
         ui->tableWidgetLR1->setItem(i, 2, new QTableWidgetItem(transitionsStr));
@@ -551,38 +707,69 @@ void Task2Window::displayLR1Table()
     // 清空表格
     ui->tableWidgetLR1Table->setRowCount(0);
     
-    // 这里简化处理，只显示Action表的一部分
-    ui->tableWidgetLR1Table->setColumnCount(2);
-    ui->tableWidgetLR1Table->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("状态ID")));
-    ui->tableWidgetLR1Table->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("Action/Goto")));
+    // 获取LR(1)分析表
+    const auto& actionTable = m_lr1Table.action;
+    const auto& gotoTable = m_lr1Table.gotoTable;
     
-    // 获取Action表和Goto表
-    QMap<int, QMap<QString, Action>> actionTable = m_lr1Table->getActionTable();
-    QMap<int, QMap<QString, int>> gotoTable = m_lr1Table->getGotoTable();
+    // 收集所有状态和符号
+    QSet<int> states;
+    QSet<QString> terminals;
+    QSet<QString> nonterminals;
     
-    // 填充表格
-    int row = 0;
-    for (int stateId : actionTable.keys()) {
+    // 收集Action表中的状态和终结符
+    for (auto actionIt = actionTable.constBegin(); actionIt != actionTable.constEnd(); ++actionIt) {
+        int state = actionIt.key();
+        states.insert(state);
+        const auto& symbolActions = actionIt.value();
+        for (auto symbolIt = symbolActions.constBegin(); symbolIt != symbolActions.constEnd(); ++symbolIt) {
+            terminals.insert(symbolIt.key());
+        }
+    }
+    
+    // 收集Goto表中的状态和非终结符
+    for (auto gotoIt = gotoTable.constBegin(); gotoIt != gotoTable.constEnd(); ++gotoIt) {
+        int state = gotoIt.key();
+        states.insert(state);
+        const auto& symbolStates = gotoIt.value();
+        for (auto symbolIt = symbolStates.constBegin(); symbolIt != symbolStates.constEnd(); ++symbolIt) {
+            nonterminals.insert(symbolIt.key());
+        }
+    }
+    
+    // 显示LR(1)分析表
+    for (int state : states) {
+        // 添加行
+        int row = ui->tableWidgetLR1Table->rowCount();
         ui->tableWidgetLR1Table->insertRow(row);
-        ui->tableWidgetLR1Table->setItem(row, 0, new QTableWidgetItem(QString::number(stateId)));
+        
+        // 显示状态编号
+        ui->tableWidgetLR1Table->setItem(row, 0, new QTableWidgetItem(QString::number(state)));
         
         // 显示Action表
-        QString actionStr = tr("Action:\n");
-        for (const QString &symbol : actionTable[stateId].keys()) {
-            const Action &action = actionTable[stateId][symbol];
-            actionStr += QString("%1: %2\n").arg(symbol).arg(action.toString());
+        QString actionStr;
+        if (actionTable.contains(state)) {
+            const auto& symbolActions = actionTable[state];
+            for (auto symbolIt = symbolActions.constBegin(); symbolIt != symbolActions.constEnd(); ++symbolIt) {
+                if (!actionStr.isEmpty()) {
+                    actionStr += ", ";
+                }
+                actionStr += symbolIt.key() + ": " + symbolIt.value();
+            }
         }
-        
-        // 显示Goto表
-        actionStr += tr("\nGoto:\n");
-        for (const QString &nonTerminal : gotoTable[stateId].keys()) {
-            int gotoState = gotoTable[stateId][nonTerminal];
-            actionStr += QString("%1: %2\n").arg(nonTerminal).arg(gotoState);
-        }
-        
         ui->tableWidgetLR1Table->setItem(row, 1, new QTableWidgetItem(actionStr));
         
-        row++;
+        // 显示Goto表
+        QString gotoStr;
+        if (gotoTable.contains(state)) {
+            const auto& symbolStates = gotoTable[state];
+            for (auto symbolIt = symbolStates.constBegin(); symbolIt != symbolStates.constEnd(); ++symbolIt) {
+                if (!gotoStr.isEmpty()) {
+                    gotoStr += ", ";
+                }
+                gotoStr += symbolIt.key() + ": " + QString::number(symbolIt.value());
+            }
+        }
+        ui->tableWidgetLR1Table->setItem(row, 2, new QTableWidgetItem(gotoStr));
     }
     
     // 调整列宽
@@ -591,65 +778,103 @@ void Task2Window::displayLR1Table()
 
 void Task2Window::displaySyntaxAnalysisResult()
 {
-    // 清空表格和语法树
+    // 清空表格
     ui->tableWidgetAnalysisSteps->setRowCount(0);
-    ui->treeWidgetSyntaxTree->clear();
     
-    // 设置表格列名
-    ui->tableWidgetAnalysisSteps->setColumnCount(5);
-    ui->tableWidgetAnalysisSteps->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("步骤")));
-    ui->tableWidgetAnalysisSteps->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("状态栈")));
-    ui->tableWidgetAnalysisSteps->setHorizontalHeaderItem(2, new QTableWidgetItem(tr("符号栈")));
-    ui->tableWidgetAnalysisSteps->setHorizontalHeaderItem(3, new QTableWidgetItem(tr("输入串")));
-    ui->tableWidgetAnalysisSteps->setHorizontalHeaderItem(4, new QTableWidgetItem(tr("动作")));
+    // 获取语法分析步骤
+    const auto& analysisSteps = m_parseResult.steps;
     
-    // 获取分析结果
-    AnalysisResult result = m_syntaxAnalyzer->getResult();
-    
-    // 填充分析步骤表格
-    for (int i = 0; i < result.steps.size(); ++i) {
-        const AnalysisStep &step = result.steps[i];
+    // 显示语法分析结果
+    for (int i = 0; i < analysisSteps.size(); ++i) {
+        const auto& step = analysisSteps[i];
         
+        // 添加行
         ui->tableWidgetAnalysisSteps->insertRow(i);
+        
+        // 显示步骤编号
         ui->tableWidgetAnalysisSteps->setItem(i, 0, new QTableWidgetItem(QString::number(step.step)));
-        ui->tableWidgetAnalysisSteps->setItem(i, 1, new QTableWidgetItem(step.stateStack));
-        ui->tableWidgetAnalysisSteps->setItem(i, 2, new QTableWidgetItem(step.symbolStack));
-        ui->tableWidgetAnalysisSteps->setItem(i, 3, new QTableWidgetItem(step.inputString));
-        ui->tableWidgetAnalysisSteps->setItem(i, 4, new QTableWidgetItem(step.action));
-    }
-    
-    // 填充语法树
-    if (result.success) {
-        QTreeWidgetItem *rootItem = result.syntaxTree.toTreeWidgetItem();
-        ui->treeWidgetSyntaxTree->addTopLevelItem(rootItem);
-        ui->treeWidgetSyntaxTree->expandAll();
+        
+        // 显示状态栈
+        QString stateStackStr;
+        for (const auto& item : step.stack) {
+            stateStackStr += QString::number(item.first) + " ";
+        }
+        ui->tableWidgetAnalysisSteps->setItem(i, 1, new QTableWidgetItem(stateStackStr.trimmed()));
+        
+        // 显示符号栈
+        QString symbolStackStr;
+        for (const auto& item : step.stack) {
+            symbolStackStr += item.second + " ";
+        }
+        ui->tableWidgetAnalysisSteps->setItem(i, 2, new QTableWidgetItem(symbolStackStr.trimmed()));
+        
+        // 显示输入串
+        QString inputStr;
+        for (const auto& token : step.rest) {
+            inputStr += token + " ";
+        }
+        ui->tableWidgetAnalysisSteps->setItem(i, 3, new QTableWidgetItem(inputStr.trimmed()));
+        
+        // 显示动作
+        QString actionStr = step.action;
+        if (!step.production.isEmpty()) {
+            actionStr += " (" + step.production + ")";
+        }
+        ui->tableWidgetAnalysisSteps->setItem(i, 4, new QTableWidgetItem(actionStr));
     }
     
     // 调整列宽
     ui->tableWidgetAnalysisSteps->resizeColumnsToContents();
-}
-
-void Task2Window::initUI()
-{
-    // 初始化表格
-    ui->tableWidgetFirst->setRowCount(0);
-    ui->tableWidgetFollow->setRowCount(0);
-    ui->tableWidgetLR0->setRowCount(0);
-    ui->tableWidgetLR1->setRowCount(0);
-    ui->tableWidgetLR1Table->setRowCount(0);
-    ui->tableWidgetAnalysisSteps->setRowCount(0);
     
-    // 初始化语法树
+    // 显示语法树
     ui->treeWidgetSyntaxTree->clear();
-    
-    // 初始化文本浏览器
-    ui->textBrowserGrammarInfo->clear();
-    ui->textBrowserSLR1Result->clear();
-    
-    // 初始化组合框
-    ui->comboBoxLR0View->addItem(tr("表格化显示"));
-    ui->comboBoxLR0View->addItem(tr("图形化显示"));
-    ui->comboBoxLR1View->addItem(tr("表格化显示"));
-    ui->comboBoxLR1View->addItem(tr("图形化显示"));
+    // 简化实现，实际语法树显示需要额外逻辑
+    QTreeWidgetItem* root = new QTreeWidgetItem(ui->treeWidgetSyntaxTree);
+    root->setText(0, tr("语法树"));
+    ui->treeWidgetSyntaxTree->expandAll();
 }
 
+bool Task2Window::loadTokenMap(const QString &mapPath)
+{
+    QFile mapFile(mapPath);
+    if (mapFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&mapFile);
+        m_tokenMap.clear();
+        
+        int lineCount = 0;
+        while (!in.atEnd()) {
+            QString line = in.readLine().trimmed();
+            lineCount++;
+            
+            if (line.isEmpty() || line.startsWith("//")) {
+                continue; // 跳过空行和注释行
+            }
+            
+            QStringList parts = line.split("=", Qt::SkipEmptyParts);
+            if (parts.size() == 2) {
+                QString code = parts[0].trimmed();
+                QString tokenName = parts[1].trimmed();
+                m_tokenMap[code] = tokenName;
+            } else {
+                qWarning() << "Invalid token map line" << lineCount << ":" << line;
+            }
+        }
+        
+        mapFile.close();
+        return true;
+    }
+    return false;
+}
+
+void Task2Window::on_pushButtonLoadTokenMap_clicked()
+{
+    QString mapPath = QFileDialog::getOpenFileName(this, tr("打开Token映射文件"), ".", tr("Token映射文件 (*.tokenmap);;所有文件 (*.*)"));
+    if (!mapPath.isEmpty()) {
+        bool success = loadTokenMap(mapPath);
+        if (success) {
+            QMessageBox::information(this, tr("成功"), tr("Token映射文件加载成功，共加载 %1 个映射").arg(m_tokenMap.size()));
+        } else {
+            QMessageBox::warning(this, tr("错误"), tr("无法加载Token映射文件"));
+        }
+    }
+}

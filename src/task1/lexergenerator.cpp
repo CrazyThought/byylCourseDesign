@@ -1,6 +1,9 @@
 #include "task1/lexergenerator.h"
 #include <QDebug>
 #include <QMap>
+#include <QFile>
+#include <QIODevice>
+#include <QTextStream>
 #define ERROR_STATE -1
 
 LexerGenerator::LexerGenerator()
@@ -449,15 +452,24 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
         tokens[i] = -1;
     }
     
-    // 使用DFA的acceptStateToRegexIndex映射分配tokenCode
-    // 使用正确的QMap遍历方式
-    QMapIterator<DFAState, int> it(minimizedDFA.acceptStateToRegexIndex);
-    while (it.hasNext()) {
-        it.next();
-        DFAState state = it.key();
-        int regexIndex = it.value();
-        if (state >= 0 && state < numStates && regexIndex >= 0 && regexIndex < regexItems.size()) {
-            tokens[state] = regexItems[regexIndex].code;
+    // 填充接受状态和对应的token代码
+    for (const auto &state : minimizedDFA.acceptStates) {
+        if (state >= 0 && state < numStates) {
+            // 只处理存在映射的状态
+            if (minimizedDFA.acceptStateToRegexIndex.contains(state)) {
+                // 从DFA的映射中获取正则表达式索引
+                int regexIndex = minimizedDFA.acceptStateToRegexIndex[state];
+                
+                // 确保索引有效
+                if (regexIndex >= 0 && regexIndex < regexItems.size()) {
+                    // 只对单单词类型设置具体编码，多单词类型由tokenCodeMap处理
+                    if (!regexItems[regexIndex].isMultiWord) {
+                        tokens[state] = regexItems[regexIndex].code;
+                    }
+                    // 多单词类型保持-1，由tokenCodeMap覆盖
+                }
+            }
+            // 对于没有映射的接受态，保持-1，由tokenCodeMap覆盖
         }
     }
     
@@ -554,4 +566,55 @@ QString LexerGenerator::getInputSymbol(const QString &input)
     if (input == "\\r") return "\\r";
     if (input == "\\0") return "\\0";
     return input;
+}
+
+QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
+{
+    QString mapContent;
+    
+    // 添加文件头注释
+    mapContent += "// Token映射文件，生成自词法分析器生成器\n";
+    mapContent += "// 格式：编码=终结符名称\n\n";
+    
+    // 为每个正则表达式项生成映射
+    for (const RegexItem &item : regexItems) {
+        if (item.isMultiWord) {
+            // 多单词情况（关键字、符号等）
+            int currentCode = item.code;
+            
+            // 使用QMap来确保同一单词的不同大小写形式映射到同一个编码
+            QMap<QString, int> lowercaseToCodeMap;
+            
+            for (const QString &word : item.wordList) {
+                QString lowercaseWord = word.toLower();
+                if (!lowercaseToCodeMap.contains(lowercaseWord)) {
+                    lowercaseToCodeMap[lowercaseWord] = currentCode++;
+                }
+            }
+            
+            // 生成映射条目
+            for (auto it = lowercaseToCodeMap.constBegin(); it != lowercaseToCodeMap.constEnd(); ++it) {
+                mapContent += QString("%1=%2\n").arg(it.value()).arg(it.key());
+            }
+        } else {
+            // 单单词情况（标识符、数字等）
+            QString tokenName = item.name.mid(1); // 移除下划线前缀
+            mapContent += QString("%1=%2\n").arg(item.code).arg(tokenName);
+        }
+    }
+    
+    return mapContent;
+}
+
+bool LexerGenerator::saveTokenMap(const QList<RegexItem> &regexItems, const QString &outputPath)
+{
+    QString mapContent = generateTokenMap(regexItems);
+    QFile file(outputPath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << mapContent;
+        file.close();
+        return true;
+    }
+    return false;
 }

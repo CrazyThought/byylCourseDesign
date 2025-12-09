@@ -42,7 +42,7 @@ int transitions[NUM_STATES][256] = {
 
 // 接受状态映射
 bool isAcceptState[NUM_STATES] = {true, true, true, true, true, false, false, false, false};
-int acceptTokens[NUM_STATES] = {100, 101, 102, 103, 200, -1, -1, -1, -1};
+int acceptTokens[NUM_STATES] = {-1, 101, -1, -1, -1, -1, -1, -1, -1};
 
 // 单词编码映射
 map<string, int> tokenCodeMap;

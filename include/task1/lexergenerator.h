@@ -23,6 +23,12 @@ public:
     // 生成词法分析器代码
     QString generateLexer(const QList<RegexItem> &regexItems, const DFA &minimizedDFA, GenerationMethod method);
     
+    // 生成token映射内容
+    QString generateTokenMap(const QList<RegexItem> &regexItems);
+    
+    // 保存token映射到文件
+    bool saveTokenMap(const QList<RegexItem> &regexItems, const QString &outputPath);
+    
     // 获取错误信息
     QString getErrorMessage() const;
     

@@ -1,0 +1,229 @@
+/*
+ * 版权信息：Copyright (c) 2023 林展星
+ * 文件名称：GrammarParser.cpp
+ *
+ * 当前版本：1.0.0
+ * 作    者：林展星
+ * 完成日期：2023年12月07日
+ *
+ * 版本历史：
+ * 1.0.0 2023-12-07 林展星 初始版本
+ */
+#include "task2/Grammar.h"
+#include "task2/configconstants.h"
+#include <QStringList>
+#include <QFile>
+#include <QTextStream>
+#include <QIODevice>
+
+// 非终结符/终结符判断由 addSymbols 归类为准；此处不再使用命名约定
+
+// 解析阶段的终结符判断不使用命名约定
+
+static QString trim(const QString& s)
+{
+    return s.trimmed();
+}
+
+static QVector<QString> splitRhs(const QString& rhs)
+{
+    QVector<QString> v;
+    QString          s = rhs;
+    int              i = 0;
+    auto isWordChar    = [](QChar c) { return c.isLetterOrNumber() || c == '_' || c == '-'; };
+    auto isSingleOp    = [](QChar c)
+    {
+        static QSet<QChar> ops;
+        if (ops.isEmpty())
+        {
+            const QChar arr[] = {'(',
+                                 ')',
+                                 '{',
+                                 '}',
+                                 '[',
+                                 ']',
+                                 ';',
+                                 ',',
+                                 '<',
+                                 '>',
+                                 '=',
+                                 '+',
+                                 '-',
+                                 '*',
+                                 '/',
+                                 '%',
+                                 '^'};
+            for (QChar ch : arr) ops.insert(ch);
+        }
+        return ops.contains(c);
+    };
+    auto matchMultiOp = [&](const QString& s, int i) -> QString
+    {
+        static const QVector<QString> mops = {"<=", ">=", "==", "!=", ":=", "++", "--"};
+        for (const auto& op : mops)
+        {
+            int L = op.size();
+            if (L > 0 && i + L <= s.size() && s.mid(i, L) == op)
+                return op;
+        }
+        return QString();
+    };
+    while (i < s.size())
+    {
+        QChar c = s[i];
+        if (c.isSpace())
+        {
+            i++;
+            continue;
+        }
+        QString mop = matchMultiOp(s, i);
+        if (!mop.isEmpty())
+        {
+            v.push_back(mop);
+            i += mop.size();
+            continue;
+        }
+        if (isSingleOp(c))
+        {
+            v.push_back(QString(c));
+            i++;
+            continue;
+        }
+        QString w;
+        while (i < s.size() && isWordChar(s[i]))
+        {
+            w += s[i];
+            i++;
+        }
+        if (!w.isEmpty())
+            v.push_back(w);
+        else
+            i++;
+    }
+    return v;
+}
+
+static bool detectDirectLeftRecursion(const Grammar& g, QString& who)
+{
+    Q_UNUSED(g);
+    Q_UNUSED(who);
+    return false;
+}
+
+static void addSymbols(Grammar& g)
+{
+    QSet<QString> lhs;
+    for (auto it = g.productions.begin(); it != g.productions.end(); ++it) lhs.insert(it.key());
+    for (auto it = g.productions.begin(); it != g.productions.end(); ++it)
+    {
+        g.nonterminals.insert(it.key());
+        for (const auto& p : it.value())
+        {
+            for (const auto& s : p.right)
+            {
+                if (s == ConfigConstants::epsilonSymbol())
+                    continue;
+                if (lhs.contains(s))
+                    g.nonterminals.insert(s);
+                else
+                    g.terminals.insert(s);
+            }
+        }
+    }
+}
+
+static bool parseLine(const QString& line, int lineNo, Grammar& g, QString& err)
+{
+    QString t = line;
+    if (t.trimmed().isEmpty())
+        return true;
+    if (t.trimmed().startsWith("//"))
+        return true;
+    if (t.indexOf("->") < 0)
+    {
+        err = QString::number(lineNo);
+        return false;
+    }
+    auto parts = t.split("->");
+    if (parts.size() != 2)
+    {
+        err = QString::number(lineNo);
+        return false;
+    }
+    QString left = trim(parts[0]);
+    QString rhs  = trim(parts[1]);
+    auto    alts = rhs.split('|');
+    if (g.startSymbol.isEmpty() && !left.isEmpty())
+        g.startSymbol = left;
+    for (auto a : alts)
+    {
+        Production p;
+        p.left  = left;
+        p.right = splitRhs(trim(a));
+        p.line  = lineNo;
+        g.productions[left].push_back(p);
+    }
+    return true;
+}
+
+static Grammar parseText(const QString& text, QString& error)
+{
+    Grammar g;
+    auto    lines = text.split('\n');
+    for (int i = 0; i < lines.size(); ++i)
+    {
+        QString l = lines[i];
+        QString s = l.trimmed();
+        if (s.startsWith('#'))
+        {
+            bool allHash = true;
+            for (int k = 0; k < s.size(); ++k)
+                if (s[k] != '#')
+                {
+                    allHash = false;
+                    break;
+                }
+            if (allHash)
+                continue;
+        }
+        QString err;
+        if (!parseLine(l, i + 1, g, err))
+        {
+            error = err;
+            return Grammar();
+        }
+    }
+    addSymbols(g);
+    QString who;
+    if (detectDirectLeftRecursion(g, who))
+    {
+        error = who;
+        return Grammar();
+    }
+    return g;
+}
+
+namespace GrammarParser
+{
+    Grammar parseFile(const QString& path, QString& error);
+    Grammar parseString(const QString& text, QString& error);
+}  // namespace GrammarParser
+
+Grammar GrammarParser::parseString(const QString& text, QString& error)
+{
+    return parseText(text, error);
+}
+
+Grammar GrammarParser::parseFile(const QString& path, QString& error)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        error = "open";
+        return Grammar();
+    }
+    QTextStream in(&f);
+    auto        content = in.readAll();
+    f.close();
+    return parseText(content, error);
+}

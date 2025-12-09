@@ -402,6 +402,15 @@ void Task1Window::on_btnGenerateLexer_clicked()
     } else {
         ui->statusbar->showMessage("词法分析器生成完成", 3000);
         ui->textEditLexerCode->setPlainText(lexerCode);
+        
+        // 自动保存token映射文件，使用固定名称sample.tokenmap
+        QString tokenMapFileName = "sample.tokenmap";
+        bool success = m_lexerGenerator.saveTokenMap(m_currentRegexItems, tokenMapFileName);
+        if (success) {
+            qDebug() << "Token映射文件已保存：" << tokenMapFileName;
+        } else {
+            qDebug() << "警告：无法保存Token映射文件";
+        }
     }
 }
 
@@ -409,12 +418,14 @@ void Task1Window::on_btnSaveLexer_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("保存词法分析器"), ".", tr("C++文件 (*.cpp)"));
     if (!fileName.isEmpty()) {
+        // 保存词法分析器代码
         QFile file(fileName);
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QTextStream out(&file);
             out << ui->textEditLexerCode->toPlainText();
             file.close();
-            QMessageBox::information(this, tr("成功"), tr("文件已保存"));
+            
+            QMessageBox::information(this, tr("成功"), tr("词法分析器文件已保存"));
         } else {
             QMessageBox::warning(this, tr("错误"), tr("无法保存文件：") + file.errorString());
         }

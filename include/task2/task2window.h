@@ -13,14 +13,15 @@
 #include <QFileDialog>
 #include <QListWidget>
 
-// 前向声明
-class BNFParser;
-class FirstFollow;
-class LR0DFA;
-class SLR1Checker;
-class LR1DFA;
-class LR1Table;
-class SyntaxAnalyzer;
+// 添加必要的头文件包含
+#include "task2/Grammar.h"
+#include "task2/GrammarParser.h"
+#include "task2/LL1.h"
+#include "task2/LR0.h"
+#include "task2/SLR.h"
+#include "task2/LR1.h"
+#include "task2/LR1Parser.h"
+#include "task2/SyntaxParser.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Task2Window; }
@@ -68,18 +69,28 @@ private slots:
     void on_pushButtonOpenTokenFile_clicked();
     void on_pushButtonAnalyzeSyntax_clicked();
     void on_pushButtonSaveSyntaxTree_clicked();
+    
+    // Token映射相关槽函数
+    void on_pushButtonLoadTokenMap_clicked();
 
 private:
     Ui::Task2Window *ui;
     
-    // 功能类指针
-    BNFParser *m_bnfParser;
-    FirstFollow *m_firstFollow;
-    LR0DFA *m_lr0dfa;
-    SLR1Checker *m_slr1Checker;
-    LR1DFA *m_lr1dfa;
-    LR1Table *m_lr1Table;
-    SyntaxAnalyzer *m_syntaxAnalyzer;
+    // 文法对象
+    Grammar m_grammar;
+    
+    // 语法分析相关数据
+    LL1Info m_ll1Info;
+    LR0Graph m_lr0Graph;
+    SLRCheckResult m_slrResult;
+    LR1Graph m_lr1Graph;
+    LR1ActionTable m_lr1Table;
+    
+    // 词法分析和语法分析相关数据
+    QVector<QString> m_tokens;
+    QString m_tokenFileContent;
+    ParseResult m_parseResult;
+    QMap<QString, QString> m_tokenMap; // token 编码到终结符名称的映射
     
     // 辅助函数
     void initUI();
@@ -91,6 +102,9 @@ private:
     void displayLR1DFA();
     void displayLR1Table();
     void displaySyntaxAnalysisResult();
+    
+    // Token映射相关辅助函数
+    bool loadTokenMap(const QString &mapPath);
 };
 
 #endif // TASK2WINDOW_H

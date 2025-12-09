@@ -9,6 +9,8 @@ TARGET = byylCD
 INCLUDEPATH += . include
 
 
+
+
 # You can make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # Please consult the documentation of the deprecated API in order to know
@@ -21,19 +23,22 @@ HEADERS += include/task1/dfabuilder.h \
            include/task1/dfaminimizer.h \ 
            include/task1/task1window.h \ 
            include/task2/task2window.h \ 
-           include/task2/bnfparser.h \ 
-           include/task2/firstfollow.h \ 
-           include/task2/lr0dfa.h \ 
-           include/task2/slr1checker.h \ 
-           include/task2/lr1dfa.h \ 
-           include/task2/lr1table.h \ 
-           include/task2/syntaxanalyzer.h \ 
            include/task1/lexergenerator.h \ 
            include/task1/lexertester.h \ 
            include/task1/mainwindow.h \ 
            include/task1/nfabuilder.h \ 
            include/task1/regexprocessor.h \ 
            include/task1/regexengine.h \ 
+           include/task2/AST.h \ 
+           include/task2/DotGenerator.h \ 
+           include/task2/Grammar.h \ 
+           include/task2/GrammarParser.h \ 
+           include/task2/LL1.h \ 
+           include/task2/LR0.h \ 
+           include/task2/LR1.h \ 
+           include/task2/LR1Parser.h \ 
+           include/task2/SLR.h \ 
+           include/task2/SyntaxParser.h \ 
 FORMS += ui/mainwindow.ui \
           ui/task1window.ui \
           ui/task2window.ui
@@ -42,16 +47,18 @@ SOURCES += main.cpp \
            src/task1/dfaminimizer.cpp \ 
            src/task1/task1window.cpp \ 
            src/task2/task2window.cpp \ 
-           src/task2/bnfparser.cpp \ 
-           src/task2/firstfollow.cpp \ 
-           src/task2/lr0dfa.cpp \ 
-           src/task2/slr1checker.cpp \ 
-           src/task2/lr1dfa.cpp \ 
-           src/task2/lr1table.cpp \ 
-           src/task2/syntaxanalyzer.cpp \ 
            src/task1/lexergenerator.cpp \ 
            src/task1/lexertester.cpp \ 
            src/task1/mainwindow.cpp \ 
            src/task1/nfabuilder.cpp \ 
            src/task1/regexprocessor.cpp \ 
            src/task1/regexengine.cpp \ 
+           src/task2/DotGenerator.cpp \ 
+           src/task2/Grammar.cpp \ 
+           src/task2/GrammarParser.cpp \ 
+           src/task2/LL1.cpp \ 
+           src/task2/LR0.cpp \ 
+           src/task2/LR1.cpp \ 
+           src/task2/LR1Parser.cpp \ 
+           src/task2/SLR.cpp \ 
+           src/task2/SyntaxParser.cpp \ 

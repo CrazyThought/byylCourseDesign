@@ -1,12 +1,25 @@
-D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:454: error: request for member 'first' in 'entry', which is of non-class type 'const int'
-..\..\src\task1\lexergenerator.cpp: In member function 'QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem>&, const DFA&)':
-..\..\src\task1\lexergenerator.cpp:454:32: error: request for member 'first' in 'entry', which is of non-class type 'const int'
-  454 |         DFAState state = entry.first;
-      |                                ^~~~~
-D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:455: error: request for member 'second' in 'entry', which is of non-class type 'const int'
-..\..\src\task1\lexergenerator.cpp:455:32: error: request for member 'second' in 'entry', which is of non-class type 'const int'
-  455 |         int regexIndex = entry.second;
-      |                                ^~~~~~
-:-1: error: [Makefile.Debug:3207: debug/lexergenerator.o] Error 1
-D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:454: error: Member reference base type 'int const' is not a structure or union
-D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:455: error: Member reference base type 'int const' is not a structure or union
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:609: error: 'QFile' was not declared in this scope
+..\..\src\task1\lexergenerator.cpp: In member function 'bool LexerGenerator::saveTokenMap(const QList<RegexItem>&, const QString&)':
+..\..\src\task1\lexergenerator.cpp:609:5: error: 'QFile' was not declared in this scope
+  609 |     QFile file(outputPath);
+      |     ^~~~~
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:610: error: 'file' was not declared in this scope
+..\..\src\task1\lexergenerator.cpp:610:9: error: 'file' was not declared in this scope
+  610 |     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      |         ^~~~
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:610: error: incomplete type 'QIODevice' used in nested name specifier
+..\..\src\task1\lexergenerator.cpp:610:30: error: incomplete type 'QIODevice' used in nested name specifier
+  610 |     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      |                              ^~~~~~~~~
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:610: error: incomplete type 'QIODevice' used in nested name specifier
+..\..\src\task1\lexergenerator.cpp:610:53: error: incomplete type 'QIODevice' used in nested name specifier
+  610 |     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      |                                                     ^~~~
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:606: warning: unused parameter 'outputPath' [-Wunused-parameter]
+..\..\src\task1\lexergenerator.cpp:606:86: warning: unused parameter 'outputPath' [-Wunused-parameter]
+  606 | bool LexerGenerator::saveTokenMap(const QList<RegexItem> &regexItems, const QString &outputPath)
+      |                                                                       ~~~~~~~~~~~~~~~^~~~~~~~~~
+:-1: error: [Makefile.Debug:2261: debug/lexergenerator.o] Error 1
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:609: error: Unknown type name 'QFile' (fix available)
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:610: error: Incomplete type 'QIODevice' named in nested name specifier (fix available)
+D:\Programmes\Qt\byylCourseDesign\byylCD\src\task1\lexergenerator.cpp:610: error: Incomplete type 'QIODevice' named in nested name specifier (fix available)
