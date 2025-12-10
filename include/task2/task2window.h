@@ -91,6 +91,7 @@ private:
     QString m_tokenFileContent;
     ParseResult m_parseResult;
     QMap<QString, QString> m_tokenMap; // token 编码到终结符名称的映射
+    QSet<QString> m_singleCodeTokens; // 存储单编码token的名称，这些token需要词素
     
     // 辅助函数
     void initUI();

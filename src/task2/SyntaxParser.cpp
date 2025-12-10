@@ -85,6 +85,11 @@ SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const
             else
             {
                 r.errorPos = ip;
+                r.errorMsg = QString("语法错误：预期终结符 '%1'，但实际收到 '%2'").arg(X).arg(a);
+                r.expected = X;
+                r.actual = a;
+                r.stackTop = X;
+                r.stackDepth = st.size();
                 break;
             }
         }
@@ -94,6 +99,23 @@ SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const
             if (idx < 0)
             {
                 r.errorPos = ip;
+                r.errorMsg = QString("语法错误：非终结符 '%1' 遇到意外的符号 '%2'，LL1表中没有对应的产生式")
+                              .arg(X).arg(a);
+                r.expected = "产生式";
+                r.actual = a;
+                r.stackTop = X;
+                r.stackDepth = st.size();
+                
+                // 收集预期的符号列表
+                QStringList expectedSymbols;
+                for (auto it = info.table.value(X).begin(); it != info.table.value(X).end(); ++it) {
+                    expectedSymbols.append(it.key());
+                }
+                if (!expectedSymbols.isEmpty()) {
+                    r.expected = expectedSymbols.join(", ");
+                } else {
+                    r.expected = "无可用产生式";
+                }
                 break;
             }
             QVector<QString> rhs = g.productions[X][idx].right;

@@ -383,9 +383,9 @@ void Task2Window::on_pushButtonOpenTokenFile_clicked()
             QStringList tokensAndLexemes = m_tokenFileContent.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
             m_tokens.clear();
             
-            for (int i = 0; i < tokensAndLexemes.size(); i++) {
+            int i = 0;
+            while (i < tokensAndLexemes.size()) {
                 QString code = tokensAndLexemes[i];
-                i++; // 跳过词素，因为解析器只需要token类型
                 
                 // 使用token映射转换编码
                 QString tokenName;
@@ -394,9 +394,31 @@ void Task2Window::on_pushButtonOpenTokenFile_clicked()
                 } else {
                     // 无法识别的编码，保留原始值
                     tokenName = code;
+                    i++;
+                    m_tokens.append(tokenName);
+                    continue;
                 }
                 
-                m_tokens.append(tokenName);
+                // 使用m_singleCodeTokens动态判断是否为单编码token
+                bool isSingleCodeToken = m_singleCodeTokens.contains(tokenName);
+                
+                if (isSingleCodeToken) {
+                    // 单编码token，需要词素，往后再读一个token作为词素
+                    if (i + 1 < tokensAndLexemes.size()) {
+                        // 单编码token只需要token名称，词素已经包含在token中
+                        // 跳过词素，因为语法分析只需要token类型
+                        i += 2;
+                    } else {
+                        // 没有词素，只使用token名称
+                        i++;
+                    }
+                    // 单编码token只需要token名称，词素已经包含在token中
+                    m_tokens.append(tokenName);
+                } else {
+                    // 多编码token，不需要词素，只使用token名称
+                    m_tokens.append(tokenName);
+                    i++;
+                }
             }
             
             QMessageBox::information(this, tr("成功"), tr("词法单元文件加载成功，共加载 %1 个token").arg(m_tokens.size()));
@@ -840,6 +862,7 @@ bool Task2Window::loadTokenMap(const QString &mapPath)
     if (mapFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&mapFile);
         m_tokenMap.clear();
+        m_singleCodeTokens.clear();
         
         int lineCount = 0;
         while (!in.atEnd()) {
@@ -850,13 +873,33 @@ bool Task2Window::loadTokenMap(const QString &mapPath)
                 continue; // 跳过空行和注释行
             }
             
-            QStringList parts = line.split("=", Qt::SkipEmptyParts);
-            if (parts.size() == 2) {
-                QString code = parts[0].trimmed();
-                QString tokenName = parts[1].trimmed();
-                m_tokenMap[code] = tokenName;
-            } else {
+            // 查找第一个等号位置
+            int equalsPos = line.indexOf('=');
+            if (equalsPos == -1) {
                 qWarning() << "Invalid token map line" << lineCount << ":" << line;
+                continue;
+            }
+            
+            // 提取编码和token部分，只使用第一个等号作为分隔符
+            QString code = line.left(equalsPos).trimmed();
+            QString tokenPart = line.mid(equalsPos + 1).trimmed();
+            
+            // 检查是否为单编码token
+            bool isSingleCode = false;
+            QString tokenName;
+            if (tokenPart.contains("|single")) {
+                isSingleCode = true;
+                tokenName = tokenPart.left(tokenPart.indexOf("|single")).trimmed();
+            } else {
+                tokenName = tokenPart;
+            }
+            
+            // 存储映射关系
+            m_tokenMap[code] = tokenName;
+            
+            // 存储单编码token标记
+            if (isSingleCode) {
+                m_singleCodeTokens.insert(tokenName);
             }
         }
         

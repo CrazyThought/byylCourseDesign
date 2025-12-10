@@ -18,8 +18,13 @@
 
 struct SyntaxResult
 {
-    SyntaxASTNode* root     = nullptr;
-    int            errorPos = -1;
+    SyntaxASTNode* root       = nullptr;
+    int            errorPos   = -1;
+    QString        errorMsg   = "";
+    QString        expected   = "";
+    QString        actual     = "";
+    QString        stackTop   = "";
+    int            stackDepth = 0;
 };
 
 SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const LL1Info& info, const QMap<int, QString>& tokenMap = QMap<int, QString>());

@@ -571,6 +571,11 @@ QString LexerGenerator::getInputSymbol(const QString &input)
 QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
 {
     QString mapContent;
+    
+    // 添加文件头注释
+    mapContent += "// Token映射文件，生成自词法分析器生成器\n";
+    mapContent += "// 格式：编码=token名称 或 编码=token名称|single\n";
+    mapContent += "// |single 表示该token是单编码类型，需要词素\n\n";
 
     // 为每个正则表达式项生成映射
     for (const RegexItem &item : regexItems) {
@@ -608,7 +613,8 @@ QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
                     break;
                 }
             }
-            mapContent += QString("%1=%2\n").arg(item.code).arg(pureTokenName);
+            // 为单编码token添加|single标记
+            mapContent += QString("%1=%2|single\n").arg(item.code).arg(pureTokenName);
         }
     }
 
