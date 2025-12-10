@@ -482,7 +482,32 @@ void Task2Window::on_pushButtonAnalyzeSyntax_clicked()
         displaySyntaxAnalysisResult();
         QMessageBox::information(this, tr("成功"), tr("语法分析成功"));
     } else {
-        QMessageBox::warning(this, tr("错误"), tr("语法分析失败，错误位置: %1").arg(m_parseResult.errorPos));
+        // 显示详细的错误信息
+        QString errorMsg = tr("语法分析失败！");
+        errorMsg += tr("\n错误位置: %1").arg(m_parseResult.errorPos);
+        
+        if (!m_parseResult.errorMsg.isEmpty()) {
+            errorMsg += tr("\n错误详情: %1").arg(m_parseResult.errorMsg);
+        }
+        
+        // 显示当前token和期望的token
+        if (m_parseResult.errorPos > 0 && m_parseResult.errorPos <= m_tokens.size()) {
+            int tokenIndex = m_parseResult.errorPos - 1;
+            QString currentToken = m_tokens[tokenIndex];
+            errorMsg += tr("\n当前token: %1").arg(currentToken);
+        }
+        
+        // 显示分析步骤，帮助调试
+        if (!m_parseResult.steps.isEmpty()) {
+            const ParseStep& lastStep = m_parseResult.steps.last();
+            errorMsg += tr("\n最后分析步骤: %1").arg(lastStep.step);
+            errorMsg += tr("\n最后动作: %1").arg(lastStep.action);
+            if (!lastStep.production.isEmpty()) {
+                errorMsg += tr("\n产生式: %1").arg(lastStep.production);
+            }
+        }
+        
+        QMessageBox::warning(this, tr("语法分析失败"), errorMsg);
     }
 }
 

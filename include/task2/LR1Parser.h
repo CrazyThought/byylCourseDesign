@@ -38,6 +38,7 @@ struct ParseResult
     QVector<ParseStep> steps;
     ParseTreeNode*     root     = nullptr;
     int                errorPos = -1;
+    QString            errorMsg = "";
     SemanticASTNode*   astRoot  = nullptr;
     QVector<ParseStep> semanticSteps;
 };

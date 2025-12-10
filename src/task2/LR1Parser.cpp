@@ -189,6 +189,7 @@ ParseResult LR1Parser::parse(const QVector<QString>& tokens,
                             QString("错误：状态=%1, 前瞻=%2, 动作冲突未配置，中止").arg(st).arg(a);
                         pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
                         res.errorPos = res.steps.size();
+                        res.errorMsg = msg;
                         break;
                     }
                 }
@@ -209,6 +210,7 @@ ParseResult LR1Parser::parse(const QVector<QString>& tokens,
                 QString msg = QString("错误：状态=%1, 前瞻=%2, 无可用动作，中止").arg(st).arg(a);
                 pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
                 res.errorPos = res.steps.size();
+                res.errorMsg = msg;
                 break;
             }
         }
