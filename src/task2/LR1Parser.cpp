@@ -356,107 +356,62 @@ static SemanticASTNode* buildSemantic(const QString&                   L,
                                       const QString&                   rootPolicy,
                                       const QString&                   childOrder)
 {
-    if (roles.isEmpty())
-    {
-        if (semKids.size() == 1 && semKids[0])
-        {
-            return semKids[0];
-        }
-        SemanticASTNode* root = makeSemNode(L);
-        for (auto c : semKids)
-            if (c)
-                root->children.push_back(c);
-        return root;
-    }
-    // 若同一候选存在多个 root 标注，视为聚合节点：并列附加（列表型产生式）
-    int rootCount = 0;
-    for (int i = 0; i < roles.size(); ++i)
-        if (roleMeaning.value(roles[i]) == "root")
-            rootCount++;
-    if (rootCount > 1)
-    {
-        SemanticASTNode* root = makeSemNode(L);
-        QVector<int>     idxs;
-        for (int i = 0; i < roles.size(); ++i)
-        {
-            auto m = roleMeaning.value(roles[i]);
-            if (m == "root" || m == "child" || m == "sibling")
-                idxs.push_back(i);
-        }
-        for (int i : idxs)
-        {
-            if (i < semKids.size() && semKids[i])
-                root->children.push_back(semKids[i]);
-        }
-        return root;
-    }
-    int          rootIdx = -1;
-    QVector<int> rootIdxs;
-    for (int i = 0; i < roles.size(); ++i)
-    {
-        auto m = roleMeaning.value(roles[i]);
-        if (m == "root")
-        {
-            rootIdxs.push_back(i);
-            if (rootIdx < 0)
-                rootIdx = i;
-            else if (rootPolicy == "last_1")
-                rootIdx = i;
-        }
-    }
-    QVector<int> childIdx;
-    QVector<int> siblingIdx;
-    for (int i = 0; i < roles.size(); ++i)
-    {
-        auto m = roleMeaning.value(roles[i]);
-        if (m == "child")
-            childIdx.push_back(i);
-        else if (m == "sibling")
-            siblingIdx.push_back(i);
-    }
     SemanticASTNode* root = nullptr;
-    if (rootIdx >= 0 && rootIdx < semKids.size() && semKids[rootIdx])
+    SemanticASTNode* currentRoot = nullptr;
+    
+    // 遍历所有子树和对应的角色
+    for (int i = 0; i < semKids.size(); ++i)
     {
-        // 提升已有子树为根，保留其完整子结构
-        root = semKids[rootIdx];
+        SemanticASTNode* child = semKids[i];
+        if (!child) continue;
+        
+        int role = (i < roles.size()) ? roles[i] : 0;
+        QString roleName = roleMeaning.value(role, "skip");
+        
+        if (roleName == "skip")
+        {
+            // 规则1: 0=跳过该子树，不添加到结果中
+            continue;
+        }
+        else if (roleName == "root")
+        {
+            // 规则2: 1=提升为根节点
+            if (!root)
+            {
+                // 第一个角色1的节点作为根节点
+                root = child;
+                currentRoot = child;
+            }
+            else
+            {
+                // 后续角色1的节点作为兄弟节点添加到根节点
+                root->children.push_back(child);
+                // 更新当前根节点为新的角色1节点，处理后续的角色2节点
+                currentRoot = child;
+            }
+        }
+        else if (roleName == "child")
+        {
+            // 规则3: 2=作为最近的角色1节点的子节点
+            if (currentRoot)
+            {
+                // 添加到最近的角色1节点
+                currentRoot->children.push_back(child);
+            }
+            else if (root)
+            {
+                // 如果没有角色1节点，添加到根节点
+                root->children.push_back(child);
+            }
+        }
     }
-    else
+    
+    // 如果没有找到任何节点，创建一个默认根节点
+    if (!root)
     {
         root = makeSemNode(L);
     }
-    if (childOrder == "rhs_order")
-    {
-        for (int idx : childIdx)
-        {
-            if (idx < semKids.size() && semKids[idx] && idx != rootIdx)
-                root->children.push_back(semKids[idx]);
-        }
-    }
-    else
-    {
-        for (int i = childIdx.size() - 1; i >= 0; --i)
-        {
-            int idx = childIdx[i];
-            if (idx < semKids.size() && semKids[idx] && idx != rootIdx)
-                root->children.push_back(semKids[idx]);
-        }
-    }
-    // 追加其它 root 标记的项为子节点
-    for (int i = 0; i < rootIdxs.size(); ++i)
-    {
-        int idx = rootIdxs[i];
-        if (idx == rootIdx)
-            continue;
-        if (idx < semKids.size() && semKids[idx])
-            root->children.push_back(semKids[idx]);
-    }
-    // sibling 附加
-    for (int idx : siblingIdx)
-    {
-        if (idx < semKids.size() && semKids[idx] && idx != rootIdx)
-            root->children.push_back(semKids[idx]);
-    }
-    // 不再附加未标注项，避免语法树膨胀
+    
     return root;
 }
 
@@ -789,5 +744,15 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
         res.errorPos = res.steps.size();
         break;
     }
+    
+    // 确保语义树的根节点始终是起始符号
+    if (res.astRoot && res.astRoot->tag != g.startSymbol)
+    {
+        SemanticASTNode* top = new SemanticASTNode();
+        top->tag = g.startSymbol;
+        top->children.push_back(res.astRoot);
+        res.astRoot = top;
+    }
+    
     return res;
 }

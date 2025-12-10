@@ -39,9 +39,11 @@ HEADERS += include/task1/dfabuilder.h \
            include/task2/LR1Parser.h \ 
            include/task2/SLR.h \ 
            include/task2/SyntaxParser.h \ 
+
 FORMS += ui/mainwindow.ui \
           ui/task1window.ui \
           ui/task2window.ui
+          
 SOURCES += main.cpp \ 
            src/task1/dfabuilder.cpp \ 
            src/task1/dfaminimizer.cpp \ 

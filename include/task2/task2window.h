@@ -68,10 +68,12 @@ private slots:
     // 语法分析与语法树生成相关槽函数
     void on_pushButtonOpenTokenFile_clicked();
     void on_pushButtonAnalyzeSyntax_clicked();
-    void on_pushButtonSaveSyntaxTree_clicked();
     
     // Token映射相关槽函数
     void on_pushButtonLoadTokenMap_clicked();
+    
+    // 语义动作相关槽函数
+    void on_pushButtonLoadSemantics_clicked();
 
 private:
     Ui::Task2Window *ui;
@@ -93,6 +95,10 @@ private:
     QMap<QString, QString> m_tokenMap; // token 编码到终结符名称的映射
     QSet<QString> m_singleCodeTokens; // 存储单编码token的名称，这些token需要词素
     
+    // 语义动作相关数据
+    QMap<QString, QVector<QVector<int>>> m_semanticActions; // 语义动作映射
+    QMap<int, QString> m_roleMeaning; // 角色含义映射
+    
     // 辅助函数
     void initUI();
     void loadExampleGrammar();
@@ -103,9 +109,8 @@ private:
     void displayLR1DFA();
     void displayLR1Table();
     void displaySyntaxAnalysisResult();
-    
-    // Token映射相关辅助函数
     bool loadTokenMap(const QString &mapPath);
+    bool parseSemanticActions(const QString &semPath);
 };
 
 #endif // TASK2WINDOW_H

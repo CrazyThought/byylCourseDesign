@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>6</number>
+      </property>
       <widget class="QWidget" name="tabBNF">
        <attribute name="title">
         <string>BNF文法处理</string>
@@ -115,7 +118,7 @@
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -138,10 +141,10 @@
              <item>
               <widget class="QTableWidget" name="tableWidgetFirst">
                <property name="editTriggers">
-                <enum>QAbstractItemView::NoEditTriggers</enum>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
                <property name="horizontalScrollMode">
-                <enum>QAbstractItemView::ScrollPerPixel</enum>
+                <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
                </property>
                <property name="columnCount">
                 <number>2</number>
@@ -173,10 +176,10 @@
              <item>
               <widget class="QTableWidget" name="tableWidgetFollow">
                <property name="editTriggers">
-                <enum>QAbstractItemView::NoEditTriggers</enum>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
                <property name="horizontalScrollMode">
-                <enum>QAbstractItemView::ScrollPerPixel</enum>
+                <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
                </property>
                <property name="columnCount">
                 <number>2</number>
@@ -220,14 +223,14 @@
           <item>
            <widget class="QComboBox" name="comboBoxLR0View">
             <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToContents</enum>
+             <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
             </property>
            </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -248,32 +251,32 @@
            <item>
             <widget class="QTableWidget" name="tableWidgetLR0">
              <property name="editTriggers">
-              <enum>QAbstractItemView::NoEditTriggers</enum>
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
              </property>
-              <property name="horizontalScrollMode">
-               <enum>QAbstractItemView::ScrollPerPixel</enum>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+             </property>
+             <property name="columnCount">
+              <number>3</number>
+             </property>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>状态ID</string>
               </property>
-              <property name="columnCount">
-               <number>3</number>
+             </column>
+             <column>
+              <property name="text">
+               <string>项目集</string>
               </property>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>状态ID</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>项目集</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>转移关系</string>
-               </property>
-              </column>
+             </column>
+             <column>
+              <property name="text">
+               <string>转移关系</string>
+              </property>
+             </column>
             </widget>
            </item>
           </layout>
@@ -331,14 +334,14 @@
           <item>
            <widget class="QComboBox" name="comboBoxLR1View">
             <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToContents</enum>
+             <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
             </property>
            </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -359,32 +362,32 @@
            <item>
             <widget class="QTableWidget" name="tableWidgetLR1">
              <property name="editTriggers">
-              <enum>QAbstractItemView::NoEditTriggers</enum>
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
              </property>
-              <property name="horizontalScrollMode">
-               <enum>QAbstractItemView::ScrollPerPixel</enum>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+             </property>
+             <property name="columnCount">
+              <number>3</number>
+             </property>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>状态ID</string>
               </property>
-              <property name="columnCount">
-               <number>3</number>
+             </column>
+             <column>
+              <property name="text">
+               <string>项目集</string>
               </property>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>状态ID</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>项目集</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>转移关系</string>
-               </property>
-              </column>
+             </column>
+             <column>
+              <property name="text">
+               <string>转移关系</string>
+              </property>
+             </column>
             </widget>
            </item>
           </layout>
@@ -416,7 +419,7 @@
           <item>
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -437,27 +440,27 @@
            <item>
             <widget class="QTableWidget" name="tableWidgetLR1Table">
              <property name="editTriggers">
-              <enum>QAbstractItemView::NoEditTriggers</enum>
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
              </property>
-              <property name="horizontalScrollMode">
-               <enum>QAbstractItemView::ScrollPerPixel</enum>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+             </property>
+             <property name="columnCount">
+              <number>2</number>
+             </property>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>状态ID</string>
               </property>
-              <property name="columnCount">
-               <number>2</number>
+             </column>
+             <column>
+              <property name="text">
+               <string>Action/Goto</string>
               </property>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>状态ID</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Action/Goto</string>
-               </property>
-              </column>
+             </column>
             </widget>
            </item>
           </layout>
@@ -487,16 +490,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonSaveSyntaxTree">
+           <widget class="QPushButton" name="pushButtonLoadSemantics">
             <property name="text">
-             <string>保存语法树</string>
+             <string>加载语义动作</string>
             </property>
            </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -542,42 +545,42 @@
              <item>
               <widget class="QTableWidget" name="tableWidgetAnalysisSteps">
                <property name="editTriggers">
-                <enum>QAbstractItemView::NoEditTriggers</enum>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
-              <property name="horizontalScrollMode">
-               <enum>QAbstractItemView::ScrollPerPixel</enum>
-              </property>
-              <property name="columnCount">
-               <number>5</number>
-              </property>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>步骤</string>
+               <property name="horizontalScrollMode">
+                <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
                </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>状态栈</string>
+               <property name="columnCount">
+                <number>5</number>
                </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>符号栈</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>输入串</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>动作</string>
-               </property>
-              </column>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>步骤</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>状态栈</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>符号栈</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>输入串</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>动作</string>
+                </property>
+               </column>
               </widget>
              </item>
             </layout>
@@ -592,7 +595,7 @@
              <item>
               <widget class="QTreeWidget" name="treeWidgetSyntaxTree">
                <property name="editTriggers">
-                <enum>QAbstractItemView::NoEditTriggers</enum>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
                <property name="headerHidden">
                 <bool>false</bool>

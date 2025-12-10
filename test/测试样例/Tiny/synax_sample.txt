@@ -1,8 +1,3 @@
-2.Tiny语言的语法
-
-
-TINY语言的BNF文法如下：
-
 program->stmt-sequence
 stmt-sequence-> stmt-sequence ;statement |statement
 statement->if-stmt|repeat-stmt|assign-stmt|read-stmt|write-stmt
@@ -18,4 +13,3 @@ addop-> + |-
 term->term mulop factor | factor 
 mulop-> * | / |% |^
 factor->(exp) | number | identifier
-

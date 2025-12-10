@@ -105,7 +105,7 @@ public:
     QHBoxLayout *horizontalLayout_8;
     QPushButton *pushButtonOpenTokenFile;
     QPushButton *pushButtonAnalyzeSyntax;
-    QPushButton *pushButtonSaveSyntaxTree;
+    QPushButton *pushButtonLoadSemantics;
     QSpacerItem *horizontalSpacer_5;
     QHBoxLayout *horizontalLayout_9;
     QGroupBox *groupBoxTokenFile;
@@ -235,8 +235,8 @@ public:
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
         tableWidgetFirst->setHorizontalHeaderItem(1, __qtablewidgetitem1);
         tableWidgetFirst->setObjectName("tableWidgetFirst");
-        tableWidgetFirst->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableWidgetFirst->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableWidgetFirst->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+        tableWidgetFirst->setHorizontalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
         tableWidgetFirst->setColumnCount(2);
         tableWidgetFirst->horizontalHeader()->setStretchLastSection(true);
 
@@ -257,8 +257,8 @@ public:
         QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
         tableWidgetFollow->setHorizontalHeaderItem(1, __qtablewidgetitem3);
         tableWidgetFollow->setObjectName("tableWidgetFollow");
-        tableWidgetFollow->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableWidgetFollow->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableWidgetFollow->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+        tableWidgetFollow->setHorizontalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
         tableWidgetFollow->setColumnCount(2);
         tableWidgetFollow->horizontalHeader()->setStretchLastSection(true);
 
@@ -284,7 +284,7 @@ public:
 
         comboBoxLR0View = new QComboBox(tabLR0DFA);
         comboBoxLR0View->setObjectName("comboBoxLR0View");
-        comboBoxLR0View->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+        comboBoxLR0View->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
         horizontalLayout_5->addWidget(comboBoxLR0View);
 
@@ -309,8 +309,8 @@ public:
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
         tableWidgetLR0->setHorizontalHeaderItem(2, __qtablewidgetitem6);
         tableWidgetLR0->setObjectName("tableWidgetLR0");
-        tableWidgetLR0->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableWidgetLR0->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableWidgetLR0->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+        tableWidgetLR0->setHorizontalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
         tableWidgetLR0->setColumnCount(3);
         tableWidgetLR0->horizontalHeader()->setStretchLastSection(true);
 
@@ -356,7 +356,7 @@ public:
 
         comboBoxLR1View = new QComboBox(tabLR1DFA);
         comboBoxLR1View->setObjectName("comboBoxLR1View");
-        comboBoxLR1View->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+        comboBoxLR1View->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
         horizontalLayout_6->addWidget(comboBoxLR1View);
 
@@ -381,8 +381,8 @@ public:
         QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
         tableWidgetLR1->setHorizontalHeaderItem(2, __qtablewidgetitem9);
         tableWidgetLR1->setObjectName("tableWidgetLR1");
-        tableWidgetLR1->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableWidgetLR1->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableWidgetLR1->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+        tableWidgetLR1->setHorizontalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
         tableWidgetLR1->setColumnCount(3);
         tableWidgetLR1->horizontalHeader()->setStretchLastSection(true);
 
@@ -427,8 +427,8 @@ public:
         QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
         tableWidgetLR1Table->setHorizontalHeaderItem(1, __qtablewidgetitem11);
         tableWidgetLR1Table->setObjectName("tableWidgetLR1Table");
-        tableWidgetLR1Table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableWidgetLR1Table->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableWidgetLR1Table->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+        tableWidgetLR1Table->setHorizontalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
         tableWidgetLR1Table->setColumnCount(2);
         tableWidgetLR1Table->horizontalHeader()->setStretchLastSection(true);
 
@@ -454,10 +454,10 @@ public:
 
         horizontalLayout_8->addWidget(pushButtonAnalyzeSyntax);
 
-        pushButtonSaveSyntaxTree = new QPushButton(tabSyntaxAnalysis);
-        pushButtonSaveSyntaxTree->setObjectName("pushButtonSaveSyntaxTree");
+        pushButtonLoadSemantics = new QPushButton(tabSyntaxAnalysis);
+        pushButtonLoadSemantics->setObjectName("pushButtonLoadSemantics");
 
-        horizontalLayout_8->addWidget(pushButtonSaveSyntaxTree);
+        horizontalLayout_8->addWidget(pushButtonLoadSemantics);
 
         horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
@@ -504,8 +504,8 @@ public:
         QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
         tableWidgetAnalysisSteps->setHorizontalHeaderItem(4, __qtablewidgetitem16);
         tableWidgetAnalysisSteps->setObjectName("tableWidgetAnalysisSteps");
-        tableWidgetAnalysisSteps->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableWidgetAnalysisSteps->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        tableWidgetAnalysisSteps->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+        tableWidgetAnalysisSteps->setHorizontalScrollMode(QAbstractItemView::ScrollMode::ScrollPerPixel);
         tableWidgetAnalysisSteps->setColumnCount(5);
         tableWidgetAnalysisSteps->horizontalHeader()->setStretchLastSection(true);
 
@@ -520,7 +520,7 @@ public:
         verticalLayout_19->setObjectName("verticalLayout_19");
         treeWidgetSyntaxTree = new QTreeWidget(groupBoxSyntaxTree);
         treeWidgetSyntaxTree->setObjectName("treeWidgetSyntaxTree");
-        treeWidgetSyntaxTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        treeWidgetSyntaxTree->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
         treeWidgetSyntaxTree->setHeaderHidden(false);
 
         verticalLayout_19->addWidget(treeWidgetSyntaxTree);
@@ -552,6 +552,9 @@ public:
         menuFile->addAction(actionExit);
 
         retranslateUi(Task2Window);
+
+        tabWidget->setCurrentIndex(6);
+
 
         QMetaObject::connectSlotsByName(Task2Window);
     } // setupUi
@@ -612,7 +615,7 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tabLR1Table), QCoreApplication::translate("Task2Window", "LR(1)\345\210\206\346\236\220\350\241\250", nullptr));
         pushButtonOpenTokenFile->setText(QCoreApplication::translate("Task2Window", "\346\211\223\345\274\200\350\257\215\346\263\225\345\215\225\345\205\203\346\226\207\344\273\266", nullptr));
         pushButtonAnalyzeSyntax->setText(QCoreApplication::translate("Task2Window", "\350\277\233\350\241\214\350\257\255\346\263\225\345\210\206\346\236\220", nullptr));
-        pushButtonSaveSyntaxTree->setText(QCoreApplication::translate("Task2Window", "\344\277\235\345\255\230\350\257\255\346\263\225\346\240\221", nullptr));
+        pushButtonLoadSemantics->setText(QCoreApplication::translate("Task2Window", "\345\212\240\350\275\275\350\257\255\344\271\211\345\212\250\344\275\234", nullptr));
         groupBoxTokenFile->setTitle(QCoreApplication::translate("Task2Window", "\350\257\215\346\263\225\345\215\225\345\205\203\346\226\207\344\273\266", nullptr));
         groupBoxAnalysisSteps->setTitle(QCoreApplication::translate("Task2Window", "\345\210\206\346\236\220\346\255\245\351\252\244", nullptr));
         QTableWidgetItem *___qtablewidgetitem12 = tableWidgetAnalysisSteps->horizontalHeaderItem(0);

@@ -482,7 +482,21 @@ void Task2Window::on_pushButtonAnalyzeSyntax_clicked()
     ui->tableWidgetAnalysisSteps->setRowCount(0);
     
     // 进行语法分析
-    m_parseResult = LR1Parser::parse(m_tokens, m_grammar, m_lr1Table);
+    if (m_semanticActions.isEmpty()) {
+        // 如果没有加载语义动作，使用普通语法分析
+        m_parseResult = LR1Parser::parse(m_tokens, m_grammar, m_lr1Table);
+    } else {
+        // 使用语义动作进行语法分析
+        m_parseResult = LR1Parser::parseWithSemantics(
+            m_tokens, 
+            m_grammar, 
+            m_lr1Table, 
+            m_semanticActions, 
+            m_roleMeaning, 
+            "first_1", 
+            "rhs_order"
+        );
+    }
     
     if (m_parseResult.errorPos == -1) {
         // 显示分析结果
@@ -515,15 +529,6 @@ void Task2Window::on_pushButtonAnalyzeSyntax_clicked()
         }
         
         QMessageBox::warning(this, tr("语法分析失败"), errorMsg);
-    }
-}
-
-void Task2Window::on_pushButtonSaveSyntaxTree_clicked()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("保存语法树"), ".", tr("图片文件 (*.png *.jpg);;所有文件 (*.*)"));
-    if (!fileName.isEmpty()) {
-        // 简化实现，实际语法树生成需要额外逻辑
-        QMessageBox::information(this, tr("提示"), tr("语法树保存功能暂未实现"));
     }
 }
 
@@ -830,6 +835,42 @@ void Task2Window::displayLR1Table()
     ui->tableWidgetLR1Table->resizeColumnsToContents();
 }
 
+// 递归构建普通语法树的QTreeWidgetItem
+QTreeWidgetItem* buildTreeWidgetItem(ParseTreeNode* node, QTreeWidgetItem* parent)
+{
+    if (!node) {
+        return nullptr;
+    }
+    
+    QTreeWidgetItem* treeItem = new QTreeWidgetItem(parent);
+    treeItem->setText(0, node->symbol);
+    
+    // 递归构建子节点
+    for (ParseTreeNode* child : node->children) {
+        buildTreeWidgetItem(child, treeItem);
+    }
+    
+    return treeItem;
+}
+
+// 递归构建语义AST的QTreeWidgetItem
+QTreeWidgetItem* buildSemanticTreeWidgetItem(SemanticASTNode* node, QTreeWidgetItem* parent)
+{
+    if (!node) {
+        return nullptr;
+    }
+    
+    QTreeWidgetItem* treeItem = new QTreeWidgetItem(parent);
+    treeItem->setText(0, node->tag);
+    
+    // 递归构建子节点
+    for (SemanticASTNode* child : node->children) {
+        buildSemanticTreeWidgetItem(child, treeItem);
+    }
+    
+    return treeItem;
+}
+
 void Task2Window::displaySyntaxAnalysisResult()
 {
     // 清空表格
@@ -882,10 +923,38 @@ void Task2Window::displaySyntaxAnalysisResult()
     
     // 显示语法树
     ui->treeWidgetSyntaxTree->clear();
-    // 简化实现，实际语法树显示需要额外逻辑
-    QTreeWidgetItem* root = new QTreeWidgetItem(ui->treeWidgetSyntaxTree);
-    root->setText(0, tr("语法树"));
+    
+    if (m_parseResult.astRoot) {
+        // 显示语义AST
+        QTreeWidgetItem* rootItem = buildSemanticTreeWidgetItem(m_parseResult.astRoot, nullptr);
+        if (rootItem) {
+            ui->treeWidgetSyntaxTree->addTopLevelItem(rootItem);
+        }
+    } else if (m_parseResult.root) {
+        // 显示普通语法树
+        QTreeWidgetItem* rootItem = buildTreeWidgetItem(m_parseResult.root, nullptr);
+        if (rootItem) {
+            ui->treeWidgetSyntaxTree->addTopLevelItem(rootItem);
+        }
+    } else {
+        // 如果没有语法树，显示提示信息
+        QTreeWidgetItem* rootItem = new QTreeWidgetItem(ui->treeWidgetSyntaxTree);
+        rootItem->setText(0, tr("无语法树"));
+    }
+    
+    // 展开所有节点
     ui->treeWidgetSyntaxTree->expandAll();
+    // 调整列宽
+    ui->treeWidgetSyntaxTree->resizeColumnToContents(0);
+    
+    // 显示语义动作状态
+    QString statusMsg;
+    if (m_semanticActions.isEmpty()) {
+        statusMsg = tr("未加载语义动作，使用普通语法分析");
+    } else {
+        statusMsg = tr("已加载 %1 个产生式的语义动作，使用语义语法分析").arg(m_semanticActions.size());
+    }
+    qDebug() << statusMsg;
 }
 
 bool Task2Window::loadTokenMap(const QString &mapPath)
@@ -939,6 +1008,76 @@ bool Task2Window::loadTokenMap(const QString &mapPath)
         return true;
     }
     return false;
+}
+
+// 解析语义动作文件
+bool Task2Window::parseSemanticActions(const QString &semPath)
+{
+    QFile semFile(semPath);
+    if (semFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&semFile);
+        m_semanticActions.clear();
+        
+        // 预定义角色含义
+        m_roleMeaning = {{0, "skip"}, {1, "root"}, {2, "child"}};
+        
+        QString production;
+        while (!in.atEnd()) {
+            QString line = in.readLine().trimmed();
+            
+            if (line.isEmpty() || line.startsWith("//")) {
+                continue; // 跳过空行和注释行
+            }
+            
+            if (!production.isEmpty()) {
+                // 解析语义动作序列
+                QStringList actionList = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+                QVector<int> actions;
+                for (const QString &actionStr : actionList) {
+                    actions.append(actionStr.toInt());
+                }
+                
+                // 提取产生式左部作为键
+                QString leftPart = production.section(" -> ", 0, 0).trimmed();
+                
+                // 存储语义动作
+                m_semanticActions[leftPart].append(actions);
+                
+                // 重置production，准备下一个产生式
+                production.clear();
+            } else {
+                // 这是一个产生式行
+                production = line;
+            }
+        }
+        
+        semFile.close();
+        return true;
+    }
+    return false;
+}
+
+// 加载语义动作文件
+void Task2Window::on_pushButtonLoadSemantics_clicked()
+{
+    QString semPath = QFileDialog::getOpenFileName(
+        this, 
+        tr("打开语义动作文件"), 
+        ".", 
+        tr("文本文件 (*.txt);;所有文件 (*.*)")
+    );
+    
+    if (!semPath.isEmpty()) {
+        if (parseSemanticActions(semPath)) {
+            QMessageBox::information(
+                this, 
+                tr("成功"), 
+                tr("语义动作文件加载成功，共加载 %1 个产生式的语义动作").arg(m_semanticActions.size())
+            );
+        } else {
+            QMessageBox::warning(this, tr("错误"), tr("语义动作文件加载失败"));
+        }
+    }
 }
 
 void Task2Window::on_pushButtonLoadTokenMap_clicked()
