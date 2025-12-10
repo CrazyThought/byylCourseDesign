@@ -17,6 +17,7 @@
 #include "Grammar.h"
 #include "LR1.h"
 #include "AST.h"
+#include "TokenInfo.h"
 
 struct ParseTreeNode
 {
@@ -28,7 +29,7 @@ struct ParseStep
 {
     int                          step = 0;
     QVector<QPair<int, QString>> stack;
-    QVector<QString>             rest;
+    QVector<TokenInfo>           rest;
     QString                      action;
     QString                      production;
 };
@@ -52,26 +53,16 @@ class LR1Parser
      * @param {LR1ActionTable} t - LR(1) 动作/GOTO 表
      * @return {ParseResult} 包含步骤与解析树的结果
      */
-    static ParseResult parse(const QVector<QString>& tokens,
+    static ParseResult parse(const QVector<TokenInfo>& tokens,
                              const Grammar&          g,
                              const LR1ActionTable&   t);
     /**
      */
-    static ParseResult parseWithSemantics(const QVector<QString>&                     tokens,
+    static ParseResult parseWithSemantics(const QVector<TokenInfo>&                    tokens,
                                           const Grammar&                              g,
                                           const LR1ActionTable&                       t,
                                           const QMap<QString, QVector<QVector<int>>>& actions,
                                           const QMap<int, QString>&                   roleMeaning,
                                           const QString&                              rootPolicy,
                                           const QString&                              childOrder);
-    /**
-     */
-    static ParseResult parseWithSemantics(const QVector<QString>&                     tokens,
-                                          const Grammar&                              g,
-                                          const LR1ActionTable&                       t,
-                                          const QMap<QString, QVector<QVector<int>>>& actions,
-                                          const QMap<int, QString>&                   roleMeaning,
-                                          const QString&                              rootPolicy,
-                                          const QString&                              childOrder,
-                                          const QVector<QString>&                     lexemes);
 };

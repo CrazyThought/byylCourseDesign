@@ -389,36 +389,43 @@ void Task2Window::on_pushButtonOpenTokenFile_clicked()
                 
                 // 使用token映射转换编码
                 QString tokenName;
+                bool isSingleCodeToken = false;
+                
                 if (m_tokenMap.contains(code)) {
                     tokenName = m_tokenMap.value(code);
+                    // 使用m_singleCodeTokens动态判断是否为单编码token
+                    isSingleCodeToken = m_singleCodeTokens.contains(tokenName);
                 } else {
                     // 无法识别的编码，保留原始值
                     tokenName = code;
-                    i++;
-                    m_tokens.append(tokenName);
-                    continue;
+                    // 无法识别的编码默认不是单编码token
+                    isSingleCodeToken = false;
                 }
                 
-                // 使用m_singleCodeTokens动态判断是否为单编码token
-                bool isSingleCodeToken = m_singleCodeTokens.contains(tokenName);
+                // 创建TokenInfo结构体
+                TokenInfo token;
+                token.tokenType = tokenName;
                 
                 if (isSingleCodeToken) {
                     // 单编码token，需要词素，往后再读一个token作为词素
+                    // 根据用户要求：只要是单编码token，就必须往下读一个作为词素
                     if (i + 1 < tokensAndLexemes.size()) {
-                        // 单编码token只需要token名称，词素已经包含在token中
-                        // 跳过词素，因为语法分析只需要token类型
+                        // 单编码token，词素为下一个token，无论它是否是有效的编码
+                        token.lexeme = tokensAndLexemes[i + 1];
                         i += 2;
                     } else {
-                        // 没有词素，只使用token名称
+                        // 没有词素，词素为空字符串
+                        token.lexeme = "";
                         i++;
                     }
-                    // 单编码token只需要token名称，词素已经包含在token中
-                    m_tokens.append(tokenName);
                 } else {
-                    // 多编码token，不需要词素，只使用token名称
-                    m_tokens.append(tokenName);
+                    // 多编码token，不需要词素，词素为空字符串
+                    token.lexeme = "";
                     i++;
                 }
+                
+                // 将TokenInfo结构体添加到tokens列表
+                m_tokens.append(token);
             }
             
             QMessageBox::information(this, tr("成功"), tr("词法单元文件加载成功，共加载 %1 个token").arg(m_tokens.size()));
@@ -493,8 +500,8 @@ void Task2Window::on_pushButtonAnalyzeSyntax_clicked()
         // 显示当前token和期望的token
         if (m_parseResult.errorPos > 0 && m_parseResult.errorPos <= m_tokens.size()) {
             int tokenIndex = m_parseResult.errorPos - 1;
-            QString currentToken = m_tokens[tokenIndex];
-            errorMsg += tr("\n当前token: %1").arg(currentToken);
+            const TokenInfo& currentTokenInfo = m_tokens[tokenIndex];
+            errorMsg += tr("\n当前token: %1").arg(currentTokenInfo.tokenType);
         }
         
         // 显示分析步骤，帮助调试
@@ -858,7 +865,7 @@ void Task2Window::displaySyntaxAnalysisResult()
         // 显示输入串
         QString inputStr;
         for (const auto& token : step.rest) {
-            inputStr += token + " ";
+            inputStr += token.tokenType + " ";
         }
         ui->tableWidgetAnalysisSteps->setItem(i, 3, new QTableWidgetItem(inputStr.trimmed()));
         

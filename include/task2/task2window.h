@@ -87,7 +87,7 @@ private:
     LR1ActionTable m_lr1Table;
     
     // 词法分析和语法分析相关数据
-    QVector<QString> m_tokens;
+    QVector<TokenInfo> m_tokens; // 存储token序列，包含token类型和词素
     QString m_tokenFileContent;
     ParseResult m_parseResult;
     QMap<QString, QString> m_tokenMap; // token 编码到终结符名称的映射
