@@ -363,6 +363,13 @@ QStringList RegexProcessor::extractMultiWords(const QString &pattern)
         
         for (int i = 0; i < pattern.length(); ++i) {
             QChar c = pattern.at(i);
+            
+            // 检查是否为转义字符
+            if (c == '\\' && i + 1 < pattern.length()) {
+                i++; // 跳过转义后的字符
+                continue;
+            }
+            
             if (c == '(') {
                 bracketCount++;
             } else if (c == ')') {
@@ -473,6 +480,13 @@ QStringList RegexProcessor::generateWordsFromGroupedRegex(const QString &pattern
     bool isChoiceExpr = false;
     for (int i = 0; i < pattern.length(); ++i) {
         QChar c = pattern.at(i);
+        
+        // 检查是否为转义字符
+        if (c == '\\' && i + 1 < pattern.length()) {
+            i++; // 跳过转义后的字符
+            continue;
+        }
+        
         if (c == '(') {
             bracketCount++;
         } else if (c == ')') {
@@ -491,6 +505,13 @@ QStringList RegexProcessor::generateWordsFromGroupedRegex(const QString &pattern
         
         for (int i = 0; i < pattern.length(); ++i) {
             QChar c = pattern.at(i);
+            
+            // 检查是否为转义字符
+            if (c == '\\' && i + 1 < pattern.length()) {
+                i++; // 跳过转义后的字符
+                continue;
+            }
+            
             if (c == '(') {
                 bracketCount++;
             } else if (c == ')') {
@@ -535,6 +556,12 @@ QStringList RegexProcessor::generateWordsFromGroupedRegex(const QString &pattern
     
     for (int i = 0; i < pattern.length(); ++i) {
         QChar c = pattern.at(i);
+        
+        // 检查是否为转义字符
+        if (c == '\\' && i + 1 < pattern.length()) {
+            i++; // 跳过转义后的字符
+            continue;
+        }
         
         if (c == '(') {
             bracketCount++;

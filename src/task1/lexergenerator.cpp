@@ -535,14 +535,19 @@ QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
                 QString lowercaseWord = word.toLower();
                 int codeValue = lowercaseToCodeMap[lowercaseWord];
 
-                // 只对引号进行转义，不对其他字符进行过度转义
-                QString escapedWord = word;
+                // 正确处理转义字符
+                QString escapedWord;
+                for (int i = 0; i < word.length(); i++) {
+                    QChar c = word.at(i);
+                    if (c == '\\' && i + 1 < word.length()) {
+                        // 处理转义字符，只保留转义后的字符
+                        escapedWord += word.at(++i);
+                    } else {
+                        escapedWord += c;
+                    }
+                }
 
-                // 移除多余的转义字符，只保留引号的转义
-                // 首先移除所有转义字符
-                escapedWord.replace("\\", "");
-
-                // 然后只对引号进行转义
+                // 对引号进行转义，用于生成C++代码
                 escapedWord.replace("\"", "\\\"");
 
                 // 生成tokenCodeMap赋值语句
@@ -595,11 +600,19 @@ QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
 
             // 生成映射条目
             for (auto it = lowercaseToCodeMap.constBegin(); it != lowercaseToCodeMap.constEnd(); ++it) {
-                // 修复转义字符，只保留必要的转义
-                QString tokenValue = it.key();
-                // 去除多余的转义字符
-                tokenValue.replace("\\", "");
-                mapContent += QString("%1=%2\n").arg(it.value()).arg(tokenValue);
+                // 正确处理转义字符
+            QString tokenValue = it.key();
+            QString processedValue;
+            for (int i = 0; i < tokenValue.length(); i++) {
+                QChar c = tokenValue.at(i);
+                if (c == '\\' && i + 1 < tokenValue.length()) {
+                    // 处理转义字符，只保留转义后的字符
+                    processedValue += tokenValue.at(++i);
+                } else {
+                    processedValue += c;
+                }
+            }
+            mapContent += QString("%1=%2\n").arg(it.value()).arg(processedValue);
             }
         } else {
             // 单单词情况（标识符、数字等）
