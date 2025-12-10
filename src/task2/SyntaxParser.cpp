@@ -24,10 +24,44 @@ static bool isTerminal(const QSet<QString>& terms, const QString& s)
     return terms.contains(s) || s == ConfigConstants::eofSymbol();
 }
 
-SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const LL1Info& info)
+SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const LL1Info& info, const QMap<int, QString>& tokenMap)
 {
     SyntaxResult     r;
-    QVector<QString> input = tokens;
+    QVector<QString> input;
+    
+    // 处理词法分析器生成的tokens，将编码和词素合并为完整token
+    int i = 0;
+    while (i < tokens.size()) {
+        QString current = tokens[i];
+        bool isTokenCode = false;
+        int tokenCode = current.toInt(&isTokenCode);
+        
+        if (isTokenCode) {
+            // 检查是否为单编码token类型
+            if (tokenMap.contains(tokenCode)) {
+                QString tokenName = tokenMap[tokenCode];
+                // 单编码token类型，需要向后继续识别词素内容
+                if (i + 1 < tokens.size()) {
+                    // 下一个元素是词素，合并为完整token
+                    input.push_back(tokenName + " " + tokens[i + 1]);
+                    i += 2;
+                } else {
+                    // 没有词素，只使用token名称
+                    input.push_back(tokenName);
+                    i++;
+                }
+            } else {
+                // 没有对应的token映射，直接使用编码
+                input.push_back(current);
+                i++;
+            }
+        } else {
+            // 不是编码，直接作为token
+            input.push_back(current);
+            i++;
+        }
+    }
+    
     input.push_back(ConfigConstants::eofSymbol());
     QVector<QString> st;
     st.push_back(ConfigConstants::eofSymbol());

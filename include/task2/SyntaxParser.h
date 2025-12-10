@@ -22,4 +22,4 @@ struct SyntaxResult
     int            errorPos = -1;
 };
 
-SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const LL1Info& info);
+SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const LL1Info& info, const QMap<int, QString>& tokenMap = QMap<int, QString>());

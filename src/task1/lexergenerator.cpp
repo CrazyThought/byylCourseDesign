@@ -94,7 +94,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
         code += "        {\n";
         code += "            string currentLexeme;\n";
         code += "            bool currentMatched = false;\n\n";
-    
+
         // 多单词情况，直接匹配单词列表
         if (item.isMultiWord) {
             int index = 0;
@@ -102,7 +102,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
                 QString escapedWord = word;
                 escapedWord.replace("\"", "\\\"");
                 escapedWord.replace("\\", "\\\\");
-                
+
                 code += QString("            if (source.compare(pos, %1, \"%2\") == 0) {\n").arg(word.length()).arg(escapedWord);
                 code += QString("                currentLexeme = \"%1\";\n").arg(escapedWord);
                 code += "                currentMatched = true;\n";
@@ -173,7 +173,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
                 code += "            currentLexeme = source[pos];\n";
                 code += "            currentMatched = true;\n";
             }
-            
+
             code += "            if (currentMatched) {\n";
             code += "                if (currentLexeme.length() > maxMatchLen) {\n";
             code += "                    maxMatchLen = currentLexeme.length();\n";
@@ -183,7 +183,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
             code += "                }\n";
             code += "            }\n";
         }
-        
+
         code += "        }\n";
     }
 
@@ -217,7 +217,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "    initializeTokenCodeMap();\n\n";
     code += "    string source;\n";
     code += "    ifstream file;\n\n";
-    
+
     code += "    if (argc > 1) {\n";
     code += "        // 从文件读取源文件\n";
     code += "        file.open(argv[1]);\n";
@@ -238,14 +238,14 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     code += "            source += line + '\n';\n";
     code += "        }\n";
     code += "    }\n\n";
-    
+
     code += "    vector<Token> tokens = lexicalAnalysis(source);\n\n";
-    
+
     code += "    // 输出格式：单词\t编码\n";
     code += "    for (const auto &token : tokens) {\n";
     code += "        cout << token.lexeme << '\t' << token.code << endl;\n";
     code += "    }\n\n";
-    
+
     code += "    return 0;\n";
     code += "}\n";
 
@@ -255,7 +255,7 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
 QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &regexItems, const DFA &minimizedDFA)
 {
     QString code;
-    
+
     // 生成头文件
     code += "#include <iostream>\n";
     code += "#include <fstream>\n";
@@ -265,12 +265,12 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "#include <cstring>\n";
     code += "#include <cctype>\n";
     code += "using namespace std;\n\n";
-    
+
     // 生成全局变量
     code += "ifstream in;\n";
     code += "string buf;\n";
     code += "int read_cnt = 0;\n\n";
-    
+
     // 生成跳过空白字符函数
     code += "void skipBlank() {\n";
     code += "\tchar c;\n";
@@ -283,19 +283,19 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "\t\t}\n";
     code += "\t}\n";
     code += "}\n\n";
-    
+
     // 生成状态转移表
     code += generateStateTransitionTable(minimizedDFA);
     code += "\n";
-    
+
     // 生成接受状态映射
     code += generateAcceptStatesMap(regexItems, minimizedDFA);
     code += "\n";
-    
+
     // 生成单词编码映射表
     code += generateTokenCodeMap(regexItems);
     code += "\n";
-    
+
     // 生成词法分析函数
     code += "void analyzeToken() {\n";
     code += "\tint state = " + QString::number(minimizedDFA.startState) + ";\n";
@@ -344,7 +344,7 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "\t\tread_cnt++;\n";
     code += "\t}\n";
     code += "}\n\n";
-    
+
     // 生成主函数
     code += "int main(int argc, char *argv[]) {\n";
     code += "\t// 初始化单词编码映射表\n";
@@ -370,21 +370,21 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "\tin.close();\n";
     code += "\treturn 0;\n";
     code += "}\n";
-    
+
     return code;
 }
 
 QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
 {
     QString code;
-    
+
     code += "// DFA状态转移表\n";
     code += "const int NUM_STATES = " + QString::number(minimizedDFA.states.size()) + ";\n";
     code += "const int ERROR_STATE = -1;\n\n";
-    
+
     // 构建完整的状态转移表
     QVector<QVector<int>> transitionTable(minimizedDFA.states.size(), QVector<int>(256, ERROR_STATE));
-    
+
     // 填充状态转移表
     for (const auto &transition : minimizedDFA.transitions) {
         if (transition.input.size() == 1) {
@@ -404,11 +404,11 @@ QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
             }
         }
     }
-    
+
     // 生成状态转移表代码
     code += "// 状态转移表: transitions[当前状态][输入字符ASCII值] = 下一个状态\n";
     code += "int transitions[NUM_STATES][256] = {\n";
-    
+
     for (int i = 0; i < transitionTable.size(); i++) {
         code += "    {";
         for (int j = 0; j < transitionTable[i].size(); j++) {
@@ -422,36 +422,36 @@ QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
             code += ",\n";
         }
     }
-    
+
     code += "\n};\n";
-    
+
     return code;
 }
 
 QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexItems, const DFA &minimizedDFA)
 {
     QString code;
-    
+
     code += "// 接受状态映射\n";
-    
+
     // 构建接受状态映射
     int numStates = minimizedDFA.states.size();
     QVector<bool> isAccept(numStates, false);
     QVector<int> tokens(numStates, -1);
-    
+
     // 1. 遍历所有接受状态，将它们标记为接受状态
     for (const auto &state : minimizedDFA.acceptStates) {
         if (state >= 0 && state < numStates) {
             isAccept[state] = true;
         }
     }
-    
+
     // 2. 为每个接受状态分配正确的tokenCode
     // 初始化tokens数组为-1
     for (int i = 0; i < numStates; i++) {
         tokens[i] = -1;
     }
-    
+
     // 填充接受状态和对应的token代码
     for (const auto &state : minimizedDFA.acceptStates) {
         if (state >= 0 && state < numStates) {
@@ -459,7 +459,7 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
             if (minimizedDFA.acceptStateToRegexIndex.contains(state)) {
                 // 从DFA的映射中获取正则表达式索引
                 int regexIndex = minimizedDFA.acceptStateToRegexIndex[state];
-                
+
                 // 确保索引有效
                 if (regexIndex >= 0 && regexIndex < regexItems.size()) {
                     // 只对单单词类型设置具体编码，多单词类型由tokenCodeMap处理
@@ -472,11 +472,11 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
             // 对于没有映射的接受态，保持-1，由tokenCodeMap覆盖
         }
     }
-    
+
     // 对于没有映射的接受态，保持-1，由tokenCodeMap覆盖
     // 非多单词接受态应该已经通过映射获得了正确的tokenCode
     // 多单词接受态由tokenCodeMap处理，不需要额外分配
-    
+
     // 生成接受状态数组
     code += "bool isAcceptState[NUM_STATES] = {";
     for (int i = 0; i < isAccept.size(); i++) {
@@ -486,7 +486,7 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
         code += isAccept[i] ? "true" : "false";
     }
     code += "};\n";
-    
+
     // 生成token代码数组
     code += "int acceptTokens[NUM_STATES] = {";
     for (int i = 0; i < tokens.size(); i++) {
@@ -496,31 +496,31 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
         code += QString::number(tokens[i]);
     }
     code += "};\n";
-    
+
     return code;
 }
 
 QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
 {
     QString code;
-    
+
     code += "// 单词编码映射\n";
     code += "map<string, int> tokenCodeMap;\n";
     code += "int nextTokenCode = 1;\n\n";
-    
+
     // 创建初始化函数，将所有赋值操作放在函数内部
     code += "// 初始化单词编码映射表\n";
     code += "void initializeTokenCodeMap() {\n";
-    
+
     // 为每个正则表达式项生成映射
     for (const RegexItem &item : regexItems) {
         if (item.isMultiWord) {
             // 多单词情况，实现大小写不敏感处理
             int currentCode = item.code;
-            
+
             // 使用QMap来临时存储小写单词到编码的映射，确保同一单词的不同大小写形式映射到同一个编码
             QMap<QString, int> lowercaseToCodeMap;
-            
+
             // 第一步：收集所有单词的小写形式，确保同一单词的不同大小写形式映射到同一个编码
             for (const QString &word : item.wordList) {
                 QString lowercaseWord = word.toLower();
@@ -528,23 +528,23 @@ QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
                     lowercaseToCodeMap[lowercaseWord] = currentCode++;
                 }
             }
-            
+
             // 第二步：为每个原始单词生成映射，使用其小写形式对应的编码
             // 这样可以确保同一关键字的所有大小写变体都能在映射表中完整展示
             for (const QString &word : item.wordList) {
                 QString lowercaseWord = word.toLower();
                 int codeValue = lowercaseToCodeMap[lowercaseWord];
-                
+
                 // 只对引号进行转义，不对其他字符进行过度转义
                 QString escapedWord = word;
-                
+
                 // 移除多余的转义字符，只保留引号的转义
                 // 首先移除所有转义字符
                 escapedWord.replace("\\", "");
-                
+
                 // 然后只对引号进行转义
                 escapedWord.replace("\"", "\\\"");
-                
+
                 // 生成tokenCodeMap赋值语句
                 code += QString("    tokenCodeMap[\"%1\"] = %2;\n").arg(escapedWord).arg(codeValue);
             }
@@ -553,9 +553,9 @@ QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
             // 这些类型（如标识符、数字）将通过状态转移或直接匹配来识别
         }
     }
-    
+
     code += "}\n\n";
-    
+
     return code;
 }
 
@@ -571,38 +571,47 @@ QString LexerGenerator::getInputSymbol(const QString &input)
 QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
 {
     QString mapContent;
-    
-    // 添加文件头注释
-    mapContent += "// Token映射文件，生成自词法分析器生成器\n";
-    mapContent += "// 格式：编码=终结符名称\n\n";
-    
+
     // 为每个正则表达式项生成映射
     for (const RegexItem &item : regexItems) {
         if (item.isMultiWord) {
             // 多单词情况（关键字、符号等）
             int currentCode = item.code;
-            
+
             // 使用QMap来确保同一单词的不同大小写形式映射到同一个编码
             QMap<QString, int> lowercaseToCodeMap;
-            
+
             for (const QString &word : item.wordList) {
                 QString lowercaseWord = word.toLower();
                 if (!lowercaseToCodeMap.contains(lowercaseWord)) {
                     lowercaseToCodeMap[lowercaseWord] = currentCode++;
                 }
             }
-            
+
             // 生成映射条目
             for (auto it = lowercaseToCodeMap.constBegin(); it != lowercaseToCodeMap.constEnd(); ++it) {
-                mapContent += QString("%1=%2\n").arg(it.value()).arg(it.key());
+                // 修复转义字符，只保留必要的转义
+                QString tokenValue = it.key();
+                // 去除多余的转义字符
+                tokenValue.replace("\\", "");
+                mapContent += QString("%1=%2\n").arg(it.value()).arg(tokenValue);
             }
         } else {
             // 单单词情况（标识符、数字等）
             QString tokenName = item.name.mid(1); // 移除下划线前缀
-            mapContent += QString("%1=%2\n").arg(item.code).arg(tokenName);
+            // 提取纯名称，去除后面的编号
+            QString pureTokenName;
+            for (QChar c : tokenName) {
+                if (!c.isDigit()) {
+                    pureTokenName.append(c);
+                } else {
+                    break;
+                }
+            }
+            mapContent += QString("%1=%2\n").arg(item.code).arg(pureTokenName);
         }
     }
-    
+
     return mapContent;
 }
 

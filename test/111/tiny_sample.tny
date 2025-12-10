@@ -1,37 +1,10 @@
-{123+*-/%^<><<=>>===;:=IfThenElseEndRepeatUntilReadWrite}
-{098765abcdefABCDEF$;:=<>+-*/%^}
-
-Read num123
-Read _count
-Write 98765
-Write 0
-
-sum:=0
-sum:=sum+100
-prod:=10*5
-rem:=20%3
-pow:=2^3
-diff:=50-8
-div:=100/4
-
-If num123<100Then
-    Write 12345
-Else If num123<=200Then
-    Write 67890
-Else If num123>300Then
-    Write _count
-Else If num123>=400Then
-    sum:=sum+1
-Else If num123=500Then
-    prod:=prod*2
-Else If num123<>600Then
-    diff:=diff-1
-End
-
-Repeat
-    sum:=sum+1
-    _count:=_count-1
-Until _count<=0
-
-temp:=100;
-flag:=$
+{thisisacomment}
+read x;
+if 0 < x then
+  fact := 1;
+  repeat
+    fact := fact * x;
+    x := x - 1
+  until x = 0;
+  write fact
+end

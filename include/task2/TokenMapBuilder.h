@@ -19,4 +19,5 @@ class TokenMapBuilder
    public:
     static QMap<QString, QString> build(const QString& regexText, const ParsedFile& pf);
     static bool                   saveJson(const QMap<QString, QString>& m, const QString& path);
+    static QMap<int, QString>     parseTokenMap(const QString& path);
 };

@@ -1119,13 +1119,27 @@ void Task1Window::displayLexicalResults(const QList<LexicalResult> &results)
         // 添加单词编码
         resultText += QString::number(result.tokenCode) + " ";
         
-        // 检查是否为标识符或数字：根据tokenCode判断
-        // 标识符（tokenCode 100）和数字（tokenCode 101）：显示编码 单词
-        // 其他符号：只显示编码
-        bool isIdentifierOrNumber = (result.tokenCode == 100 || result.tokenCode == 101);
+        // 检查是否为单编码token类型：根据tokenCode查找对应的RegexItem
+        bool isSingleWordToken = false;
+        for (const RegexItem &item : m_currentRegexItems) {
+            if (item.isMultiWord) {
+                // 多单词情况，检查编码范围
+                int codeRange = item.wordList.size();
+                if (result.tokenCode >= item.code && result.tokenCode < item.code + codeRange) {
+                    isSingleWordToken = false;
+                    break;
+                }
+            } else {
+                // 单单词情况，直接比较编码
+                if (result.tokenCode == item.code) {
+                    isSingleWordToken = true;
+                    break;
+                }
+            }
+        }
         
-        // 对于标识符或数字，在编码后接着输出单词，中间使用空格分隔
-        if (isIdentifierOrNumber) {
+        // 对于单编码token类型，在编码后接着输出词素，中间使用空格分隔
+        if (isSingleWordToken) {
             resultText += result.lexeme + " ";
         }
     }

@@ -126,3 +126,48 @@ bool TokenMapBuilder::saveJson(const QMap<QString, QString>& m, const QString& p
     f.close();
     return true;
 }
+
+QMap<int, QString> TokenMapBuilder::parseTokenMap(const QString& path)
+{
+    QMap<int, QString> tokenMap;
+    QFile file(path);
+    
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return tokenMap;
+    }
+    
+    QTextStream in(&file);
+    int lineNumber = 0;
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        lineNumber++;
+        
+        // 跳过空行和注释行
+        if (line.isEmpty() || line.startsWith("//")) {
+            continue;
+        }
+        
+        // 查找第一个等号位置
+        int equalsPos = line.indexOf('=');
+        if (equalsPos == -1) {
+            continue; // 无效行，跳过
+        }
+        
+        // 提取编码和token名称，只使用第一个等号作为分隔符
+        QString codeStr = line.left(equalsPos).trimmed();
+        QString tokenName = line.mid(equalsPos + 1).trimmed();
+        
+        // 转换编码为整数
+        bool ok = false;
+        int code = codeStr.toInt(&ok);
+        if (ok) {
+            tokenMap[code] = tokenName;
+        } else {
+            // 无效编码，跳过
+            continue;
+        }
+    }
+    
+    file.close();
+    return tokenMap;
+}
