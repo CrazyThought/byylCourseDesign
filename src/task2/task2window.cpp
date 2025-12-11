@@ -11,6 +11,7 @@
 
 #include "task2/task2window.h"
 #include "ui_task2window.h"
+#include <QApplication>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTextStream>
@@ -482,13 +483,19 @@ void Task2Window::on_pushButtonAnalyzeSyntax_clicked()
     // 清空表格
     ui->tableWidgetAnalysisSteps->setRowCount(0);
     
+    // 创建LR1Parser实例
+    LR1Parser parser;
+    
+    // 连接信号和槽，实现实时更新
+    connect(&parser, &LR1Parser::stepUpdated, this, &Task2Window::onStepUpdated);
+    
     // 进行语法分析
     if (m_semanticActions.isEmpty()) {
         // 如果没有加载语义动作，使用普通语法分析
-        m_parseResult = LR1Parser::parse(m_tokens, m_grammar, m_lr1Table);
+        m_parseResult = parser.parse(m_tokens, m_grammar, m_lr1Table);
     } else {
         // 使用语义动作进行语法分析
-        m_parseResult = LR1Parser::parseWithSemantics(
+        m_parseResult = parser.parseWithSemantics(
             m_tokens, 
             m_grammar, 
             m_lr1Table, 
@@ -499,9 +506,8 @@ void Task2Window::on_pushButtonAnalyzeSyntax_clicked()
         );
     }
     
+    // 分析完成后，显示最终结果
     if (m_parseResult.errorPos == -1) {
-        // 显示分析结果
-        displaySyntaxAnalysisResult();
         QMessageBox::information(this, tr("成功"), tr("语法分析成功"));
     } else {
         // 显示详细的错误信息
@@ -537,6 +543,51 @@ void Task2Window::on_comboBoxLR0View_currentIndexChanged(int index)
 {
     Q_UNUSED(index);
     // 简单的LR0视图切换，实际功能暂未实现
+}
+
+/**
+ * @brief 处理分析步骤更新信号的槽函数
+ * @param step 当前分析步骤
+ * @details 实时更新分析步骤表格，显示当前步骤的状态
+ */
+void Task2Window::onStepUpdated(const ParseStep& step)
+{
+    // 添加新行到表格
+    int row = ui->tableWidgetAnalysisSteps->rowCount();
+    ui->tableWidgetAnalysisSteps->insertRow(row);
+    
+    // 显示步骤号
+    ui->tableWidgetAnalysisSteps->setItem(row, 0, new QTableWidgetItem(QString::number(step.step)));
+    
+    // 显示栈状态（合并状态栈和符号栈）
+    QString stackStr;
+    for (const auto& item : step.stack) {
+        stackStr += QString::number(item.first) + " " + item.second + " ";
+    }
+    ui->tableWidgetAnalysisSteps->setItem(row, 1, new QTableWidgetItem(stackStr.trimmed()));
+    
+    // 显示剩余输入
+    QString inputStr;
+    for (const auto& token : step.rest) {
+        inputStr += token.tokenType + " ";
+    }
+    ui->tableWidgetAnalysisSteps->setItem(row, 2, new QTableWidgetItem(inputStr.trimmed()));
+    
+    // 显示动作和产生式
+    QString actionStr = step.action;
+    if (!step.production.isEmpty()) {
+        actionStr += " (" + step.production + ")";
+    }
+    ui->tableWidgetAnalysisSteps->setItem(row, 3, new QTableWidgetItem(actionStr));
+    
+    // 调整列宽
+    ui->tableWidgetAnalysisSteps->resizeColumnsToContents();
+    
+    // 滚动到最新行
+    ui->tableWidgetAnalysisSteps->scrollToBottom();
+    
+    // 处理事件循环，确保UI实时更新
+    QApplication::processEvents();
 }
 
 void Task2Window::on_comboBoxLR1View_currentIndexChanged(int index)

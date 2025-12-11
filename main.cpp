@@ -26,3 +26,4 @@ int main(int argc, char *argv[])
     w.show(); // 显示主窗口
     return a.exec(); // 进入事件循环，等待用户交互
 }
+

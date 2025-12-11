@@ -97,6 +97,9 @@ private slots:
     
     // 语义动作相关槽函数
     void on_pushButtonLoadSemantics_clicked();///< 加载语义动作按钮点击槽函数
+    
+    // 实时更新分析步骤槽函数
+    void onStepUpdated(const ParseStep& step);///< 处理分析步骤更新信号的槽函数
 
 private:
     Ui::Task2Window *ui;                 ///< UI指针

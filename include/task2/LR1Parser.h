@@ -11,6 +11,7 @@
 #include <QString>
 #include <QVector>
 #include <QMap>
+#include <QObject>
 #include "Grammar.h"
 #include "LR1.h"
 #include "AST.h"
@@ -61,9 +62,16 @@ struct ParseResult
  * @class LR1Parser
  * @details 实现LR1语法分析算法，支持普通语法分析和带语义动作的语法分析
  */
-class LR1Parser
+class LR1Parser : public QObject
 {
+    Q_OBJECT
    public:
+    /**
+     * @brief 构造函数
+     * @param parent 父对象
+     */
+    explicit LR1Parser(QObject *parent = nullptr);
+    
     /**
      * @brief 执行普通LR1语法分析
      * @param tokens 终结符token序列，末尾隐含 `$`
@@ -71,7 +79,7 @@ class LR1Parser
      * @param t LR(1) 动作/GOTO 表
      * @return 包含分析步骤与解析树的结果
      */
-    static ParseResult parse(const QVector<TokenInfo>& tokens,
+    ParseResult parse(const QVector<TokenInfo>& tokens,
                              const Grammar&          g,
                              const LR1ActionTable&   t);
     
@@ -86,11 +94,18 @@ class LR1Parser
      * @param childOrder 子节点顺序
      * @return 包含分析步骤、解析树和语义树的结果
      */
-    static ParseResult parseWithSemantics(const QVector<TokenInfo>&                    tokens,
+    ParseResult parseWithSemantics(const QVector<TokenInfo>&                    tokens,
                                           const Grammar&                              g,
                                           const LR1ActionTable&                       t,
                                           const QMap<QString, QVector<QVector<int>>>& actions,
                                           const QMap<int, QString>&                   roleMeaning,
                                           const QString&                              rootPolicy,
                                           const QString&                              childOrder);
+    
+    /**
+     * @brief 信号：当分析步骤更新时发出
+     * @param step 当前分析步骤
+     */
+    signals:
+    void stepUpdated(const ParseStep& step);
 };

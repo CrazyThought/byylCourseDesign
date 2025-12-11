@@ -127,20 +127,30 @@ static int reductionIdFor(const LR1ActionTable& t, const QString& L, const QVect
 }
 
 /**
- * @brief 将解析步骤添加到结果中
+ * @brief LR1Parser构造函数
+ * @param parent 父对象
+ */
+LR1Parser::LR1Parser(QObject *parent) : QObject(parent)
+{
+}
+
+/**
+ * @brief 将解析步骤添加到结果中，并发出信号
  * @param steps 解析步骤列表
  * @param stepIdx 步骤索引
  * @param stk 当前栈状态
  * @param rest 剩余输入符号
  * @param act 当前动作
  * @param prod 当前使用的产生式
+ * @param parser LR1Parser实例，用于发出信号
  */
 static void pushStep(QVector<ParseStep>&                 steps,
                      int                                 stepIdx,
                      const QVector<QPair<int, QString>>& stk,
                      const QVector<TokenInfo>&           rest,
                      const QString&                      act,
-                     const QString&                      prod)
+                     const QString&                      prod,
+                     LR1Parser*                          parser)
 {
     ParseStep ps;
     ps.step       = stepIdx;
@@ -149,6 +159,12 @@ static void pushStep(QVector<ParseStep>&                 steps,
     ps.action     = act;
     ps.production = prod;
     steps.push_back(ps);
+    
+    // 发出信号，通知UI更新
+    if (parser)
+    {
+        parser->stepUpdated(ps);
+    }
 }
 
 /**
@@ -253,7 +269,7 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
                     else
                     {
                         QString msg = QString("错误：状态=%1, 前瞻=%2, 动作冲突未配置，中止").arg(st).arg(a);
-                        pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
+                        pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
                         res.errorPos = res.steps.size();
                         res.errorMsg = msg;
                         break;
@@ -286,7 +302,7 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
                 if (!expectedTokens.isEmpty()) {
                     msg += QString("，期望的token: %1").arg(expectedTokens.join(", "));
                 }
-                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
+                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
                 res.errorPos = res.steps.size();
                 res.errorMsg = msg;
                 break;
@@ -294,7 +310,7 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
         }
         if (act == "acc")
         {
-            pushStep(res.steps, step++, stack, input, act, QString());
+            pushStep(res.steps, step++, stack, input, act, QString(), this);
             if (!nodeStk.isEmpty())
                 res.root = nodeStk.back();
             break;
@@ -308,8 +324,8 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
             res.root         = n;
             nodeStk.push_back(n);
             // 语义过程记录：移进叶子
-            pushStep(res.semanticSteps, step, stack, input, QString("shift %1").arg(a), QString());
-            pushStep(res.steps, step++, stack, input, act, QString());
+            pushStep(res.semanticSteps, step, stack, input, QString("shift %1").arg(a), QString(), this);
+            pushStep(res.steps, step++, stack, input, act, QString(), this);
             input.pop_front();
             continue;
         }
@@ -320,7 +336,7 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
             if (!parseReduction(t, act, L, rhs))
             {
                 QString msg = QString("错误：归约解析失败，动作=%1，中止").arg(act);
-                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
+                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
                 res.errorPos = res.steps.size();
                 break;
             }
@@ -342,7 +358,7 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
             if (to < 0)
             {
                 QString msg = QString("错误：goto 失败，状态=%1, 归约到=%2，中止").arg(stTop).arg(L);
-                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
+                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
                 res.errorPos = res.steps.size();
                 break;
             }
@@ -363,13 +379,15 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
                          .arg(L)
                          .arg(rhs.isEmpty() ? QString("#") : rhs.join(" "))
                          .arg(kidsStr),
-                     QString());
+                     QString(),
+                     this);
             pushStep(res.steps,
                      step++,
                      stack,
                      input,
                      act,
-                     QString("%1 -> %2").arg(L).arg(rhs.isEmpty() ? QString("#") : rhs.join(" ")));
+                     QString("%1 -> %2").arg(L).arg(rhs.isEmpty() ? QString("#") : rhs.join(" ")),
+                     this);
             continue;
         }
         pushStep(res.steps,
@@ -377,7 +395,8 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
                  stack,
                  input,
                  QStringLiteral("error"),
-                 QString("错误：未知动作 '%1'，中止").arg(act));
+                 QString("错误：未知动作 '%1'，中止").arg(act),
+                 this);
         res.errorPos = res.steps.size();
         break;
     }
@@ -587,9 +606,9 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
                     {
                         QString msg =
                             QString("错误：状态=%1, 前瞻=%2, 动作冲突未配置，中止").arg(st).arg(a);
-                        pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
+                        pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
                         pushStep(
-                            res.semanticSteps, step, stack, input, QStringLiteral("error"), msg);
+                            res.semanticSteps, step, stack, input, QStringLiteral("error"), msg, this);
                         res.errorPos = res.steps.size();
                         break;
                     }
@@ -621,15 +640,15 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
                 if (!expectedTokens.isEmpty()) {
                     msg += QString("，期望的token: %1").arg(expectedTokens.join(", "));
                 }
-                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
-                pushStep(res.semanticSteps, step, stack, input, QStringLiteral("error"), msg);
+                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
+                pushStep(res.semanticSteps, step, stack, input, QStringLiteral("error"), msg, this);
                 res.errorPos = res.steps.size();
                 break;
             }
         }
         if (act == "acc")
         {
-            pushStep(res.steps, step++, stack, input, act, QString());
+            pushStep(res.steps, step++, stack, input, act, QString(), this);
             if (!nodeStk.isEmpty())
                 res.root = nodeStk.back();
             if (!semStk.isEmpty())
@@ -676,9 +695,10 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
                      QString("移进符号[%1]%2，语义栈压入终结符节点")
                          .arg(a)
                          .arg(tag != a ? QString("（lexeme=%1）").arg(lexeme) : QString()),
-                     QString());
+                     QString(),
+                     this);
             
-            pushStep(res.steps, step++, stack, input, act, QString());
+            pushStep(res.steps, step++, stack, input, act, QString(), this);
             input.pop_front();
             continue;
         }
@@ -689,8 +709,8 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
             if (!parseReduction(t, act, L, rhs))
             {
                 QString msg = QString("错误：归约解析失败，动作=%1，中止").arg(act);
-                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
-                pushStep(res.semanticSteps, step, stack, input, QStringLiteral("error"), msg);
+                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
+                pushStep(res.semanticSteps, step, stack, input, QStringLiteral("error"), msg, this);
                 res.errorPos = res.steps.size();
                 break;
             }
@@ -720,8 +740,8 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
             {
                 QString msg =
                     QString("错误：goto 失败，状态=%1, 归约到=%2，中止").arg(stTop).arg(L);
-                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
-                pushStep(res.semanticSteps, step, stack, input, QStringLiteral("error"), msg);
+                pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg, this);
+                pushStep(res.semanticSteps, step, stack, input, QStringLiteral("error"), msg, this);
                 res.errorPos = res.steps.size();
                 break;
             }
@@ -788,14 +808,16 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
                          .arg(sem ? sem->tag : L)
                          .arg(rid >= 0 ? QString("（编码:%1）").arg(rid) : QString())
                          .arg(kidsStr),
-                     QString());
+                     QString(),
+                     this);
             
             pushStep(res.steps,
                      step++,
                      stack,
                      input,
                      act,
-                     QString("%1 -> %2").arg(L).arg(rhs.isEmpty() ? QString("#") : rhs.join(" ")));
+                     QString("%1 -> %2").arg(L).arg(rhs.isEmpty() ? QString("#") : rhs.join(" ")),
+                     this);
             continue;
         }
         pushStep(res.steps,
@@ -803,13 +825,15 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&             
                  stack,
                  input,
                  QStringLiteral("error"),
-                 QString("错误：未知动作 '%1'，中止").arg(act));
+                 QString("错误：未知动作 '%1'，中止").arg(act),
+                 this);
         pushStep(res.semanticSteps,
                  step,
                  stack,
                  input,
                  QStringLiteral("error"),
-                 QString("错误：未知动作 '%1'，中止").arg(act));
+                 QString("错误：未知动作 '%1'，中止").arg(act),
+                 this);
         res.errorPos = res.steps.size();
         break;
     }

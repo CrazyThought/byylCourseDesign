@@ -1,33 +1,35 @@
-program-> definition-list
-definition-list-> definition-list definition | definition
-definition-> variable-definition | function-definition
-variable-definition-> type-indicator identifier ;|type-indicator identifier[number];
-type-indicator-> int | float | real| void
-function-definition-> type-indicator identifier（parameters）compound-stmt
-parameters->parameter-list | void
-parameter-list->parameter-list, parameter | parameter
-parameter-> type-indicator identifier | type-indicator identifier[ ]
-compound-stmt-> { local-definitions statement-list }
-local-definitions-> local-definitions variable-definition | #
-statement-list-> statement-list statement | #
-statement->expression-stmt | compound-stmt | condition-stmt|while-stmt |for-stmt | return-stmt
-expression-stmt-> expression ; | ;
-condition-stmt-> if(expression) statement |if（expression）statement else statement
-while-stmt-> while ( expression) statement
-for-stmt-> for(for-init;expression;for-update) statement
-for-init-> expression | variable-definition | #
-for-update-> expression-list | #
-expression-list-> expression-list, expression | expression
-return-stmt->return ;| return expression ;
-expression-> variable=expression | simple-expression
-variable->identifier |identifier[expression]
-simple-expression->additive-expression relop additive-expression | additive-expression
-relop-><=|<|>|>=|==|!=
-additive-expression->additive-expression addop term | term
-addop->+|-
-term->term mulop factor | factor
-mulop->*|/|% |^
-factor->(expression )| variable | call | number | ++variable| --variable
-call->identifier(arguments)
-arguments->argument-list | #
-argument-list->argument-list,expression | expression
+program -> definition-list
+definition-list -> definition-list definition | definition
+definition -> variable-definition | function-definition
+variable-definition -> type-indicator identifier ; | type-indicator identifier [ number ] ;
+type-indicator -> int | float | real | void
+function-definition -> type-indicator identifier ( parameters ) compound-stmt
+parameters -> parameter-list | void
+parameter-list -> parameter-list , parameter | parameter
+parameter -> type-indicator identifier | type-indicator identifier [ ]
+compound-stmt -> { local-definitions statement-list }
+local-definitions-H -> variable-definition local-definitions-H | #
+local-definitions -> local-definitions-H
+statement-list -> statement-list-H
+statement-list-H -> statement statement-list-H | #
+statement -> expression-stmt | compound-stmt | condition-stmt | while-stmt | for-stmt | return-stmt
+expression-stmt -> expression ; | ; 
+condition-stmt -> if ( expression ) statement | if ( expression ) statement else statement
+while-stmt -> while ( expression ) statement
+for-stmt -> for ( for-init ; expression ; for-update ) statement
+for-init -> expression | variable-definition | #
+for-update -> expression-list | #
+expression-list -> expression-list , expression | expression
+return-stmt -> return ; | return expression ;
+expression -> variable = expression | simple-expression
+variable -> identifier | identifier [ expression ]
+simple-expression -> additive-expression relop additive-expression | additive-expression
+relop -> <= | < | > | >= | == | !=
+additive-expression -> additive-expression addop term | term
+addop -> + | -
+term -> term mulop factor | factor
+mulop -> * | / | % | ^
+factor -> ( expression ) | variable | call | number | ++ variable | -- variable
+call -> identifier ( arguments )
+arguments -> argument-list | #
+argument-list -> argument-list , expression | expression
