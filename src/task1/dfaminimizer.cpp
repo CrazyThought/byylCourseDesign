@@ -1,14 +1,41 @@
+/*
+ * @file dfaminimizer.cpp
+ * @id dfaminimizer-cpp
+ * @brief 实现DFA最小化功能，使用Hopcroft算法对DFA进行状态合并和优化
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
+ */
 #include "task1/dfaminimizer.h"
 #include <QDebug>
 
+/**
+ * @brief 构造函数
+ * 
+ * 初始化DFA最小化器
+ */
 DFAMinimizer::DFAMinimizer()
 {
 }
 
+/**
+ * @brief 析构函数
+ * 
+ * 清理DFA最小化器资源
+ */
 DFAMinimizer::~DFAMinimizer()
 {
 }
 
+/**
+ * @brief 最小化DFA
+ * 
+ * 使用Hopcroft算法对输入的DFA进行最小化
+ * 
+ * @param dfa 要最小化的DFA
+ * @return DFA 最小化后的DFA
+ */
 DFA DFAMinimizer::minimizeDFA(const DFA &dfa)
 {
     m_errorMessage.clear();
@@ -144,6 +171,11 @@ DFA DFAMinimizer::minimizeDFA(const DFA &dfa)
     return minimizedDFA;
 }
 
+/**
+ * @brief 获取错误信息
+ * 
+ * @return QString 错误信息
+ */
 QString DFAMinimizer::getErrorMessage() const
 {
     return m_errorMessage;
@@ -173,6 +205,14 @@ QHash<DFAState, QHash<QString, DFAState>> buildForwardTransitionTable(const DFA 
     return forwardTable;
 }
 
+/**
+ * @brief 实现Hopcroft算法
+ * 
+ * 使用Hopcroft算法对DFA进行等价类划分
+ * 
+ * @param dfa 输入DFA
+ * @return QList<QSet<DFAState>> 等价类划分结果
+ */
 QList<QSet<DFAState>> DFAMinimizer::hopcroftAlgorithm(const DFA &dfa)
 {
     QList<QSet<DFAState>> P; // 划分集合

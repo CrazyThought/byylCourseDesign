@@ -1,14 +1,11 @@
 /*
- * 版权信息：Copyright (c) 2023 林展星
- * 文件名称：TokenInfo.h
- *           定义TokenInfo结构体，用于存储token类型和词素
- *
- * 当前版本：1.0.0
- * 作    者：林展星
- * 完成日期：2023年12月7日
- *
- * 版本历史：
- * 1.0.0 2023-12-07 林展星 初始版本
+ * @file TokenInfo.h
+ * @id TokenInfo-h
+ * @brief 定义TokenInfo结构体，用于存储词法分析器生成的token类型和词素信息
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
  */
 #pragma once
 #include <QString>

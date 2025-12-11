@@ -1,3 +1,12 @@
+/*
+ * @file task1window.cpp
+ * @id task1window-cpp
+ * @brief 实现任务1的主窗口，包含正则表达式处理、NFA/DFA转换、DFA最小化、词法分析器生成和测试功能
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
+ */
 #include "task1/task1window.h"
 #include "ui_task1window.h"
 #include <QFileDialog>
@@ -8,6 +17,13 @@
 #include <QDir>
 #include <utility>
 
+/**
+ * @brief 构造函数
+ * 
+ * 初始化任务1窗口，创建动态表格，设置UI组件，添加信号槽连接
+ * 
+ * @param parent 父窗口指针
+ */
 Task1Window::Task1Window(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Task1Window)
@@ -76,6 +92,11 @@ Task1Window::Task1Window(QWidget *parent)
     }
 }
 
+/**
+ * @brief 析构函数
+ * 
+ * 清理动态表格和UI资源
+ */
 Task1Window::~Task1Window()
 {
     cleanupDynamicTables();
@@ -83,6 +104,11 @@ Task1Window::~Task1Window()
 }
 
 // 正则表达式模块
+/**
+ * @brief 打开正则表达式文件按钮点击事件
+ * 
+ * 打开文件选择对话框，读取正则表达式文件内容到文本编辑框
+ */
 void Task1Window::on_btnOpenRegex_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("打开正则表达式文件"), ".", tr("文本文件 (*.txt)"));
@@ -98,6 +124,11 @@ void Task1Window::on_btnOpenRegex_clicked()
     }
 }
 
+/**
+ * @brief 保存正则表达式文件按钮点击事件
+ * 
+ * 打开文件保存对话框，将文本编辑框中的正则表达式内容保存到文件
+ */
 void Task1Window::on_btnSaveRegex_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("保存正则表达式文件"), ".", tr("文本文件 (*.txt)"));
@@ -114,6 +145,11 @@ void Task1Window::on_btnSaveRegex_clicked()
     }
 }
 
+/**
+ * @brief 解析正则表达式按钮点击事件
+ * 
+ * 解析文本编辑框中的正则表达式，更新正则表达式项列表和下拉列表
+ */
 void Task1Window::on_btnParseRegex_clicked()
 {
     QString regexText = ui->textEditRegex->toPlainText();
@@ -159,6 +195,11 @@ void Task1Window::on_actionExit_triggered()
 }
 
 // NFA模块
+/**
+ * @brief 生成NFA按钮点击事件
+ * 
+ * 为每个正则表达式生成NFA，合并生成总NFA，并更新显示
+ */
 void Task1Window::on_btnGenerateNFA_clicked()
 {
     // 首先解析正则表达式
@@ -226,6 +267,14 @@ void Task1Window::on_btnGenerateNFA_clicked()
 }
 
 // DFA模块
+/**
+ * @brief 合并多个NFA
+ * 
+ * 将多个NFA合并为一个总NFA
+ * 
+ * @param nfAs 要合并的NFA列表
+ * @return NFA 合并后的总NFA
+ */
 NFA Task1Window::mergeNFAs(const QList<NFA> &nfAs)
 {
     NFA totalNFA;
@@ -298,6 +347,11 @@ NFA Task1Window::mergeNFAs(const QList<NFA> &nfAs)
     return totalNFA;
 }
 
+/**
+ * @brief 生成DFA按钮点击事件
+ * 
+ * 为每个NFA生成DFA，生成总DFA，并更新显示
+ */
 void Task1Window::on_btnGenerateDFA_clicked()
 {
     // 检查是否已生成NFA
@@ -332,6 +386,11 @@ void Task1Window::on_btnGenerateDFA_clicked()
 }
 
 // 最小化DFA模块
+/**
+ * @brief 最小化DFA按钮点击事件
+ * 
+ * 为每个DFA生成最小化DFA，生成总最小化DFA，并更新显示
+ */
 void Task1Window::on_btnMinimizeDFA_clicked()
 {
     // 检查是否已生成DFA
@@ -366,6 +425,11 @@ void Task1Window::on_btnMinimizeDFA_clicked()
 }
 
 // 词法分析器生成模块
+/**
+ * @brief 生成词法分析器按钮点击事件
+ * 
+ * 根据最小化DFA生成词法分析器代码
+ */
 void Task1Window::on_btnGenerateLexer_clicked()
 {
     ui->statusbar->showMessage("正在生成词法分析器...", 0);

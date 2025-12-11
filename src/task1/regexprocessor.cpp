@@ -1,16 +1,43 @@
+/*
+ * @file regexprocessor.cpp
+ * @id regexprocessor-cpp
+ * @brief 实现正则表达式处理功能，包括正则表达式解析、验证和转换
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
+ */
 #include "task1/regexprocessor.h"
 #include "task1/regexengine.h"
 #include <QStringList>
 #include <QtGlobal> // 为了Qt::SkipEmptyParts
 
+/**
+ * @brief 构造函数
+ * 
+ * 初始化正则表达式处理器
+ */
 RegexProcessor::RegexProcessor()
 {
 }
 
+/**
+ * @brief 析构函数
+ * 
+ * 清理正则表达式处理器资源
+ */
 RegexProcessor::~RegexProcessor()
 {
 }
 
+/**
+ * @brief 解析正则表达式文本
+ * 
+ * 从文本中解析正则表达式项和引用定义
+ * 
+ * @param text 包含正则表达式定义的文本
+ * @return bool 解析成功返回true，失败返回false
+ */
 bool RegexProcessor::parse(const QString &text)
 {
     m_regexItems.clear();
@@ -94,16 +121,33 @@ bool RegexProcessor::parse(const QString &text)
     return true;
 }
 
+/**
+ * @brief 获取解析得到的正则表达式项列表
+ * 
+ * @return QList<RegexItem> 正则表达式项列表
+ */
 QList<RegexItem> RegexProcessor::getRegexItems() const
 {
     return m_regexItems;
 }
 
+/**
+ * @brief 获取错误信息
+ * 
+ * @return QString 错误信息
+ */
 QString RegexProcessor::getErrorMessage() const
 {
     return m_errorMessage;
 }
 
+/**
+ * @brief 解析单行正则表达式定义
+ * 
+ * @param line 包含正则表达式定义的单行文本
+ * @param item 输出参数，存储解析结果
+ * @return bool 解析成功返回true，失败返回false
+ */
 bool RegexProcessor::parseLine(const QString &line, RegexItem &item)
 {
     // 寻找等号位置
@@ -164,6 +208,16 @@ bool RegexProcessor::parseLine(const QString &line, RegexItem &item)
     return true;
 }
 
+/**
+ * @brief 验证正则表达式名称
+ * 
+ * 验证正则表达式名称的格式，提取编码和是否为多单词
+ * 
+ * @param name 正则表达式名称
+ * @param code 输出参数，存储提取的编码
+ * @param isMultiWord 输出参数，指示是否为多单词
+ * @return bool 验证成功返回true，失败返回false
+ */
 bool RegexProcessor::validateName(const QString &name, int &code, bool &isMultiWord)
 {
     // 只有以下划线开头的正则表达式才需要验证命名规则
@@ -238,11 +292,19 @@ bool RegexProcessor::validateName(const QString &name, int &code, bool &isMultiW
     return true;
 }
 
+/**
+ * @brief 处理转义字符
+ * 
+ * 处理正则表达式中的转义字符
+ * 
+ * @param pattern 包含转义字符的正则表达式模式
+ * @return QString 处理后的正则表达式模式
+ */
 QString RegexProcessor::processEscapeCharacters(const QString &pattern)
 {
     QString result = pattern;
     
-    // Process escape characters
+    // 处理转义字符
     // Escape special characters: +, *, ?, |, (, ), [, ], {, }, ., ^, $
     QList<QChar> specialChars;
     specialChars << '+' << '*' << '?' << '|' << '(' << ')' << '[' << ']' << '{' << '}' << '.' << '^' << '$' << '\\';    
@@ -266,6 +328,14 @@ QString RegexProcessor::processEscapeCharacters(const QString &pattern)
     return result;
 }
 
+/**
+ * @brief 检查正则表达式语法
+ * 
+ * 使用自定义RegexEngine检查正则表达式语法
+ * 
+ * @param pattern 要检查的正则表达式模式
+ * @return bool 语法正确返回true，错误返回false
+ */
 bool RegexProcessor::checkRegexSyntax(const QString &pattern)
 {
     try {
@@ -284,6 +354,14 @@ bool RegexProcessor::checkRegexSyntax(const QString &pattern)
     return true;
 }
 
+/**
+ * @brief 转换为标准正则表达式格式
+ * 
+ * 将包含引用的正则表达式转换为标准格式
+ * 
+ * @param pattern 包含引用的正则表达式
+ * @return QString 转换后的标准正则表达式
+ */
 QString RegexProcessor::convertToStandardRegex(const QString &pattern)
 {
     QString result = pattern;
@@ -338,6 +416,14 @@ QString RegexProcessor::convertToStandardRegex(const QString &pattern)
     return result;
 }
 
+/**
+ * @brief 提取多单词
+ * 
+ * 从正则表达式模式中提取所有可能的多单词
+ * 
+ * @param pattern 正则表达式模式
+ * @return QStringList 提取的多单词列表
+ */
 QStringList RegexProcessor::extractMultiWords(const QString &pattern)
 {
     QStringList result;
@@ -409,8 +495,14 @@ QStringList RegexProcessor::extractMultiWords(const QString &pattern)
     return result;
 }
 
-// 生成所有可能的大小写组合
-// 注意：此函数只处理简单字符串，不处理包含 (、) 或 | 的复杂表达式
+/**
+ * @brief 生成所有可能的大小写组合
+ * 
+ * 注意：此函数只处理简单字符串，不处理包含 (、) 或 | 的复杂表达式
+ * 
+ * @param pattern 要生成大小写组合的字符串
+ * @return QStringList 所有可能的大小写组合
+ */
 QStringList RegexProcessor::generateAllCaseCombinations(const QString &pattern)
 {
     QStringList result;
@@ -458,7 +550,13 @@ QStringList RegexProcessor::generateAllCaseCombinations(const QString &pattern)
     return result;
 }
 
-// 从分组的正则表达式中生成所有可能的单词变体
+/**
+ * @brief 从分组的正则表达式中生成所有可能的单词变体
+ * 
+ * @param pattern 分组的正则表达式
+ * @param depth 递归深度，防止无限递归
+ * @return QStringList 所有可能的单词变体
+ */
 QStringList RegexProcessor::generateWordsFromGroupedRegex(const QString &pattern, int depth)
 {
     QStringList result;

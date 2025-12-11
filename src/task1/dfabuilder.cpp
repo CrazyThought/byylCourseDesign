@@ -1,16 +1,43 @@
+/*
+ * @file dfabuilder.cpp
+ * @id dfabuilder-cpp
+ * @brief 实现NFA到DFA的转换功能
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
+ */
 #include "task1/dfabuilder.h"
 #include <QDebug>
 #include <algorithm>
 
+/**
+ * @brief 构造函数
+ * 
+ * 初始化DFA构建器，设置状态计数器初始值为0
+ */
 DFABuilder::DFABuilder()
     : m_nextState(0)
 {
 }
 
+/**
+ * @brief 析构函数
+ * 
+ * 清理DFA构建器资源
+ */
 DFABuilder::~DFABuilder()
 {
 }
 
+/**
+ * @brief 将NFA转换为DFA
+ * 
+ * 使用子集构造法将非确定有限自动机(NFA)转换为确定有限自动机(DFA)
+ * 
+ * @param nfa 要转换的NFA
+ * @return DFA 转换后的DFA
+ */
 DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
 {
     resetStateCounter();
@@ -123,11 +150,25 @@ DFA DFABuilder::convertNFAToDFA(const NFA &nfa)
     return dfa;
 }
 
+/**
+ * @brief 获取错误信息
+ * 
+ * @return QString 错误信息
+ */
 QString DFABuilder::getErrorMessage() const
 {
     return m_errorMessage;
 }
 
+/**
+ * @brief 计算ε-闭包
+ * 
+ * 计算给定状态集合的ε-闭包，即从这些状态出发通过ε转换可达的所有状态
+ * 
+ * @param nfa 输入的NFA
+ * @param states 初始状态集合
+ * @return QSet<NFAState> ε-闭包结果
+ */
 QSet<NFAState> DFABuilder::epsilonClosure(const NFA &nfa, const QSet<NFAState> &states)
 {
     QSet<NFAState> closure = states;
@@ -154,6 +195,16 @@ QSet<NFAState> DFABuilder::epsilonClosure(const NFA &nfa, const QSet<NFAState> &
     return closure;
 }
 
+/**
+ * @brief 计算move操作
+ * 
+ * 计算从给定状态集合出发，通过特定输入字符转换可达的所有状态
+ * 
+ * @param nfa 输入的NFA
+ * @param states 初始状态集合
+ * @param input 输入字符
+ * @return QSet<NFAState> move操作结果
+ */
 QSet<NFAState> DFABuilder::move(const NFA &nfa, const QSet<NFAState> &states, const QString &input)
 {
     QSet<NFAState> result;
@@ -171,11 +222,21 @@ QSet<NFAState> DFABuilder::move(const NFA &nfa, const QSet<NFAState> &states, co
     return result;
 }
 
+/**
+ * @brief 获取下一个可用的DFA状态编号
+ * 
+ * @return DFAState 下一个状态编号
+ */
 DFAState DFABuilder::getNextState()
 {
     return m_nextState++;
 }
 
+/**
+ * @brief 重置状态计数器
+ * 
+ * 将状态计数器重置为0
+ */
 void DFABuilder::resetStateCounter()
 {
     m_nextState = 0;

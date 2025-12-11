@@ -1,23 +1,36 @@
 /*
- * 版权信息：Copyright (c) 2023 林展星
- * 文件名称：LR1.cpp
- *
- * 当前版本：1.0.0
- * 作    者：林展星
- * 完成日期：2023年12月07日
- *
- * 版本历史：
- * 1.0.0 2023-12-07 林展星 初始版本
+ * @file LR1.cpp
+ * @id LR1-cpp
+ * @brief LR1分析器生成核心实现，包括LR1项集构造、LR1图构建和LR1分析表生成。
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
  */
 #include "task2/LR1.h"
 #include "task2/LL1.h"
 #include "task2/configconstants.h"
 
+/**
+ * @brief 判断符号是否为终结符
+ * @param terms 终结符集合
+ * @param s 待判断的符号
+ * @return 如果是终结符或文件结束符，返回true；否则返回false
+ */
 static bool isTerminal(const QSet<QString>& terms, const QString& s)
 {
     return terms.contains(s) || s == ConfigConstants::eofSymbol();
 }
 
+/**
+ * @brief 计算序列的FIRST集
+ * @param g 文法
+ * @param info LL1信息，包含FIRST集
+ * @param seq 符号序列
+ * @param la 前瞻符号
+ * @return 序列的FIRST集
+ * @note 用于LR1项集的闭包计算
+ */
 static QSet<QString> firstSeqLL1(const Grammar&          g,
                                  const LL1Info&          info,
                                  const QVector<QString>& seq,
@@ -55,6 +68,14 @@ static QSet<QString> firstSeqLL1(const Grammar&          g,
     return res;
 }
 
+/**
+ * @brief 计算LR1项集的闭包
+ * @param g 文法
+ * @param info LL1信息，包含FIRST集
+ * @param I 初始项集
+ * @return 项集的闭包
+ * @note 使用LL1的FIRST集来计算前瞻符号
+ */
 static QVector<LR1Item> closureLL1(const Grammar& g, const LL1Info& info, const QVector<LR1Item>& I)
 {
     QVector<LR1Item> items = I;
@@ -103,6 +124,15 @@ static QVector<LR1Item> closureLL1(const Grammar& g, const LL1Info& info, const 
     return items;
 }
 
+/**
+ * @brief 计算LR1项集的goTo函数
+ * @param g 文法
+ * @param info LL1信息，包含FIRST集
+ * @param I 当前项集
+ * @param X 转移符号
+ * @return 转移后的项集
+ * @note 先将项集I中所有点在X之前的项移到X之后，然后计算闭包
+ */
 static QVector<LR1Item> goToLL1(const Grammar&          g,
                                 const LL1Info&          info,
                                 const QVector<LR1Item>& I,
@@ -123,6 +153,12 @@ static QVector<LR1Item> goToLL1(const Grammar&          g,
     return closureLL1(g, info, moved);
 }
 
+/**
+ * @brief 序列化LR1项集
+ * @param I LR1项集
+ * @return 序列化后的字符串
+ * @note 用于判断两个项集是否相等
+ */
 static QString serializeSet(const QVector<LR1Item>& I)
 {
     QString          s;
@@ -136,6 +172,12 @@ static QString serializeSet(const QVector<LR1Item>& I)
     return lines.join("\n");
 }
 
+/**
+ * @brief 构建LR1分析图
+ * @param g 文法
+ * @return LR1分析图，包含状态和边
+ * @note 从增广文法开始，构建完整的LR1项集族和转移关系
+ */
 LR1Graph LR1Builder::build(const Grammar& g)
 {
     Grammar aug = g;
@@ -204,6 +246,12 @@ LR1Graph LR1Builder::build(const Grammar& g)
     return gr;
 }
 
+/**
+ * @brief 生成LR1分析图的Dot格式
+ * @param gr LR1分析图
+ * @return Dot格式的字符串
+ * @note 用于可视化LR1分析图
+ */
 QString LR1Builder::toDot(const LR1Graph& gr)
 {
     QString dot = "digraph LR1 {\nrankdir=LR; node [shape=box,fontname=Helvetica];\n";
@@ -244,6 +292,14 @@ QString LR1Builder::toDot(const LR1Graph& gr)
     return dot;
 }
 
+/**
+ * @brief 向动作表中添加动作
+ * @param action 动作表
+ * @param st 状态
+ * @param a 符号
+ * @param val 动作值
+ * @note 如果同一状态和符号已有动作，将新动作与旧动作合并，用|分隔
+ */
 static void putAction(QMap<int, QMap<QString, QString>>& action,
                       int                                st,
                       const QString&                     a,
@@ -256,6 +312,13 @@ static void putAction(QMap<int, QMap<QString, QString>>& action,
         action[st][a] = val;
 }
 
+/**
+ * @brief 计算归约编号
+ * @param g 文法
+ * @param outList 输出参数，归约编号与产生式的映射列表
+ * @return 产生式到归约编号的映射
+ * @note 用于生成归约动作
+ */
 static QMap<QString, int> computeReductionIndex(const Grammar&                g,
                                                 QVector<QPair<int, QString>>& outList)
 {
@@ -280,6 +343,13 @@ static QMap<QString, int> computeReductionIndex(const Grammar&                g,
     return idx;
 }
 
+/**
+ * @brief 计算LR1动作表
+ * @param g 文法
+ * @param gr LR1分析图
+ * @return LR1动作表，包含Action表和Goto表
+ * @note 遍历所有LR1项，生成移进、归约和接受动作
+ */
 LR1ActionTable LR1Builder::computeActionTable(const Grammar& g, const LR1Graph& gr)
 {
     LR1ActionTable t;

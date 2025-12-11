@@ -1,17 +1,45 @@
+/*
+ * @file lexertester.cpp
+ * @id lexertester-cpp
+ * @brief 实现词法分析器测试功能，包括编译词法分析器和测试词法分析器
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
+ */
 #include "task1/lexertester.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
 #include <QDebug>
 
+/**
+ * @brief 构造函数
+ * 
+ * 初始化词法分析器测试器
+ */
 LexerTester::LexerTester()
 {}
 
+/**
+ * @brief 析构函数
+ * 
+ * 清理词法分析器测试器资源，包括临时文件
+ */
 LexerTester::~LexerTester()
 {
     cleanupTempFiles();
 }
 
+/**
+ * @brief 编译词法分析器代码
+ * 
+ * 将词法分析器代码编译为可执行文件
+ * 
+ * @param lexerCode 词法分析器代码
+ * @param outputFileName 输出可执行文件名称，默认为"lexer"
+ * @return bool 编译成功返回true，失败返回false
+ */
 bool LexerTester::compileLexer(const QString &lexerCode, const QString &outputFileName)
 {
     m_errorMessage.clear();
@@ -51,6 +79,15 @@ bool LexerTester::compileLexer(const QString &lexerCode, const QString &outputFi
     return true;
 }
 
+/**
+ * @brief 测试词法分析器
+ * 
+ * 使用编译好的词法分析器对源文件进行词法分析
+ * 
+ * @param sourceFile 要测试的源文件
+ * @param lexerExecutable 词法分析器可执行文件，默认为"lexer"
+ * @return QList<LexicalResult> 词法分析结果列表
+ */
 QList<LexicalResult> LexerTester::testLexer(const QString &sourceFile, const QString &lexerExecutable)
 {
     m_errorMessage.clear();
@@ -90,16 +127,31 @@ QList<LexicalResult> LexerTester::testLexer(const QString &sourceFile, const QSt
     return parseLexicalResult(output);
 }
 
+/**
+ * @brief 获取错误信息
+ * 
+ * @return QString 错误信息
+ */
 QString LexerTester::getError() const
 {
     return m_errorMessage;
 }
 
+/**
+ * @brief 获取编译输出
+ * 
+ * @return QString 编译输出
+ */
 QString LexerTester::getCompileOutput() const
 {
     return m_compileOutput;
 }
 
+/**
+ * @brief 获取测试输出
+ * 
+ * @return QString 测试输出
+ */
 QString LexerTester::getTestOutput() const
 {
     return m_testOutput;

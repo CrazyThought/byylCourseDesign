@@ -1,3 +1,12 @@
+/*
+ * @file lexergenerator.cpp
+ * @id lexergenerator-cpp
+ * @brief 实现词法分析器生成功能，支持直接匹配和状态转移两种生成方法
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
+ */
 #include "task1/lexergenerator.h"
 #include <QDebug>
 #include <QMap>
@@ -6,14 +15,34 @@
 #include <QTextStream>
 #define ERROR_STATE -1
 
+/**
+ * @brief 构造函数
+ * 
+ * 初始化词法分析器生成器
+ */
 LexerGenerator::LexerGenerator()
 {
 }
 
+/**
+ * @brief 析构函数
+ * 
+ * 清理词法分析器生成器资源
+ */
 LexerGenerator::~LexerGenerator()
 {
 }
 
+/**
+ * @brief 生成词法分析器
+ * 
+ * 根据正则表达式项和最小化DFA，使用指定的生成方法生成词法分析器代码
+ * 
+ * @param regexItems 正则表达式项列表
+ * @param minimizedDFA 最小化DFA
+ * @param method 生成方法（直接匹配或状态转移）
+ * @return QString 生成的词法分析器代码
+ */
 QString LexerGenerator::generateLexer(const QList<RegexItem> &regexItems, const DFA &minimizedDFA, GenerationMethod method)
 {
     m_errorMessage.clear();
@@ -42,11 +71,25 @@ QString LexerGenerator::generateLexer(const QList<RegexItem> &regexItems, const 
     }
 }
 
+/**
+ * @brief 获取错误信息
+ * 
+ * @return QString 错误信息
+ */
 QString LexerGenerator::getErrorMessage() const
 {
     return m_errorMessage;
 }
 
+/**
+ * @brief 生成直接匹配法的词法分析器
+ * 
+ * 生成基于直接匹配方法的词法分析器代码
+ * 
+ * @param regexItems 正则表达式项列表
+ * @param minimizedDFA 最小化DFA（此处未使用）
+ * @return QString 生成的词法分析器代码
+ */
 QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexItems, const DFA &/*minimizedDFA*/)
 {
     QString code;
@@ -252,6 +295,15 @@ QString LexerGenerator::generateDirectMatchLexer(const QList<RegexItem> &regexIt
     return code;
 }
 
+/**
+ * @brief 生成状态转移法的词法分析器
+ * 
+ * 生成基于状态转移表的词法分析器代码
+ * 
+ * @param regexItems 正则表达式项列表
+ * @param minimizedDFA 最小化DFA
+ * @return QString 生成的词法分析器代码
+ */
 QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &regexItems, const DFA &minimizedDFA)
 {
     QString code;
@@ -374,6 +426,14 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     return code;
 }
 
+/**
+ * @brief 生成状态转移表
+ * 
+ * 生成DFA的状态转移表代码
+ * 
+ * @param minimizedDFA 最小化DFA
+ * @return QString 生成的状态转移表代码
+ */
 QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
 {
     QString code;
@@ -428,6 +488,15 @@ QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
     return code;
 }
 
+/**
+ * @brief 生成接受状态映射
+ * 
+ * 生成DFA的接受状态映射代码
+ * 
+ * @param regexItems 正则表达式项列表
+ * @param minimizedDFA 最小化DFA
+ * @return QString 生成的接受状态映射代码
+ */
 QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexItems, const DFA &minimizedDFA)
 {
     QString code;
@@ -500,6 +569,14 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
     return code;
 }
 
+/**
+ * @brief 生成单词编码映射
+ * 
+ * 生成单词编码映射表代码
+ * 
+ * @param regexItems 正则表达式项列表
+ * @return QString 生成的单词编码映射表代码
+ */
 QString LexerGenerator::generateTokenCodeMap(const QList<RegexItem> &regexItems)
 {
     QString code;
@@ -573,6 +650,14 @@ QString LexerGenerator::getInputSymbol(const QString &input)
     return input;
 }
 
+/**
+ * @brief 生成Token映射
+ * 
+ * 生成Token映射文件内容
+ * 
+ * @param regexItems 正则表达式项列表
+ * @return QString 生成的Token映射内容
+ */
 QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
 {
     QString mapContent;
@@ -634,6 +719,15 @@ QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
     return mapContent;
 }
 
+/**
+ * @brief 保存Token映射到文件
+ * 
+ * 将生成的Token映射保存到指定路径的文件中
+ * 
+ * @param regexItems 正则表达式项列表
+ * @param outputPath 输出文件路径
+ * @return bool 保存成功返回true，失败返回false
+ */
 bool LexerGenerator::saveTokenMap(const QList<RegexItem> &regexItems, const QString &outputPath)
 {
     QString mapContent = generateTokenMap(regexItems);

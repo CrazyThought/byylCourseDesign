@@ -1,10 +1,11 @@
 /**
  * @file task2window.cpp
+ * @id task2window-cpp
  * @brief 任务二主窗口实现
  * @version 1.0
- * @author 编译原理课程设计小组
- * @date 2025-12-06
- * @copyright Copyright (c) 2025 编译原理课程设计
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
  * @details 实现了任务二的主窗口界面和事件处理
  */
 

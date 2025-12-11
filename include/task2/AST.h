@@ -1,26 +1,34 @@
 /*
- * 版权信息：Copyright (c) 2023 林展星
- * 文件名称：AST.h
- *
- * 当前版本：1.0.0
- * 作    者：林展星
- * 完成日期：2023年12月07日
- *
- * 版本历史：
- * 1.0.0 2023-12-07 林展星 初始版本
+ * @file AST.h
+ * @id AST-h
+ * @brief 定义抽象语法树(AST)节点结构体，包括语法AST和语义AST
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
  */
 #pragma once
 #include <QString>
 #include <QVector>
 
+/**
+ * @brief 语法抽象语法树节点结构体
+ * 
+ * 用于表示语法分析阶段生成的抽象语法树，包含符号名称和子节点列表
+ */
 struct SyntaxASTNode
 {
-    QString                 symbol;
-    QVector<SyntaxASTNode*> children;
+    QString                 symbol;   ///< 节点的符号名称
+    QVector<SyntaxASTNode*> children; ///< 子节点列表，按语法规则顺序排列
 };
 
+/**
+ * @brief 语义抽象语法树节点结构体
+ * 
+ * 用于表示语义分析阶段生成的抽象语法树，包含标签和子节点列表
+ */
 struct SemanticASTNode
 {
-    QString                   tag;
-    QVector<SemanticASTNode*> children;
+    QString                   tag;      ///< 节点的标签，用于语义分析
+    QVector<SemanticASTNode*> children; ///< 子节点列表，按语义规则顺序排列
 };

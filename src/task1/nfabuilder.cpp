@@ -1,16 +1,41 @@
+/*
+ * @file nfabuilder.cpp
+ * @id nfabuilder-cpp
+ * @brief 实现NFA构建功能，包括正则表达式解析和各种NFA操作
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
+ */
 #include "task1/nfabuilder.h"
 #include <QDebug>
 
+/**
+ * @brief 构造函数
+ * 
+ * 初始化NFA构建器，设置状态计数器初始值为0
+ */
 NFABuilder::NFABuilder()
     : m_nextState(0)
 {
 }
 
+/**
+ * @brief 析构函数
+ * 
+ * 清理NFA构建器资源
+ */
 NFABuilder::~NFABuilder()
 {
 }
 
-// 构建邻接表
+/**
+ * @brief 构建NFA的邻接表
+ * 
+ * 基于NFA的转换集合构建邻接表，便于快速查找状态转换
+ * 
+ * @param nfa 要构建邻接表的NFA
+ */
 void NFABuilder::buildTransitionTable(NFA &nfa)
 {
     // 清空现有邻接表
@@ -22,6 +47,14 @@ void NFABuilder::buildTransitionTable(NFA &nfa)
     }
 }
 
+/**
+ * @brief 构建NFA
+ * 
+ * 基于正则表达式项构建NFA
+ * 
+ * @param regexItem 包含正则表达式模式的RegexItem对象
+ * @return NFA 构建好的NFA
+ */
 NFA NFABuilder::buildNFA(const RegexItem &regexItem)
 {
     resetStateCounter();
@@ -32,11 +65,24 @@ NFA NFABuilder::buildNFA(const RegexItem &regexItem)
     return nfa;
 }
 
+/**
+ * @brief 获取错误信息
+ * 
+ * @return QString 错误信息
+ */
 QString NFABuilder::getErrorMessage() const
 {
     return m_errorMessage;
 }
 
+/**
+ * @brief 构建基本NFA
+ * 
+ * 构建一个接受单个字符的基本NFA
+ * 
+ * @param input 接受的字符
+ * @return NFA 基本NFA
+ */
 NFA NFABuilder::buildBasicNFA(const QString &input)
 {
     NFA nfa;
@@ -67,6 +113,15 @@ NFA NFABuilder::buildBasicNFA(const QString &input)
     return nfa;
 }
 
+/**
+ * @brief 构建连接操作的NFA
+ * 
+ * 构建一个能够接受nfa1和nfa2连接的NFA
+ * 
+ * @param nfa1 第一个NFA
+ * @param nfa2 第二个NFA
+ * @return NFA 连接后的NFA
+ */
 NFA NFABuilder::buildConcatenationNFA(const NFA &nfa1, const NFA &nfa2)
 {
     NFA result;
@@ -97,6 +152,15 @@ NFA NFABuilder::buildConcatenationNFA(const NFA &nfa1, const NFA &nfa2)
     return result;
 }
 
+/**
+ * @brief 构建选择操作的NFA
+ * 
+ * 构建一个能够接受nfa1或nfa2的NFA
+ * 
+ * @param nfa1 第一个NFA
+ * @param nfa2 第二个NFA
+ * @return NFA 选择操作后的NFA
+ */
 NFA NFABuilder::buildChoiceNFA(const NFA &nfa1, const NFA &nfa2)
 {
     NFA result;
@@ -152,6 +216,14 @@ NFA NFABuilder::buildChoiceNFA(const NFA &nfa1, const NFA &nfa2)
     return result;
 }
 
+/**
+ * @brief 构建闭包操作的NFA
+ * 
+ * 构建一个能够接受nfa的零次或多次重复的NFA（闭包操作 *）
+ * 
+ * @param nfa 输入的NFA
+ * @return NFA 闭包操作后的NFA
+ */
 NFA NFABuilder::buildClosureNFA(const NFA &nfa)
 {
     NFA result;
@@ -208,6 +280,14 @@ NFA NFABuilder::buildClosureNFA(const NFA &nfa)
     return result;
 }
 
+/**
+ * @brief 构建正闭包操作的NFA
+ * 
+ * 构建一个能够接受nfa的一次或多次重复的NFA（正闭包操作 +）
+ * 
+ * @param nfa 输入的NFA
+ * @return NFA 正闭包操作后的NFA
+ */
 NFA NFABuilder::buildPositiveClosureNFA(const NFA &nfa)
 {
     // 正闭包 = 自身 + 闭包
@@ -215,6 +295,14 @@ NFA NFABuilder::buildPositiveClosureNFA(const NFA &nfa)
     return buildConcatenationNFA(nfa, closureNFA);
 }
 
+/**
+ * @brief 构建可选操作的NFA
+ * 
+ * 构建一个能够接受nfa的零次或一次出现的NFA（可选操作 ?）
+ * 
+ * @param nfa 输入的NFA
+ * @return NFA 可选操作后的NFA
+ */
 NFA NFABuilder::buildOptionalNFA(const NFA &nfa)
 {
     // 可选 = 自身 | ε
@@ -222,6 +310,14 @@ NFA NFABuilder::buildOptionalNFA(const NFA &nfa)
     return buildChoiceNFA(nfa, epsilonNFA);
 }
 
+/**
+ * @brief 构建字符集的NFA
+ * 
+ * 构建一个能够接受指定字符集的NFA
+ * 
+ * @param charSet 字符集，例如 [a-z0-9]
+ * @return NFA 字符集的NFA
+ */
 NFA NFABuilder::buildCharacterSetNFA(const QString &charSet)
 {
     // 处理字符集，例如 [a-z0-9]
@@ -283,6 +379,14 @@ NFA NFABuilder::buildCharacterSetNFA(const QString &charSet)
     return result;
 }
 
+/**
+ * @brief 解析正则表达式
+ * 
+ * 使用递归下降解析器处理正则表达式，构建对应的NFA
+ * 
+ * @param regex 要解析的正则表达式
+ * @return NFA 构建好的NFA
+ */
 NFA NFABuilder::parseRegex(const QString &regex)
 {
     // 实现递归下降解析器来处理正则表达式
@@ -306,6 +410,16 @@ NFA NFABuilder::parseRegex(const QString &regex)
     return nfa;
 }
 
+/**
+ * @brief 解析选择操作
+ * 
+ * 解析正则表达式中的选择操作：concatenation (| concatenation)*
+ * 
+ * @param regex 要解析的正则表达式
+ * @param pos 当前解析位置（引用传递，会被修改）
+ * @param error 错误信息（引用传递，解析失败时会被设置）
+ * @return NFA 解析得到的NFA
+ */
 NFA NFABuilder::parseChoice(const QString &regex, int &pos, QString &error)
 {
     // 解析选择操作：concatenation (| concatenation)*
@@ -323,6 +437,16 @@ NFA NFABuilder::parseChoice(const QString &regex, int &pos, QString &error)
     return result;
 }
 
+/**
+ * @brief 解析连接操作
+ * 
+ * 解析正则表达式中的连接操作：closure (closure)*
+ * 
+ * @param regex 要解析的正则表达式
+ * @param pos 当前解析位置（引用传递，会被修改）
+ * @param error 错误信息（引用传递，解析失败时会被设置）
+ * @return NFA 解析得到的NFA
+ */
 NFA NFABuilder::parseConcatenation(const QString &regex, int &pos, QString &error)
 {
     // 解析连接操作：closure (closure)*
@@ -339,6 +463,16 @@ NFA NFABuilder::parseConcatenation(const QString &regex, int &pos, QString &erro
     return result;
 }
 
+/**
+ * @brief 解析闭包操作
+ * 
+ * 解析正则表达式中的闭包操作：primary (* | + | ?)*
+ * 
+ * @param regex 要解析的正则表达式
+ * @param pos 当前解析位置（引用传递，会被修改）
+ * @param error 错误信息（引用传递，解析失败时会被设置）
+ * @return NFA 解析得到的NFA
+ */
 NFA NFABuilder::parseClosure(const QString &regex, int &pos, QString &error)
 {
     // 解析闭包操作：primary (* | + | ?)*
@@ -364,6 +498,16 @@ NFA NFABuilder::parseClosure(const QString &regex, int &pos, QString &error)
     return result;
 }
 
+/**
+ * @brief 解析基本元素
+ * 
+ * 解析正则表达式中的基本元素：字符、字符集、或 (regex)
+ * 
+ * @param regex 要解析的正则表达式
+ * @param pos 当前解析位置（引用传递，会被修改）
+ * @param error 错误信息（引用传递，解析失败时会被设置）
+ * @return NFA 解析得到的NFA
+ */
 NFA NFABuilder::parsePrimary(const QString &regex, int &pos, QString &error)
 {
     // 解析基本元素：字符、字符集、或 (regex)
@@ -416,11 +560,21 @@ NFA NFABuilder::parsePrimary(const QString &regex, int &pos, QString &error)
     }
 }
 
+/**
+ * @brief 获取下一个可用的NFA状态编号
+ * 
+ * @return NFAState 下一个状态编号
+ */
 NFAState NFABuilder::getNextState()
 {
     return m_nextState++;
 }
 
+/**
+ * @brief 重置状态计数器
+ * 
+ * 将状态计数器重置为0
+ */
 void NFABuilder::resetStateCounter()
 {
     m_nextState = 0;

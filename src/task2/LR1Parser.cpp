@@ -1,19 +1,24 @@
 /*
- * 版权信息：Copyright (c) 2023 林展星
- * 文件名称：LR1Parser.cpp
- *           支持冲突策略与优先移进终结符配置，输出解析步骤与语义树。
- *
- * 当前版本：1.0.0
- * 作    者：林展星
- * 完成日期：2023年12月7日
- *
- * 版本历史：
- * 1.0.0 2023-12-07 林展星 初始版本
+ * @file LR1Parser.cpp
+ * @id lr1parser-cpp
+ * @brief 支持冲突策略与优先移进终结符配置，输出解析步骤与语义树
+ * @version 1.0
+ * @author 郭梓烽
+ * @date 2025/12/07
+ * @copyright Copyright (c) 2025 郭梓烽
  */
 #include "task2/LR1Parser.h"
 #include "task2/configconstants.h"
 #include <QDebug>
 
+/**
+ * @brief 获取指定状态和符号的动作
+ * @param t LR1动作表
+ * @param st 当前状态
+ * @param a 当前符号
+ * @return 动作字符串，如"s10"、"r5"、"acc"或空字符串（表示无动作）
+ * @note 如果没有找到动作，会打印详细的调试信息，包括可用动作和期望的符号
+ */
 static QString actionFor(const LR1ActionTable& t, int st, const QString& a)
 {
     QString action = t.action.value(st).value(a);
@@ -41,11 +46,26 @@ static QString actionFor(const LR1ActionTable& t, int st, const QString& a)
     return action;
 }
 
+/**
+ * @brief 获取指定状态和非终结符的goto转移
+ * @param t LR1动作表
+ * @param st 当前状态
+ * @param A 当前非终结符
+ * @return goto转移的目标状态，-1表示无转移
+ */
 static int gotoFor(const LR1ActionTable& t, int st, const QString& A)
 {
     return t.gotoTable.value(st).value(A, -1);
 }
 
+/**
+ * @brief 解析归约动作，获取产生式的左部和右部
+ * @param t LR1动作表
+ * @param act 动作字符串，如"r5"或"r A -> B C"
+ * @param L 输出参数，产生式的左部
+ * @param rhs 输出参数，产生式的右部符号列表
+ * @return 是否成功解析
+ */
 static bool parseReduction(const LR1ActionTable& t,
                            const QString&        act,
                            QString&              L,
@@ -88,6 +108,13 @@ static bool parseReduction(const LR1ActionTable& t,
     return false;
 }
 
+/**
+ * @brief 根据产生式的左部和右部获取归约编号
+ * @param t LR1动作表
+ * @param L 产生式的左部
+ * @param rhs 产生式的右部符号列表
+ * @return 归约编号，-1表示未找到
+ */
 static int reductionIdFor(const LR1ActionTable& t, const QString& L, const QVector<QString>& rhs)
 {
     QString key = L + " -> " + (rhs.isEmpty() ? QString("#") : rhs.join(" "));
@@ -99,6 +126,15 @@ static int reductionIdFor(const LR1ActionTable& t, const QString& L, const QVect
     return -1;
 }
 
+/**
+ * @brief 将解析步骤添加到结果中
+ * @param steps 解析步骤列表
+ * @param stepIdx 步骤索引
+ * @param stk 当前栈状态
+ * @param rest 剩余输入符号
+ * @param act 当前动作
+ * @param prod 当前使用的产生式
+ */
 static void pushStep(QVector<ParseStep>&                 steps,
                      int                                 stepIdx,
                      const QVector<QPair<int, QString>>& stk,
@@ -115,6 +151,14 @@ static void pushStep(QVector<ParseStep>&                 steps,
     steps.push_back(ps);
 }
 
+/**
+ * @brief 执行LR1语法分析
+ * @param tokens 词法分析结果，token列表
+ * @param g 文法，未使用
+ * @param t LR1动作表
+ * @return 解析结果，包含解析步骤、语法树和错误信息
+ * @note 该方法只进行语法分析，不生成语义树
+ */
 ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
                              const Grammar&          g,
                              const LR1ActionTable&   t)
@@ -208,8 +252,7 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
                     }
                     else
                     {
-                        QString msg =
-                            QString("错误：状态=%1, 前瞻=%2, 动作冲突未配置，中止").arg(st).arg(a);
+                        QString msg = QString("错误：状态=%1, 前瞻=%2, 动作冲突未配置，中止").arg(st).arg(a);
                         pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
                         res.errorPos = res.steps.size();
                         res.errorMsg = msg;
@@ -298,8 +341,7 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
             int to    = gotoFor(t, stTop, L);
             if (to < 0)
             {
-                QString msg =
-                    QString("错误：goto 失败，状态=%1, 归约到=%2，中止").arg(stTop).arg(L);
+                QString msg = QString("错误：goto 失败，状态=%1, 归约到=%2，中止").arg(stTop).arg(L);
                 pushStep(res.steps, step++, stack, input, QStringLiteral("error"), msg);
                 res.errorPos = res.steps.size();
                 break;
@@ -342,6 +384,11 @@ ParseResult LR1Parser::parse(const QVector<TokenInfo>& tokens,
     return res;
 }
 
+/**
+ * @brief 创建一个新的语义AST节点
+ * @param tag 节点标签
+ * @return 指向新创建节点的指针
+ */
 static SemanticASTNode* makeSemNode(const QString& tag)
 {
     auto n = new SemanticASTNode();
@@ -349,6 +396,16 @@ static SemanticASTNode* makeSemNode(const QString& tag)
     return n;
 }
 
+/**
+ * @brief 构建语义AST
+ * @param L 产生式左部
+ * @param semKids 语义子节点列表
+ * @param roles 子节点角色列表
+ * @param roleMeaning 角色含义映射
+ * @param rootPolicy 根节点选择策略
+ * @param childOrder 子节点顺序
+ * @return 构建的语义AST根节点
+ */
 static SemanticASTNode* buildSemantic(const QString&                   L,
                                       const QVector<SemanticASTNode*>& semKids,
                                       const QVector<int>&              roles,
@@ -415,6 +472,18 @@ static SemanticASTNode* buildSemantic(const QString&                   L,
     return root;
 }
 
+/**
+ * @brief 执行带语义动作的LR1语法分析
+ * @param tokens 词法分析结果，token列表
+ * @param g 文法
+ * @param t LR1动作表
+ * @param actions 语义动作配置
+ * @param roleMeaning 角色含义映射
+ * @param rootPolicy 根节点选择策略
+ * @param childOrder 子节点顺序
+ * @return 解析结果，包含解析步骤、语法树、语义树和错误信息
+ * @note 该方法不仅进行语法分析，还生成语义树
+ */
 ParseResult LR1Parser::parseWithSemantics(const QVector<TokenInfo>&                    tokens,
                                           const Grammar&                              g,
                                           const LR1ActionTable&                       t,
