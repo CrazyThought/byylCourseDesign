@@ -160,8 +160,17 @@ CMakeLists.txt.user*
 .qcreator/
 .vscode/
 .trae/
+document/
 
 # Debug and build directories
 debug/
 release/
 
+# 无用的相关文件
+编译原理课程设计任务书.pdf
+编译原理课程项目-实验报告书-书写格式-范例.pdf
+林泽勋20212821020编译原理项目文档.pdf
+任务书.txt
+任务书内容.txt
+实验报告.md
+实验总结.md
