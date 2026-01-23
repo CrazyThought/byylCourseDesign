@@ -1132,15 +1132,15 @@ void Task2Window::on_pushButtonLoadSemantics_clicked()
     }
 }
 
-void Task2Window::on_pushButtonLoadTokenMap_clicked()
-{
-    QString mapPath = QFileDialog::getOpenFileName(this, tr("打开Token映射文件"), ".", tr("Token映射文件 (*.tokenmap);;所有文件 (*.*)"));
-    if (!mapPath.isEmpty()) {
-        bool success = loadTokenMap(mapPath);
-        if (success) {
-            QMessageBox::information(this, tr("成功"), tr("Token映射文件加载成功，共加载 %1 个映射").arg(m_tokenMap.size()));
-        } else {
-            QMessageBox::warning(this, tr("错误"), tr("无法加载Token映射文件"));
-        }
-    }
-}
+// void Task2Window::on_pushButtonLoadTokenMap_clicked()
+// {
+//     QString mapPath = QFileDialog::getOpenFileName(this, tr("打开Token映射文件"), ".", tr("Token映射文件 (*.tokenmap);;所有文件 (*.*)"));
+//     if (!mapPath.isEmpty()) {
+//         bool success = loadTokenMap(mapPath);
+//         if (success) {
+//             QMessageBox::information(this, tr("成功"), tr("Token映射文件加载成功，共加载 %1 个映射").arg(m_tokenMap.size()));
+//         } else {
+//             QMessageBox::warning(this, tr("错误"), tr("无法加载Token映射文件"));
+//         }
+//     }
+// }

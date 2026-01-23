@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-12-12T00:00:00.000Z" agent="Mozilla/5.0" etag="test" version="21.7.5">
+  <diagram name="BNF文法分析算法流程图">
+    <mxGraphModel xmlns="http://www.mxgraph.com/mxgraph/model" dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- 开始节点 -->
+        <mxCell id="start" value="开始" style="shape=roundedrectangle;perimeter=roundedRectPerimeter;fillColor=white;strokeColor=black;strokeWidth=2;rounded=1;arcSize=20;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="400" y="50" width="100" height="50" as="geometry"/>
+        </mxCell>
+        
+        <!-- 输入BNF文法 -->
+        <mxCell id="input_grammar" value="输入BNF文法" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="370" y="130" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="start" target="input_grammar">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="100" as="sourcePoint"/>
+            <mxPoint x="450" y="130" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 初始化文法对象 -->
+        <mxCell id="init_grammar" value="初始化文法对象" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="370" y="210" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="input_grammar" target="init_grammar">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="180" as="sourcePoint"/>
+            <mxPoint x="450" y="210" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 选择分析算法 -->
+        <mxCell id="choose_algorithm" value="选择分析算法" style="shape=diamond;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="390" y="290" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="init_grammar" target="choose_algorithm">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="260" as="sourcePoint"/>
+            <mxPoint x="450" y="290" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LL(1)算法流程 -->
+        <mxCell id="ll1_flow" value="LL(1)算法流程" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="200" y="370" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge4" value="LL(1)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" edge="1" parent="1" source="choose_algorithm" target="ll1_flow">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="390" y="315" as="sourcePoint"/>
+            <mxPoint x="200" y="315" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LR算法流程 -->
+        <mxCell id="lr_flow" value="LR算法流程" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="540" y="370" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge5" value="LR(0)/SLR/LR(1)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" edge="1" parent="1" source="choose_algorithm" target="lr_flow">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="315" as="sourcePoint"/>
+            <mxPoint x="540" y="315" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LL(1)：计算FIRST集 -->
+        <mxCell id="ll1_first" value="计算FIRST集" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="150" y="450" width="140" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="ll1_flow" target="ll1_first">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="280" y="420" as="sourcePoint"/>
+            <mxPoint x="220" y="450" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LL(1)：计算FOLLOW集 -->
+        <mxCell id="ll1_follow" value="计算FOLLOW集" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="350" y="450" width="140" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="ll1_first" target="ll1_follow">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="475" as="sourcePoint"/>
+            <mxPoint x="350" y="475" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LL(1)：构建分析表 -->
+        <mxCell id="ll1_table" value="构建LL(1)分析表" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="550" y="450" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="ll1_follow" target="ll1_table">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="490" y="475" as="sourcePoint"/>
+            <mxPoint x="550" y="475" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LR：构建项目集规范族 -->
+        <mxCell id="lr_itemsets" value="构建项目集规范族" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="350" y="450" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="lr_flow" target="lr_itemsets">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="620" y="420" as="sourcePoint"/>
+            <mxPoint x="430" y="450" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LR：生成分析表 -->
+        <mxCell id="lr_table" value="生成LR分析表" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="550" y="450" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="lr_itemsets" target="lr_table">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="475" as="sourcePoint"/>
+            <mxPoint x="550" y="475" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 执行语法分析 -->
+        <mxCell id="parse" value="执行语法分析" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="370" y="530" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="ll1_table" target="parse">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="500" as="sourcePoint"/>
+            <mxPoint x="450" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="lr_table" target="parse">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="500" as="sourcePoint"/>
+            <mxPoint x="450" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 生成分析结果 -->
+        <mxCell id="generate_result" value="生成分析结果" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="370" y="610" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="parse" target="generate_result">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="580" as="sourcePoint"/>
+            <mxPoint x="450" y="610" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 分析是否成功 -->
+        <mxCell id="is_success" value="分析是否成功?" style="shape=diamond;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="390" y="690" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="generate_result" target="is_success">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="660" as="sourcePoint"/>
+            <mxPoint x="450" y="690" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 输出成功结果 -->
+        <mxCell id="success" value="输出成功结果" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="250" y="770" width="140" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge15" value="是" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" edge="1" parent="1" source="is_success" target="success">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="390" y="715" as="sourcePoint"/>
+            <mxPoint x="250" y="715" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 输出错误信息 -->
+        <mxCell id="error" value="输出错误信息" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="510" y="770" width="140" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge16" value="否" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" edge="1" parent="1" source="is_success" target="error">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="715" as="sourcePoint"/>
+            <mxPoint x="510" y="715" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 结束节点 -->
+        <mxCell id="end" value="结束" style="shape=roundedrectangle;perimeter=roundedRectPerimeter;fillColor=white;strokeColor=black;strokeWidth=2;rounded=1;arcSize=20;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=14;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="400" y="850" width="100" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="success" target="end">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="320" y="820" as="sourcePoint"/>
+            <mxPoint x="450" y="850" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="error" target="end">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="580" y="820" as="sourcePoint"/>
+            <mxPoint x="450" y="850" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LL(1)算法详细步骤 -->
+        <mxCell id="ll1_first_detail" value="计算每个符号的FIRST集" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="100" y="530" width="140" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="ll1_first" target="ll1_first_detail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="500" as="sourcePoint"/>
+            <mxPoint x="170" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="ll1_follow_detail" value="计算每个非终结符的FOLLOW集" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="280" y="530" width="160" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="ll1_follow" target="ll1_follow_detail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="500" as="sourcePoint"/>
+            <mxPoint x="360" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="ll1_table_detail" value="构建LL(1)分析表，处理冲突" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="480" y="530" width="180" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="ll1_table" target="ll1_table_detail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="500" as="sourcePoint"/>
+            <mxPoint x="570" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LR算法详细步骤 -->
+        <mxCell id="lr_itemsets_detail" value="构建LR(0)/LR(1)项目集规范族" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="280" y="530" width="180" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="lr_itemsets" target="lr_itemsets_detail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="430" y="500" as="sourcePoint"/>
+            <mxPoint x="370" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lr_table_detail" value="生成动作表和跳转表" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="480" y="530" width="160" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="lr_table" target="lr_table_detail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="500" as="sourcePoint"/>
+            <mxPoint x="560" y="530" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 语法分析详细步骤 -->
+        <mxCell id="parse_detail" value="使用分析表执行移进-归约分析" style="shape=rectangle;fillColor=white;strokeColor=black;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=SimSun;fontSize=12;fontColor=black;" vertex="1" parent="1">
+          <mxGeometry x="300" y="610" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge24" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;fillColor=none;strokeColor=black;strokeWidth=2;" edge="1" parent="1" source="parse" target="parse_detail">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="580" as="sourcePoint"/>
+            <mxPoint x="400" y="610" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

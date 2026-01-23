@@ -83,6 +83,16 @@ static QVector<QString> splitRhs(const QString& rhs)
             continue;
         }
         
+        // 处理转义字符
+        if (c == '\\' && i < s.size() - 1)
+        {
+            // 转义字符，将下一个字符作为普通字符处理
+            QChar nextChar = s[i + 1];
+            v.push_back(QString(nextChar));
+            i += 2;
+            continue;
+        }
+        
         // 尝试匹配多字符操作符
         QString mop = matchMultiOp(s, i);
         if (!mop.isEmpty())

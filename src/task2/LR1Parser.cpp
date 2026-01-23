@@ -435,6 +435,9 @@ static SemanticASTNode* buildSemantic(const QString&                   L,
     SemanticASTNode* root = nullptr;
     SemanticASTNode* currentRoot = nullptr;
     
+    // 检查是否有语义动作配置
+    bool hasSemanticActions = !roles.isEmpty();
+    
     // 遍历所有子树和对应的角色
     for (int i = 0; i < semKids.size(); ++i)
     {
@@ -443,6 +446,11 @@ static SemanticASTNode* buildSemantic(const QString&                   L,
         
         int role = (i < roles.size()) ? roles[i] : 0;
         QString roleName = roleMeaning.value(role, "skip");
+        
+        // 如果没有语义动作配置，所有子节点都作为root处理
+        if (!hasSemanticActions) {
+            roleName = "root";
+        }
         
         if (roleName == "skip")
         {
@@ -479,6 +487,12 @@ static SemanticASTNode* buildSemantic(const QString&                   L,
                 // 如果没有角色1节点，添加到根节点
                 root->children.push_back(child);
             }
+            // 如果还没有根节点，创建一个默认根节点
+            else {
+                root = makeSemNode(L);
+                root->children.push_back(child);
+                currentRoot = root;
+            }
         }
     }
     
@@ -486,6 +500,14 @@ static SemanticASTNode* buildSemantic(const QString&                   L,
     if (!root)
     {
         root = makeSemNode(L);
+        // 如果有子节点，添加到根节点中
+        if (!semKids.isEmpty()) {
+            for (auto child : semKids) {
+                if (child) {
+                    root->children.push_back(child);
+                }
+            }
+        }
     }
     
     return root;

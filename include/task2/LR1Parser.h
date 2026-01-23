@@ -65,13 +65,25 @@ struct ParseResult
 class LR1Parser : public QObject
 {
     Q_OBJECT
-   public:
+public:
     /**
      * @brief 构造函数
      * @param parent 父对象
      */
     explicit LR1Parser(QObject *parent = nullptr);
-    
+
+    /**
+     * @brief 设置是否启用实时步骤更新
+     * @param enable 是否启用实时更新
+     */
+    void setRealTimeUpdate(bool enable);
+
+    /**
+     * @brief 获取是否启用了实时步骤更新
+     * @return 是否启用了实时更新
+     */
+    bool isRealTimeUpdateEnabled() const;
+
     /**
      * @brief 执行普通LR1语法分析
      * @param tokens 终结符token序列，末尾隐含 `$`
@@ -80,9 +92,9 @@ class LR1Parser : public QObject
      * @return 包含分析步骤与解析树的结果
      */
     ParseResult parse(const QVector<TokenInfo>& tokens,
-                             const Grammar&          g,
-                             const LR1ActionTable&   t);
-    
+                      const Grammar&          g,
+                      const LR1ActionTable&   t);
+
     /**
      * @brief 执行带语义动作的LR1语法分析
      * @param tokens 终结符token序列，末尾隐含 `$`
@@ -95,17 +107,20 @@ class LR1Parser : public QObject
      * @return 包含分析步骤、解析树和语义树的结果
      */
     ParseResult parseWithSemantics(const QVector<TokenInfo>&                    tokens,
-                                          const Grammar&                              g,
-                                          const LR1ActionTable&                       t,
-                                          const QMap<QString, QVector<QVector<int>>>& actions,
-                                          const QMap<int, QString>&                   roleMeaning,
-                                          const QString&                              rootPolicy,
-                                          const QString&                              childOrder);
-    
+                                   const Grammar&                              g,
+                                   const LR1ActionTable&                       t,
+                                   const QMap<QString, QVector<QVector<int>>>& actions,
+                                   const QMap<int, QString>&                   roleMeaning,
+                                   const QString&                              rootPolicy,
+                                   const QString&                              childOrder);
+
     /**
      * @brief 信号：当分析步骤更新时发出
      * @param step 当前分析步骤
      */
-    signals:
+signals:
     void stepUpdated(const ParseStep& step);
+
+private:
+    bool m_enableRealTimeUpdate; ///< 是否启用实时步骤更新
 };

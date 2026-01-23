@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="65bd71144e" modified="2025-12-12T00:00:00.000Z" agent="Mozilla/5.0" etag="test" version="21.7.5" type="device">
+    <diagram name="系统总体架构">
+        <mxGraphModel xmlns="http://www.mxgraph.com/mxgraph/model" dx="256" dy="610" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="编译原理课程设计系统" style="shape=rectangle;strokeColor=#000000;fillColor=#4CAF50;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=18;fontWeight=bold;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="300" y="50" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="主窗口模块" style="shape=rectangle;strokeColor=#000000;fillColor=#2196F3;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="350" y="150" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="任务1：正则表达式引擎与词法分析" style="shape=rectangle;strokeColor=#000000;fillColor=#FF9800;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="100" y="250" width="250" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="任务2：语法分析器设计与实现" style="shape=rectangle;strokeColor=#000000;fillColor=#9C27B0;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="450" y="250" width="250" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="3" target="4" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="3" target="5" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="任务1详细功能结构" id="diagram2">
+        <mxGraphModel dx="256" dy="610" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="任务1：正则表达式引擎与词法分析" style="shape=rectangle;strokeColor=#000000;fillColor=#FF9800;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=16;fontWeight=bold;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="250" y="50" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="正则表达式处理" style="shape=rectangle;strokeColor=#000000;fillColor=#FFC107;fontColor=#000000;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="100" y="150" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="NFA生成与显示" style="shape=rectangle;strokeColor=#000000;fillColor=#FFC107;fontColor=#000000;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="320" y="150" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="DFA生成与显示" style="shape=rectangle;strokeColor=#000000;fillColor=#FFC107;fontColor=#000000;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="540" y="150" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="DFA最小化" style="shape=rectangle;strokeColor=#000000;fillColor=#FFC107;fontColor=#000000;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="100" y="250" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="词法分析器生成" style="shape=rectangle;strokeColor=#000000;fillColor=#FFC107;fontColor=#000000;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="320" y="250" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="词法分析测试" style="shape=rectangle;strokeColor=#000000;fillColor=#FFC107;fontColor=#000000;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="540" y="250" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="3" edge="1"/>
+                <mxCell id="10" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="4" edge="1"/>
+                <mxCell id="11" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="5" edge="1"/>
+                <mxCell id="12" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="5" target="6" edge="1"/>
+                <mxCell id="13" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="6" target="7" edge="1"/>
+                <mxCell id="14" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="7" target="8" edge="1"/>
+                <mxCell id="15" value="支持多种正则表达式运算符" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="20" y="220" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="支持命名正则表达式" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="20" y="260" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="解析和验证正则表达式语法" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="20" y="300" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="处理转义字符和特殊符号" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="20" y="340" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="基于Thompson构造法" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="220" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="支持多种正则表达式元素" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="260" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="构建优化的邻接表" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="300" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="使用子集构造法" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="220" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="计算ε-闭包" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="260" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="计算move操作" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="300" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="使用Hopcroft算法" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="60" y="380" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="处理可选符号语义限制" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="60" y="420" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="支持两种生成方法" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="380" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="生成token映射" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="420" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="生成完整词法分析器代码" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="460" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="编译生成的词法分析器" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="380" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="执行词法分析并输出结果" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="420" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="解析和展示词法分析结果" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="460" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="3" target="15" edge="1"/>
+                <mxCell id="34" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="3" target="16" edge="1"/>
+                <mxCell id="35" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="3" target="17" edge="1"/>
+                <mxCell id="36" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="3" target="18" edge="1"/>
+                <mxCell id="37" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="4" target="19" edge="1"/>
+                <mxCell id="38" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="4" target="20" edge="1"/>
+                <mxCell id="39" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="4" target="21" edge="1"/>
+                <mxCell id="40" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="5" target="22" edge="1"/>
+                <mxCell id="41" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="5" target="23" edge="1"/>
+                <mxCell id="42" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="5" target="24" edge="1"/>
+                <mxCell id="43" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="6" target="25" edge="1"/>
+                <mxCell id="44" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="6" target="26" edge="1"/>
+                <mxCell id="45" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="7" target="27" edge="1"/>
+                <mxCell id="46" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="7" target="28" edge="1"/>
+                <mxCell id="47" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="7" target="29" edge="1"/>
+                <mxCell id="48" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="8" target="30" edge="1"/>
+                <mxCell id="49" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="8" target="31" edge="1"/>
+                <mxCell id="50" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="8" target="32" edge="1"/>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="任务2详细功能结构" id="diagram3">
+        <mxGraphModel dx="256" dy="610" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="任务2：语法分析器设计与实现" style="shape=rectangle;strokeColor=#000000;fillColor=#9C27B0;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=16;fontWeight=bold;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="250" y="50" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="BNF文法处理" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="100" y="150" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="First/Follow集合计算" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="320" y="150" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="LR(0)DFA生成" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="540" y="150" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="SLR(1)文法判断" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="100" y="250" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="LR(1)DFA生成" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="320" y="250" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="LR(1)分析表生成" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="540" y="250" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="语法分析" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="210" y="350" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="语法树生成" style="shape=rectangle;strokeColor=#000000;fillColor=#E91E63;fontColor=#ffffff;strokeWidth=2;rounded=1;shadow=1;fontSize=14;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="430" y="350" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="3" edge="1"/>
+                <mxCell id="12" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="4" edge="1"/>
+                <mxCell id="13" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="5" edge="1"/>
+                <mxCell id="14" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="6" edge="1"/>
+                <mxCell id="15" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="7" edge="1"/>
+                <mxCell id="16" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="8" edge="1"/>
+                <mxCell id="17" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="9" edge="1"/>
+                <mxCell id="18" value="" style="endArrow=classic;strokeWidth=2;strokeColor=#000000" parent="1" source="2" target="10" edge="1"/>
+                <mxCell id="19" value="解析BNF文法" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="20" y="220" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="处理产生式结构" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="20" y="260" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="支持文法的基本操作" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="20" y="300" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="计算文法的First集合" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="220" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="计算文法的Follow集合" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="260" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="可视化显示计算结果" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="300" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="生成LR(0)状态转换图" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="220" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="构建LR(0)项目集规范族" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="260" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="可视化显示LR(0)DFA" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="300" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="判断是否为SLR(1)文法" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="60" y="420" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="显示判断结果和原因" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="60" y="460" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="生成LR(1)状态转换图" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="420" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="构建LR(1)项目集规范族" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="460" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="可视化显示LR(1)DFA" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="280" y="500" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="生成LR(1)动作表" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="420" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="生成LR(1)状态转移表" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="460" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="保存LR(1)分析表" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="500" y="500" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="打开Token文件" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="180" y="520" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="执行LR(1)语法分析" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="180" y="560" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="显示分析过程和结果" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="180" y="600" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="生成语法分析树" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="400" y="520" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="构建抽象语法树(AST)" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="400" y="560" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="可视化显示语法树" style="shape=rectangle;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=1;rounded=1;shadow=0;fontSize=12;align=center;verticalAlign=middle;resizable=0" parent="1" vertex="1">
+                    <mxGeometry x="400" y="600" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="3" target="19" edge="1"/>
+                <mxCell id="43" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="3" target="20" edge="1"/>
+                <mxCell id="44" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="3" target="21" edge="1"/>
+                <mxCell id="45" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="4" target="22" edge="1"/>
+                <mxCell id="46" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="4" target="23" edge="1"/>
+                <mxCell id="47" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="4" target="24" edge="1"/>
+                <mxCell id="48" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="5" target="25" edge="1"/>
+                <mxCell id="49" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="5" target="26" edge="1"/>
+                <mxCell id="50" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="5" target="27" edge="1"/>
+                <mxCell id="51" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="6" target="28" edge="1"/>
+                <mxCell id="52" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="6" target="29" edge="1"/>
+                <mxCell id="53" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="7" target="30" edge="1"/>
+                <mxCell id="54" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="7" target="31" edge="1"/>
+                <mxCell id="55" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="7" target="32" edge="1"/>
+                <mxCell id="56" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="8" target="33" edge="1"/>
+                <mxCell id="57" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="8" target="34" edge="1"/>
+                <mxCell id="58" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="8" target="35" edge="1"/>
+                <mxCell id="59" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="9" target="36" edge="1"/>
+                <mxCell id="60" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="9" target="37" edge="1"/>
+                <mxCell id="61" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="9" target="38" edge="1"/>
+                <mxCell id="62" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="10" target="39" edge="1"/>
+                <mxCell id="63" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="10" target="40" edge="1"/>
+                <mxCell id="64" value="" style="endArrow=classic;strokeWidth=1;strokeColor=#000000" parent="1" source="10" target="41" edge="1"/>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

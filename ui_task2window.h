@@ -553,7 +553,7 @@ public:
 
         retranslateUi(Task2Window);
 
-        tabWidget->setCurrentIndex(6);
+        tabWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(Task2Window);

@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tabRegex">
        <attribute name="title">
@@ -119,8 +119,7 @@
           <property name="title">
            <string>NFA图表</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
-          </layout>
+          <layout class="QVBoxLayout" name="verticalLayout_8"/>
          </widget>
         </item>
        </layout>
@@ -176,8 +175,7 @@
           <property name="title">
            <string>DFA图表</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_16">
-          </layout>
+          <layout class="QVBoxLayout" name="verticalLayout_16"/>
          </widget>
         </item>
        </layout>
@@ -233,8 +231,7 @@
           <property name="title">
            <string>最小化DFA图表</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_22">
-          </layout>
+          <layout class="QVBoxLayout" name="verticalLayout_22"/>
          </widget>
         </item>
        </layout>

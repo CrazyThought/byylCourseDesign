@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-12-12T09:00:00.000Z" agent="Mozilla/5.0" etag="def456" version="21.6.8" type="device">
+  <diagram name="LR(0)分析算法流程图">
+    <mxGraphModel xmlns="http://www.mxgraph.com/mxgraph/model" dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- 开始节点 -->
+        <mxCell id="start" value="开始" style="shape=roundedRectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;rounded=1;arcSize=20" vertex="1" parent="1">
+          <mxGeometry x="350" y="50" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- 初始化节点 -->
+        <mxCell id="init" value="初始化\n- 扩展文法：添加S'→S产生式\n- 构建LR(0)项目集规范族\n- 构建LR(0)分析表\n- 初始化分析栈：压入状态0\n- 初始化输入指针：指向第一个符号\n- 添加输入结束符$" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="250" y="120" width="300" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="start" target="init">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 获取当前状态和输入符号 -->
+        <mxCell id="get_current" value="获取当前状态和输入符号\n- 当前状态s = 栈顶状态\n- 当前输入符号a = 当前输入指针指向的符号" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="280" y="250" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="init" target="get_current">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 查找动作表项 -->
+        <mxCell id="lookup_action" value="查找LR(0)分析表项\n查询动作表[s,a]" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="280" y="340" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="get_current" target="lookup_action">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 检查动作类型 -->
+        <mxCell id="check_action" value="检查动作类型" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="410" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="lookup_action" target="check_action">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 接受动作 -->
+        <mxCell id="accept" value="接受动作\n分析成功，结束" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="100" y="410" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" value="接受" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="check_action" target="accept">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 移进动作 -->
+        <mxCell id="shift" value="移进动作\n- 将输入符号a压入栈中\n- 将移进后的状态j压入栈中\n- 输入指针向前移动一位" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="550" y="410" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge6" value="移进" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="check_action" target="shift">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 归约动作 -->
+        <mxCell id="reduce" value="归约动作\n- 归约产生式A→α\n- 计算α的长度n = |α|\n- 弹出栈顶2*n个元素（n个状态 + n个符号）" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="500" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge7" value="归约" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="check_action" target="reduce">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 错误处理 -->
+        <mxCell id="error" value="错误处理\n- 报告语法错误\n- 输出错误位置和信息\n- 分析失败，结束" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="550" y="500" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge8" value="错误" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="check_action" target="error">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 获取新栈顶状态 -->
+        <mxCell id="get_new_top" value="获取新的栈顶状态s'" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="590" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="edge9" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="reduce" target="get_new_top">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 查找Goto表项 -->
+        <mxCell id="lookup_goto" value="查找Goto表项\n查询Goto表[s', A]，获取新状态j" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="660" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="edge10" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="get_new_top" target="lookup_goto">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 压入新状态和非终结符 -->
+        <mxCell id="push_new" value="压入新状态和非终结符\n- 将非终结符A压入栈中\n- 将新状态j压入栈中" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000" vertex="1" parent="1">
+          <mxGeometry x="300" y="730" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge11" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="lookup_goto" target="push_new">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- 结束节点 -->
+        <mxCell id="end" value="结束" style="shape=roundedRectangle;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;rounded=1;arcSize=20" vertex="1" parent="1">
+          <mxGeometry x="350" y="850" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- 循环边 -->
+        <mxCell id="edge12" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="shift" target="get_current">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge13" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="push_new" target="get_current">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge14" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="accept" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge15" value="" style="strokeColor=#000000;edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="error" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -470,9 +470,17 @@ ASTNode* RegexEngine::parseCharSet(const QList<Token> &tokens, int &pos, bool is
     QSet<QChar> charSet;
     
     while (pos < tokens.size() && tokens[pos].type != TokenType::RIGHT_BRACKET) {
-        if (pos + 2 < tokens.size() && tokens[pos].type == TokenType::CHARACTER && 
-            tokens[pos+1].type == TokenType::HYPHEN && 
-            tokens[pos+2].type == TokenType::CHARACTER) {
+        // 处理转义字符
+        if (tokens[pos].type == TokenType::ESCAPE) {
+            pos++;
+            if (pos >= tokens.size() || tokens[pos].type != TokenType::CHARACTER) {
+                throw QString("字符集语法错误：转义序列不完整");
+            }
+            charSet.insert(tokens[pos].value);
+            pos++;
+        } else if (pos + 2 < tokens.size() && tokens[pos].type == TokenType::CHARACTER && 
+                   tokens[pos+1].type == TokenType::HYPHEN && 
+                   tokens[pos+2].type == TokenType::CHARACTER) {
             // 处理范围，如 a-z
             QChar start = tokens[pos].value;
             QChar end = tokens[pos+2].value;
@@ -977,18 +985,28 @@ bool RegexEngine::simulateNFA(const NFA &nfa, const QString &input, int startPos
                             nextStates.insert(transition.toState);
                         }
                     } else if (transition.input == '[') {
-                        // 字符集匹配，需要查找字符集信息
-                        // 注意：这只是一个临时解决方案
+                        // 字符集匹配或普通字符匹配
                         static QMap<NFAState, QPair<QSet<QChar>, bool>> charSetInfo;
                         if (charSetInfo.contains(state)) {
+                            // 字符集匹配
                             QSet<QChar> charSet = charSetInfo[state].first;
                             bool isNegated = charSetInfo[state].second;
                             if ((charSet.contains(c) && !isNegated) || (!charSet.contains(c) && isNegated)) {
                                 nextStates.insert(transition.toState);
                             }
+                        } else {
+                            // 普通字符匹配
+                            if (c == '[') {
+                                nextStates.insert(transition.toState);
+                            }
+                        }
+                    } else if (transition.input == ']') {
+                        // 普通字符匹配，因为字符集的右括号不应该出现在这里
+                        if (c == ']') {
+                            nextStates.insert(transition.toState);
                         }
                     } else if (transition.input == c) {
-                        // 直接匹配字符
+                        // 直接匹配其他普通字符
                         nextStates.insert(transition.toState);
                     }
                 }

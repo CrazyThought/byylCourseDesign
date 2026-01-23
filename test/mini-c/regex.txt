@@ -1,0 +1,7 @@
+letter=[A-Za-z]
+digit=[0-9]
+_identifier200= (_|letter)(_|letter|digit)*
+_number201=(digit+)(.digit+)?
+_comment202=//((digit|letter|_|\+|-|\*|\^|%|.|<|<=|>|>=|==|!=|=|;|,|\+\+|--|\(|\)|{|}|\[|\])*)
+_special203S=\+|-|\*|/|\^|%|.|<|<=|>|>=|==|!=|=|;|,|\+\+|--|\(|\)|{|}|\[|\]|_
+_Keyword300S=else|if|int|float|real|return|void|while|for
