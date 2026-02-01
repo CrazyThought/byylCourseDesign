@@ -131,26 +131,6 @@ private:
      */
     QString generateAcceptStatesMap(const QList<RegexItem> &regexItems, const DFA &minimizedDFA);
     
-    /**
-     * @brief 生成单词编码映射
-     * 
-     * 生成token类型到编码的映射代码
-     * 
-     * @param regexItems 正则表达式项列表
-     * @return QString 生成的单词编码映射代码
-     */
-    QString generateTokenCodeMap(const QList<RegexItem> &regexItems);
-    
-    /**
-     * @brief 获取字符对应的输入符号
-     * 
-     * 将输入字符转换为DFA输入符号
-     * 
-     * @param input 输入字符
-     * @return QString 对应的输入符号
-     */
-    QString getInputSymbol(const QString &input);
-    
     QString m_errorMessage;  ///< 错误信息
     QList<RegexItem> m_regexItems;  ///< 正则表达式列表
 };
