@@ -1,0 +1,5 @@
+if then else end read write repeat until
+{This is a comment}
+123 456.78
+identifier1 Identifier2
++ - * / = < <= > >= != :=

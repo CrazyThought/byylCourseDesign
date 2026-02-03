@@ -7,7 +7,7 @@
  * @date 2025/12/07
  * @copyright Copyright (c) 2025 郭梓烽
  */
-#include "task1/lexergenerator.h"
+#include "../../include/task1/lexergenerator.h"
 #include <QDebug>
 #include <QMap>
 #include <QFile>
@@ -340,6 +340,107 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += generateAcceptStatesMap(regexItems, minimizedDFA);
     code += "\n";
 
+    // 生成token映射表
+    code += "// Token映射表\n";
+    code += "#include <unordered_map>\n\n";
+    code += "unordered_map<string, int> tokenCodeMap;\n\n";
+    code += "void initializeTokenCodeMap() {\n";
+    
+    // 为每个正则表达式项生成映射
+    for (const RegexItem &item : regexItems) {
+        if (item.isMultiWord) {
+            // 多单词情况（关键字、符号等）
+            int currentCode = item.code;
+            
+            // 使用QMap来确保同一单词的不同大小写形式映射到同一个编码
+            QMap<QString, int> lowercaseToCodeMap;
+            
+            for (const QString &word : item.wordList) {
+                QString lowercaseWord = word.toLower();
+                if (!lowercaseToCodeMap.contains(lowercaseWord)) {
+                    lowercaseToCodeMap[lowercaseWord] = currentCode++;
+                }
+            }
+            
+            // 生成映射条目
+            for (auto it = lowercaseToCodeMap.constBegin(); it != lowercaseToCodeMap.constEnd(); ++it) {
+                // 正确处理转义字符
+                QString tokenValue = it.key();
+                // 处理转义序列，如\*应转换为*
+                if (tokenValue.length() == 2 && tokenValue.startsWith("\\")) {
+                    tokenValue = tokenValue.right(1);
+                }
+                // 只需要转义双引号和反斜杠，不需要转义其他特殊字符
+                tokenValue.replace("\"", "\\\"");
+                tokenValue.replace("\\", "\\\\");
+                code += QString("    tokenCodeMap[\"%1\"] = %2;\n").arg(tokenValue).arg(it.value());
+            }
+        }
+    }
+    
+    // 额外添加特殊字符映射，确保*和+等特殊字符能被正确识别
+    // 这些特殊字符可能被配置为单单词项，所以需要额外处理
+    for (const RegexItem &item : regexItems) {
+        if (!item.isMultiWord) {
+            // 处理单字符情况（操作符等）
+            if (item.pattern.length() == 1) {
+                QString tokenValue = item.pattern;
+                // 只需要转义双引号和反斜杠，不需要转义其他特殊字符
+                tokenValue.replace("\"", "\\\"");
+                tokenValue.replace("\\", "\\\\");
+                code += QString("    tokenCodeMap[\"%1\"] = %2;\n").arg(tokenValue).arg(item.code);
+            }
+            // 处理可能包含转义字符的情况
+            else if (item.pattern.length() == 2 && item.pattern.startsWith("\\")) {
+                // 处理转义字符，如\*
+                QString tokenValue = item.pattern.right(1);
+                // 只需要转义双引号和反斜杠，不需要转义其他特殊字符
+                tokenValue.replace("\"", "\\\"");
+                tokenValue.replace("\\", "\\\\");
+                code += QString("    tokenCodeMap[\"%1\"] = %2;\n").arg(tokenValue).arg(item.code);
+            }
+        }
+    }
+    
+
+    
+    code += "}\n\n";
+    
+    // 生成关键字检查函数
+    code += "// 关键字列表\n";
+    code += "bool isKeyword(const string &lexeme) {\n";
+    code += "    static const string keywords[] = {";
+    
+    // 收集关键字
+    QStringList keywords;
+    for (const RegexItem &item : regexItems) {
+        if (item.isMultiWord && item.name.contains("keyword", Qt::CaseInsensitive)) {
+            for (const QString &word : item.wordList) {
+                QString escapedWord = word;
+                escapedWord.replace("\"", "\\\"");
+                escapedWord.replace("\\", "\\\\");
+                keywords << "\"" + escapedWord + "\"";
+            }
+        }
+    }
+    
+    // 添加默认关键字
+    if (keywords.isEmpty()) {
+        keywords << "\"if\"" << "\"then\"" << "\"else\"" << "\"end\"" << "\"read\"" << "\"write\"" << "\"repeat\"" << "\"until\"";
+    }
+    
+    code += keywords.join(", ");
+    code += "};\n";
+    code += "    static const int keywordCount = sizeof(keywords) / sizeof(keywords[0]);\n";
+    code += "    \n";
+    code += "    for (int i = 0; i < keywordCount; i++) {\n";
+    code += "        if (lexeme == keywords[i]) {\n";
+    code += "            return true;\n";
+    code += "        }\n";
+    code += "    }\n";
+    code += "    return false;\n";
+    code += "}\n\n";
+
     // 生成词法分析函数
     code += "void analyzeToken() {\n";
     code += "\tint state = " + QString::number(minimizedDFA.startState) + ";\n";
@@ -372,7 +473,33 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "\t\t\n";
     code += "\t\t// 输出格式：单词\t编码\n";
     code += "\t\tint tokenCode = acceptTokens[lastAcceptState];\n";
-
+    code += "\n";
+    code += "\t\t// 检查是否在token映射表中（多单词编码）\n";
+    code += "\t\t// 首先尝试精确匹配\n";
+    code += "\t\tauto it = tokenCodeMap.find(buf);\n";
+    code += "\t\tif (it != tokenCodeMap.end()) {\n";
+    code += "\t\t\ttokenCode = it->second;\n";
+    code += "\t\t}\n";
+    code += "\t\t// 尝试转义后的形式（处理*+^等特殊字符）\n";
+    code += "\t\telse {\n";
+    code += "\t\t\tstring escapedBuf = \"\\\\\" + buf + \"\\\\\";\n";
+    code += "\t\t\tauto escapedIt = tokenCodeMap.find(escapedBuf);\n";
+    code += "\t\t\tif (escapedIt != tokenCodeMap.end()) {\n";
+    code += "\t\t\t\ttokenCode = escapedIt->second;\n";
+    code += "\t\t\t}\n";
+    code += "\t\t\t// 然后尝试大小写不敏感匹配\n";
+    code += "\t\t\telse {\n";
+    code += "\t\t\t\tstring lowercaseBuf;\n";
+    code += "\t\t\t\tfor (char ch : buf) {\n";
+    code += "\t\t\t\t\tlowercaseBuf += tolower(static_cast<unsigned char>(ch));\n";
+    code += "\t\t\t\t}\n";
+    code += "\t\t\t\tauto lowercaseIt = tokenCodeMap.find(lowercaseBuf);\n";
+    code += "\t\t\t\tif (lowercaseIt != tokenCodeMap.end()) {\n";
+    code += "\t\t\t\t\ttokenCode = lowercaseIt->second;\n";
+    code += "\t\t\t\t}\n";
+    code += "\t\t\t}\n";
+    code += "\t\t}\n";
+    code += "\n";
     code += "\t\tcout << buf << '\t' << tokenCode << endl;\n";
     code += "\t}\n";
     code += "\telse {\n";
@@ -396,6 +523,8 @@ QString LexerGenerator::generateStateTransitionLexer(const QList<RegexItem> &reg
     code += "\t\tcerr << \"Error: Could not open file '\" << argv[1] << \"'.\" << endl;\n";
     code += "\t\treturn 1;\n";
     code += "\t}\n\n";
+    code += "\t// 初始化token代码映射表\n";
+    code += "\tinitializeTokenCodeMap();\n\n";
     code += "\t// 跳过初始空白字符\n";
     code += "\tskipBlank();\n\n";
     code += "\t// 主循环\n";
@@ -485,7 +614,74 @@ QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
             transitionsFromState.remove("\0");
         }
 
-        // 移除硬编码的数字和字母范围检查，直接处理所有实际的字符转移
+        // 处理字符类和范围
+        // 检查是否有数字范围的转移
+        bool hasDigitTransition = false;
+        int digitToState = -1;
+        for (const auto &transition : minimizedDFA.transitions) {
+            if (transition.fromState == state && (transition.input == "digit" || transition.input == "[0-9]")) {
+                hasDigitTransition = true;
+                digitToState = transition.toState;
+                break;
+            }
+        }
+        
+        // 检查是否有字母范围的转移
+        bool hasAlphaTransition = false;
+        int alphaToState = -1;
+        for (const auto &transition : minimizedDFA.transitions) {
+            if (transition.fromState == state && (transition.input == "letter" || transition.input == "[A-Za-z]")) {
+                hasAlphaTransition = true;
+                alphaToState = transition.toState;
+                break;
+            }
+        }
+        
+        // 检查是否有字母数字范围的转移
+        bool hasAlnumTransition = false;
+        int alnumToState = -1;
+        for (const auto &transition : minimizedDFA.transitions) {
+            if (transition.fromState == state && (transition.input == "alnum" || transition.input == "[A-Za-z0-9]")) {
+                hasAlnumTransition = true;
+                alnumToState = transition.toState;
+                break;
+            }
+        }
+
+        // 生成数字范围的转移
+        if (hasDigitTransition) {
+            code += "                case '0': case '1': case '2': case '3': case '4':\n";
+            code += "                case '5': case '6': case '7': case '8': case '9':\n";
+            code += QString("                    return %1;\n").arg(digitToState);
+        }
+
+        // 生成字母范围的转移
+        if (hasAlphaTransition) {
+            code += "                case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':\n";
+            code += "                case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':\n";
+            code += "                case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':\n";
+            code += "                case 'v': case 'w': case 'x': case 'y': case 'z':\n";
+            code += "                case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':\n";
+            code += "                case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':\n";
+            code += "                case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':\n";
+            code += "                case 'V': case 'W': case 'X': case 'Y': case 'Z':\n";
+            code += QString("                    return %1;\n").arg(alphaToState);
+        }
+
+        // 生成字母数字范围的转移
+        if (hasAlnumTransition) {
+            code += "                case '0': case '1': case '2': case '3': case '4':\n";
+            code += "                case '5': case '6': case '7': case '8': case '9':\n";
+            code += "                case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':\n";
+            code += "                case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':\n";
+            code += "                case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':\n";
+            code += "                case 'v': case 'w': case 'x': case 'y': case 'z':\n";
+            code += "                case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':\n";
+            code += "                case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':\n";
+            code += "                case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':\n";
+            code += "                case 'V': case 'W': case 'X': case 'Y': case 'Z':\n";
+            code += QString("                    return %1;\n").arg(alnumToState);
+        }
 
         // 处理其他单个字符
         QMap<QString, int>::const_iterator it;
@@ -493,13 +689,20 @@ QString LexerGenerator::generateStateTransitionTable(const DFA &minimizedDFA)
             QString input = it.key();
             int toState = it.value();
             
+            // 跳过已经处理过的字符类
+            if (input == "digit" || input == "[0-9]" || 
+                input == "letter" || input == "[A-Za-z]" || 
+                input == "alnum" || input == "[A-Za-z0-9]") {
+                continue;
+            }
+            
             // 处理转义字符
             if (input == "\\\\") {
                 input = "\\\\\\\\";
             } else if (input == "\\\'") {
                 input = "\\\\'";
-            } else if (input == "\"" || input == "\\" || input == "'" || input == "%" || input == "&") {
-                // 处理其他需要转义的字符
+            } else if (input == "\"" || input == "\\" || input == "'") {
+                // 只转义双引号、反斜杠和单引号，不需要转义其他特殊字符
                 input = "\\" + input;
             }
             
@@ -555,26 +758,106 @@ QString LexerGenerator::generateAcceptStatesMap(const QList<RegexItem> &regexIte
     // 填充接受状态和对应的token代码
     for (const auto &state : minimizedDFA.acceptStates) {
         if (state >= 0 && state < numStates) {
-            // 只处理存在映射的状态
+            // 先尝试从DFA的映射中获取正则表达式索引
+            int regexIndex = -1;
             if (minimizedDFA.acceptStateToRegexIndex.contains(state)) {
-                // 从DFA的映射中获取正则表达式索引
-                int regexIndex = minimizedDFA.acceptStateToRegexIndex[state];
+                regexIndex = minimizedDFA.acceptStateToRegexIndex[state];
+            }
 
-                // 确保索引有效
-                if (regexIndex >= 0 && regexIndex < regexItems.size()) {
-                    // 获取对应的正则表达式项
-                    const RegexItem &item = regexItems[regexIndex];
-                    
-                    // 为接受状态分配token代码
-                    tokens[state] = item.code;
-                    
-                    // 对于多单词项，处理编码递增
-                    if (item.isMultiWord) {
-                        // 这里可以添加更复杂的多单词编码处理逻辑
+            // 确保索引有效
+            if (regexIndex >= 0 && regexIndex < regexItems.size()) {
+                // 获取对应的正则表达式项
+                const RegexItem &item = regexItems[regexIndex];
+                
+                // 为接受状态分配token代码
+                tokens[state] = item.code;
+                
+                // 对于多单词项，处理编码递增
+                if (item.isMultiWord) {
+                    // 多单词项的编码处理
+                }
+            }
+        }
+    }
+    
+    // 确保所有正则表达式项都有对应的接受状态映射
+    // 特别处理那些在regex_items中明确定义的项
+    QMap<int, bool> codeMapped;
+    
+    // 首先，标记已经映射的代码
+    for (const auto &state : minimizedDFA.acceptStates) {
+        if (state >= 0 && state < numStates) {
+            if (tokens[state] != -1) {
+                codeMapped[tokens[state]] = true;
+            }
+        }
+    }
+    
+    // 然后，为没有映射的代码找到接受状态
+    for (const RegexItem &item : regexItems) {
+        if (!codeMapped.contains(item.code)) {
+            // 为这个代码找到第一个可用的接受状态
+            for (const auto &state : minimizedDFA.acceptStates) {
+                if (state >= 0 && state < numStates) {
+                    if (tokens[state] == -1) {
+                        tokens[state] = item.code;
+                        codeMapped[item.code] = true;
+                        break;
                     }
                 }
             }
-            // 对于没有映射的接受态，保持-1
+        }
+    }
+    
+    // 额外确保所有正则表达式项都有对应的映射
+    // 遍历所有正则表达式项，确保每个都有对应的接受状态
+    for (const RegexItem &item : regexItems) {
+        if (!codeMapped.contains(item.code)) {
+            // 找到第一个可用的接受状态
+            for (int i = 0; i < numStates; i++) {
+                if (isAccept[i] && tokens[i] == -1) {
+                    tokens[i] = item.code;
+                    codeMapped[item.code] = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // 确保注释编码正确映射
+    // 遍历所有正则表达式项，找到注释项并确保其编码正确映射
+    for (const RegexItem &item : regexItems) {
+        if (item.name.contains("comment", Qt::CaseInsensitive)) {
+            // 找到一个未分配编码的接受状态并映射注释编码
+            bool foundState = false;
+            for (int i = 0; i < numStates; i++) {
+                if (isAccept[i] && tokens[i] == -1) {
+                    tokens[i] = item.code;
+                    codeMapped[item.code] = true;
+                    foundState = true;
+                    break;
+                }
+            }
+            // 如果没有未分配的接受状态，找到一个不是多单词编码的接受状态
+            if (!foundState) {
+                for (int i = 0; i < numStates; i++) {
+                    if (isAccept[i]) {
+                        // 检查该编码是否属于多单词项
+                        bool isMultiWordCode = false;
+                        for (const RegexItem &multiItem : regexItems) {
+                            if (multiItem.isMultiWord && multiItem.code == tokens[i]) {
+                                isMultiWordCode = true;
+                                break;
+                            }
+                        }
+                        if (!isMultiWordCode) {
+                            tokens[i] = item.code;
+                            codeMapped[item.code] = true;
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 

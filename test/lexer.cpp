@@ -561,8 +561,21 @@ int getNextState(int currentState, char input) {
 }
 
 
-bool isAcceptState[NUM_STATES] = {true, true, true, true, true, false, false, false, false};
-int acceptTokens[NUM_STATES] = {100, 101, 103, 103, 102, -1, -1, -1, -1};
+bool isAcceptState[NUM_STATES] = {true, true, true, true, true, false, true, false, false};
+int acceptTokens[NUM_STATES] = {100, 101, 103, 103, 103, -1, 102, -1, -1};
+
+// 关键字列表
+bool isKeyword(const string &lexeme) {
+    static const string keywords[] = {"if", "then", "else", "end", "read", "write", "repeat", "until"};
+    static const int keywordCount = sizeof(keywords) / sizeof(keywords[0]);
+    
+    for (int i = 0; i < keywordCount; i++) {
+        if (lexeme == keywords[i]) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void analyzeToken() {
 	int state = 5;
@@ -597,7 +610,17 @@ void analyzeToken() {
 		
 		// 输出格式：单词	编码
 		int tokenCode = acceptTokens[lastAcceptState];
-		cout << buf << '	' << tokenCode << endl;
+
+		// 检查是否为注释
+		if (buf.size() >= 2 && buf[0] == '{' && buf[buf.size()-1] == '}') {
+			tokenCode = 102;
+		}
+		// 检查是否为关键字
+		else if (tokenCode == 100 && isKeyword(buf)) {
+			tokenCode = 200;
+		}
+
+		cout << buf << '\t' << tokenCode << endl;
 	}
 	else {
 		// 跳过无法识别的字符

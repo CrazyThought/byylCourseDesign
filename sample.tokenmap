@@ -1,0 +1,29 @@
+// Token映射文件，生成自词法分析器生成器
+// 格式：编码=token名称 或 编码=token名称|single
+// |single 表示该token是单编码类型，需要词素
+
+100=_identifier100|single
+101=_number101|single
+102=_comment102|single
+103=%
+104=-
+105=/
+106=:=
+107=;
+108=<
+109=<=
+110=<>
+111==
+112=>
+113=>=
+114=\\*
+115=\\+
+116=\\^
+200=else
+201=end
+202=if
+203=read
+204=repeat
+205=then
+206=until
+207=write
