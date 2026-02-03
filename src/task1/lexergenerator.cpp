@@ -926,15 +926,51 @@ QString LexerGenerator::generateTokenMap(const QList<RegexItem> &regexItems)
             for (auto it = lowercaseToCodeMap.constBegin(); it != lowercaseToCodeMap.constEnd(); ++it) {
                 // 正确处理转义字符
                 QString tokenValue = it.key();
-                // 转义需要特殊处理的字符
-                tokenValue.replace("\\", "\\\\");
-                tokenValue.replace("\"", "\\\"");
-                tokenValue.replace("'", "\\'");
-                mapContent += QString("%1=%2\n").arg(it.value()).arg(tokenValue);
+                
+                // 移除多余的转义字符，特别是对于*+^等特殊字符
+                // 创建一个新字符串，跳过特殊字符前的转义
+                QString processedValue;
+                for (int i = 0; i < tokenValue.length(); ++i) {
+                    if (tokenValue[i] == '\\' && i + 1 < tokenValue.length()) {
+                        QChar nextChar = tokenValue[i+1];
+                        if (nextChar == '*' || nextChar == '+' || nextChar == '^') {
+                            // 移除转义，直接添加特殊字符
+                            processedValue += nextChar;
+                            i++; // 跳过下一个字符
+                        } else {
+                            // 保留其他转义
+                            processedValue += tokenValue[i];
+                        }
+                    } else {
+                        // 普通字符，直接添加
+                        processedValue += tokenValue[i];
+                    }
+                }
+                
+                // 只转义必要的字符：\, ", '
+                processedValue.replace("\\", "\\\\");
+                processedValue.replace("\"", "\\\"");
+                processedValue.replace("'", "\\'");
+                
+                mapContent += QString("%1=%2\n").arg(it.value()).arg(processedValue);
             }
         } else {
             // 单单词情况（标识符、数字等）
-            mapContent += QString("%1=%2|single\n").arg(item.code).arg(item.name);
+            // 提取纯名称部分，去除前面的"_"和末尾的数字
+            QString pureName = item.name;
+            if (pureName.startsWith('_')) {
+                pureName = pureName.mid(1); // 去除前面的"_"
+                // 找到末尾数字的开始位置
+                int digitStart = pureName.length() - 1;
+                while (digitStart >= 0 && pureName[digitStart].isDigit()) {
+                    digitStart--;
+                }
+                // 提取纯名称部分
+                if (digitStart >= 0) {
+                    pureName = pureName.left(digitStart + 1);
+                }
+            }
+            mapContent += QString("%1=%2|single\n").arg(item.code).arg(pureName);
         }
     }
 

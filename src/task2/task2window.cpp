@@ -187,7 +187,19 @@ void Task2Window::on_pushButtonClearBNF_clicked()
 
 void Task2Window::on_pushButtonLoadExample_clicked()
 {
-    loadExampleGrammar();
+    QString fileName = QFileDialog::getOpenFileName(this, tr("打开BNF文法文件"), ".", tr("文本文件 (*.txt);;所有文件 (*.*)"));
+    if (!fileName.isEmpty()) {
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream in(&file);
+            QString content = in.readAll();
+            ui->textEditBNF->setPlainText(content);
+            QMessageBox::information(this, tr("成功"), tr("BNF文法文件加载成功"));
+            file.close();
+        } else {
+            QMessageBox::warning(this, tr("错误"), tr("BNF文法文件加载失败"));
+        }
+    }
 }
 
 void Task2Window::on_pushButtonCalculateFirst_clicked()
